@@ -41,8 +41,14 @@ public class ListingsController {
                 .status(OK)
                 .body(listingsService.updateListing(listingsDto));
     }
+
+<<<<<<< HEAD
     @DeleteMapping("/{listingId}")
     public ResponseEntity<String> deleteListings(@PathVariable Long listingId) {
+=======
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteListings(@PathVariable("id") Long listingId) {
+>>>>>>> 4f1100c (Listings service v1)
         return ResponseEntity
                 .status(OK)
                 .body(listingsService.deleteListing(listingId));
