@@ -33,6 +33,5 @@ public class ListingsDto {
 
     @Valid
     @Size(min = 1, message = "At least one photo is required.")
-    @Size(max = 10, message = "A listing cannot have more than 10 photos.")
     private List<PhotosDto> photos;
 }
