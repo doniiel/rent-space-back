@@ -1,9 +1,14 @@
 package com.rentspace.listingservice.repository;
 
 import com.rentspace.listingservice.entity.Listings;
+import com.rentspace.listingservice.entity.Photos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
-public interface ListingsRepository extends JpaRepository<Listings, Long> {
+public interface PhotosRepository extends JpaRepository<Photos, Long> {
+    Optional<List<Photos>> findByListings_Id(Long id);
 }
