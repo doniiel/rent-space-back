@@ -10,7 +10,7 @@ public class PhotosDto {
 
     @NotNull(message = "Photo ID cannot be null.")
     private Long id;
-
+    
     @NotBlank(message = "URL cannot be empty.")
     private String url;
 }
