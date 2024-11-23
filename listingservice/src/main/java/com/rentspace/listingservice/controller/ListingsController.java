@@ -8,7 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/api/v1/listings")
@@ -18,28 +19,31 @@ public class ListingsController {
 
     private final ListingsService listingsService;
 
-    @GetMapping("/fetch/{id}")
-    public ResponseEntity<ListingsDto> getListings(@PathVariable("id") Long listingId) {
+    @GetMapping("/{listingId}")
+    public ResponseEntity<ListingsDto> getListings(@PathVariable Long listingId) {
         return ResponseEntity
                 .status(OK)
                 .body(listingsService.getListingById(listingId));
     }
-    @PostMapping("/create")
+
+    @PostMapping()
     public ResponseEntity<String> createListings(@Valid @RequestBody ListingsDto listingsDto) {
         return ResponseEntity
                 .status(CREATED)
                 .body(listingsService.createListing(listingsDto));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ListingsDto> updateListings(@Valid @RequestBody ListingsDto listingsDto) {
+    @PutMapping("/{id}")
+    public ResponseEntity<ListingsDto> updateListings(@PathVariable Long id,
+                                                      @Valid @RequestBody ListingsDto listingsDto) {
+        listingsDto.setId(id);
         return ResponseEntity
                 .status(OK)
                 .body(listingsService.updateListing(listingsDto));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteListings(@PathVariable("id") Long listingId) {
+    @DeleteMapping("/{listingId}")
+    public ResponseEntity<String> deleteListings(@PathVariable Long listingId) {
         return ResponseEntity
                 .status(OK)
                 .body(listingsService.deleteListing(listingId));

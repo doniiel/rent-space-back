@@ -1,5 +1,5 @@
 package com.rentspace.userservice.util;
 
 public enum Role {
-	GUEST, Host
+    GUEST, HOST, ADMIN, USER
 }
