@@ -21,7 +21,7 @@ public class ListingsController {
 
     @GetMapping("/{listingId}")
     public ResponseEntity<ListingsDto> getListings(@PathVariable Long listingId) {
-            return ResponseEntity
+        return ResponseEntity
                 .status(OK)
                 .body(listingsService.getListingById(listingId));
     }
