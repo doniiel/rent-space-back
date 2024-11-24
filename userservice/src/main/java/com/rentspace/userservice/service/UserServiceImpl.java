@@ -1,48 +1,92 @@
 package com.rentspace.userservice.service;
 
-import java.util.Optional;
-import java.util.UUID;
-
-import com.rentspace.userservice.exception.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.rentspace.userservice.dto.UserDto;
 import com.rentspace.userservice.entity.User;
+import com.rentspace.userservice.exception.UserAlreadyExistsException;
+import com.rentspace.userservice.exception.UserNotFoundException;
+import com.rentspace.userservice.mapper.UserMapper;
 import com.rentspace.userservice.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import static java.lang.String.format;
+
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-	private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-	@Autowired
-	public UserServiceImpl(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
+    @Override
+    @Transactional
+    public String createUser(UserDto userDto) {
+        log.info("Creating new user: {}", userDto);
 
-	public User createUser(User user) {
-		return userRepository.save(user);
-	}
+        if (userRepository.existsById(userDto.getId())) {
+            throw new UserAlreadyExistsException("User", "userId", userDto.getId());
+        }
+        User savedUser = userRepository.save(userMapper.toEntity(userDto));
 
-	public Optional<User> getUserByEmail(String email) {
-		return userRepository.findByEmail(email);
-	}
+        log.info("User created successfully with ID: {}", savedUser.getId());
+        return format("User created successfully with ID: %s", savedUser.getId());
+    }
 
-	public Optional<User> getUserById(UUID id) {
-		return userRepository.findById(id);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto getUserByEmail(String email) {
+        log.info("Fetching user with email: {}", email);
 
-	public User updateUser(UUID id, User userDetails) {
-		User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-		user.setName(userDetails.getName());
-		user.setEmail(userDetails.getEmail());
-		user.setPassword(userDetails.getPassword());
-		user.setRole(userDetails.getRole());
-		user.setCreatedAt(userDetails.getCreatedAt());
-		return user;
-	}
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User", "email", email)
+        );
+        UserDto userDto = userMapper.toDto(user);
+        log.info("User fetched successfully with Email: {}", userDto.getEmail());
+        return userDto;
+    }
 
-	public void deleteUser(UUID id) {
-		userRepository.deleteById(id);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto getUserById(Long userId) {
+        log.info("Fetching user with ID: {}", userId);
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("User", "userId", userId)
+        );
+        UserDto userDto = userMapper.toDto(user);
+        log.info("User fetched successfully with ID: {}", userDto.getId());
+        return userDto;
+    }
+
+    @Override
+    @Transactional
+    public UserDto updateUser(UserDto userDto) {
+        log.info("Updating user with ID: {}", userDto.getId());
+
+        if (!userRepository.existsById(userDto.getId())) {
+            throw new UserNotFoundException("User", "userId", userDto.getId());
+        }
+
+        User savedUser = userRepository.save(userMapper.toEntity(userDto));
+
+        log.info("User updated successfully with ID: {}", savedUser.getId());
+        return userMapper.toDto(savedUser);
+    }
+
+    @Override
+    @Transactional
+    public String deleteUser(Long userId) {
+        log.info("Deleting user with ID: {}", userId);
+
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User", "userId", userId);
+        }
+        userRepository.deleteById(userId);
+
+        log.info("User deleted successfully with ID: {}", userId);
+        return format("User deleted successfully with ID: %s", userId);
+    }
 }
