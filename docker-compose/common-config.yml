@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  base-service:
+    networks:
+      - rentspace
+
+  db-service:
+    extends:
+      service: base-service
+    image: postgres:15
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      timeout: 10s
+      retries: 10
+      interval: 10s
+      start_period: 10s
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: defaultdb
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+
+  app-service:
+    extends:
+      service: base-service
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+
+networks:
+  rentspace:
+    driver: bridge
