@@ -14,6 +14,7 @@ public class ListingsMapper implements BaseMapper<Listings, ListingsDto>{
         return Optional.ofNullable(entity)
                 .map(e -> {
                     ListingsDto dto = new ListingsDto();
+                    dto.setId(e.getId());
                     dto.setTitle(e.getTitle());
                     dto.setDescription(e.getDescription());
                     dto.setPricePerNight(e.getPricePerNight());
@@ -29,6 +30,7 @@ public class ListingsMapper implements BaseMapper<Listings, ListingsDto>{
         return Optional.ofNullable(dto)
                 .map(d -> {
                     Listings entity = new Listings();
+                    entity.setId(d.getId());
                     entity.setTitle(d.getTitle());
                     entity.setDescription(d.getDescription());
                     entity.setPricePerNight(d.getPricePerNight());

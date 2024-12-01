@@ -18,75 +18,94 @@ import static java.lang.String.format;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-	private final UserRepository userRepository;
-	private final UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-	@Override
-	@Transactional
-	public String createUser(UserDto userDto) {
-		log.info("Creating new user: {}", userDto);
+    @Override
+    @Transactional
+    public String createUser(UserDto userDto) {
+        log.info("Creating new user: {}", userDto);
 
-		if (userRepository.existsById(userDto.getId())) {
-			throw new UserAlreadyExistsException("User", "userId", userDto.getId());
-		}
-		User savedUser = userRepository.save(userMapper.toEntity(userDto));
+        if (userRepository.existsByEmail(userDto.getEmail()) || userRepository.existsByMobileNumber(userDto.getMobileNumber())) {
+            throw new UserAlreadyExistsException("User", "email/phone", userDto.getEmail());
+        }
+        User savedUser = userRepository.save(userMapper.toEntity(userDto));
 
-		log.info("User created successfully with ID: {}", savedUser.getId());
-		return format("User created successfully with ID: %s", savedUser.getId());
-	}
+        log.info("User created successfully with ID: {}", savedUser.getId());
+        return format("User created successfully with ID: %s", savedUser.getId());
+    }
 
-	@Override
-	@Transactional(readOnly = true)
-	public UserDto getUserByEmail(String email) {
-		log.info("Fetching user with email: {}", email);
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto getUserByEmail(String email) {
+        log.info("Fetching user with email: {}", email);
 
-		User user = userRepository.findByEmail(email).orElseThrow(
-				() -> new UserNotFoundException("User", "email", email)
-		);
-		UserDto userDto = userMapper.toDto(user);
-		log.info("User fetched successfully with Email: {}", userDto.getEmail());
-		return userDto;
-	}
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User", "email", email)
+        );
+        UserDto userDto = userMapper.toDto(user);
+        log.info("User fetched successfully with Email: {}", userDto.getEmail());
+        return userDto;
+    }
 
-	@Override
-	@Transactional(readOnly = true)
-	public UserDto getUserById(Long userId) {
-		log.info("Fetching user with ID: {}", userId);
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto getUserById(Long userId) {
+        log.info("Fetching user with ID: {}", userId);
 
-		User user = userRepository.findById(userId).orElseThrow(
-				() -> new UserNotFoundException("User", "userId", userId)
-		);
-		UserDto userDto = userMapper.toDto(user);
-		log.info("User fetched successfully with ID: {}", userDto.getId());
-		return userDto;
-	}
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("User", "userId", userId)
+        );
+        UserDto userDto = userMapper.toDto(user);
+        log.info("User fetched successfully with ID: {}", userDto.getId());
+        return userDto;
+    }
 
-	@Override
-	@Transactional
-	public UserDto updateUser(UserDto userDto) {
-		log.info("Updating user with ID: {}", userDto.getId());
+    @Override
+    @Transactional
+    public UserDto updateUser(UserDto userDto) {
+        log.info("Updating user with ID: {}", userDto.getId());
 
-		if (!userRepository.existsById(userDto.getId())) {
-			throw new UserNotFoundException("User", "userId", userDto.getId());
-		}
+//        if (!userRepository.existsById(userDto.getId())) {
+//            throw new UserNotFoundException("User", "userId", userDto.getId());
+//        }
+        User user = userRepository.findById(userDto.getId()).orElseThrow(
+                () -> new UserNotFoundException("User", "userId", userDto.getId())
+        );
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        user.setPassword(userDto.getPassword());
+        user.setRole(userDto.getRole());
+        user.setMobileNumber(userDto.getMobileNumber());
 
-		User savedUser = userRepository.save(userMapper.toEntity(userDto));
+        User savedUser = userRepository.save(user);
 
-		log.info("User updated successfully with ID: {}", savedUser.getId());
-		return userMapper.toDto(savedUser);
-	}
+        log.info("User updated successfully with ID: {}", savedUser.getId());
+        return userMapper.toDto(savedUser);
+    }
 
-	@Override
-	@Transactional
-	public String deleteUser(Long userId) {
-		log.info("Deleting user with ID: {}", userId);
+    @Override
+    @Transactional
+    public String deleteUser(Long userId) {
+        log.info("Deleting user with ID: {}", userId);
 
-		if (!userRepository.existsById(userId)) {
-			throw new UserNotFoundException("User", "userId", userId);
-		}
-		userRepository.deleteById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User", "userId", userId);
+        }
+        userRepository.deleteById(userId);
 
-		log.info("User deleted successfully with ID: {}", userId);
-		return format("User deleted successfully with ID: %s", userId);
-	}
+        log.info("User deleted successfully with ID: {}", userId);
+        return format("User deleted successfully with ID: %s", userId);
+    }
+
+    private User updateUser(User user, UserDto userDto) {
+        return (User u, User d) -> {
+            u.(d.getName());
+            u.setEmail(d.getEmail());
+            u.setPassword(d.getPassword());
+            u.setRole(d.getRole());
+            u.setMobileNumber(d.getMobileNumber());
+            return u;
+        };
+    }
 }
