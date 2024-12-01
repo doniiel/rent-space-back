@@ -30,6 +30,9 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "mobile_number")
+    private String mobileNumber;
+
     @Enumerated(STRING)
     private Role role;
 }

@@ -26,8 +26,8 @@ public class UserServiceImpl implements UserService {
     public String createUser(UserDto userDto) {
         log.info("Creating new user: {}", userDto);
 
-        if (userRepository.existsById(userDto.getId())) {
-            throw new UserAlreadyExistsException("User", "userId", userDto.getId());
+        if (userRepository.existsByEmail(userDto.getEmail()) || userRepository.existsByMobileNumber(userDto.getMobileNumber())) {
+            throw new UserAlreadyExistsException("User", "email/phone", userDto.getEmail());
         }
         User savedUser = userRepository.save(userMapper.toEntity(userDto));
 
@@ -66,11 +66,16 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(UserDto userDto) {
         log.info("Updating user with ID: {}", userDto.getId());
 
-        if (!userRepository.existsById(userDto.getId())) {
-            throw new UserNotFoundException("User", "userId", userDto.getId());
-        }
+        User user = userRepository.findById(userDto.getId()).orElseThrow(
+                () -> new UserNotFoundException("User", "userId", userDto.getId())
+        );
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        user.setPassword(userDto.getPassword());
+        user.setRole(userDto.getRole());
+        user.setMobileNumber(userDto.getMobileNumber());
 
-        User savedUser = userRepository.save(userMapper.toEntity(userDto));
+        User savedUser = userRepository.save(updateDBUser(user, userDto));
 
         log.info("User updated successfully with ID: {}", savedUser.getId());
         return userMapper.toDto(savedUser);
@@ -88,5 +93,14 @@ public class UserServiceImpl implements UserService {
 
         log.info("User deleted successfully with ID: {}", userId);
         return format("User deleted successfully with ID: %s", userId);
+    }
+
+    private User updateDBUser(User user, UserDto userDto) {
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        user.setPassword(userDto.getPassword());
+        user.setRole(userDto.getRole());
+        user.setMobileNumber(userDto.getMobileNumber());
+        return user;
     }
 }
