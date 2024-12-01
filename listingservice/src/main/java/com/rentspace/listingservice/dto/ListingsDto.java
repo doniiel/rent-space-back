@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class ListingsDto {
 
-    @NotNull(message = "ID cannot be null.")
+    @NotNull(message = "Listing ID cannot be null.")
     private Long id;
 
     @NotBlank(message = "Title cannot be empty.")

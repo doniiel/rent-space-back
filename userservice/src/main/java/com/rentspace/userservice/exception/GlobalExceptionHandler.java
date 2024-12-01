@@ -16,8 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -45,9 +44,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), NOT_FOUND);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFound(UserNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), NOT_FOUND);
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<String> handleResourceNotFound(UserAlreadyExistsException ex) {
+        return new ResponseEntity<>(ex.getMessage(), CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)

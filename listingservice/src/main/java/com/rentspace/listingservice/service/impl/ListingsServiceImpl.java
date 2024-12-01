@@ -29,6 +29,8 @@ public class ListingsServiceImpl implements ListingsService {
     private final ListingsMapper listingsMapper;
     private final PhotosMapper photosMapper;
 
+    private final PhotosServiceImpl photosService;
+
     @Override
     @Transactional(readOnly = true)
     public ListingsDto getListingById(Long listingId) {
@@ -38,9 +40,10 @@ public class ListingsServiceImpl implements ListingsService {
                 () -> new ResourseNotFoundException("Listings", "listingId", listingId)
         );
 
-        List<Photos> photos = photosRepository.findByListings_Id(listings.getId()).orElseThrow(
-                () -> new ResourseNotFoundException("Photos", "listingId", listingId)
-        );
+        List<Photos> photos = photosRepository.findByListings_Id(listings.getId());
+        if (photos.isEmpty()) {
+            throw new ResourseNotFoundException("Photos", "listingId", listingId);
+        }
 
         ListingsDto listingsDto = listingsMapper.toDto(listings);
         listingsDto.setPhotos(photosMapper.toListDto(photos));

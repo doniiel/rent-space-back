@@ -18,6 +18,7 @@ public class UserMapper implements BaseMapper<User, UserDto> {
                     user.setEmail(d.getEmail());
                     user.setPassword(d.getPassword());
                     user.setRole(d.getRole());
+                    user.setMobileNumber(d.getMobileNumber());
                     return user;
                 }).orElse(null);
     }
@@ -27,10 +28,12 @@ public class UserMapper implements BaseMapper<User, UserDto> {
         return Optional.ofNullable(user)
                 .map(u -> {
                     UserDto userDto = new UserDto();
+                    userDto.setId(u.getId());
                     userDto.setName(u.getName());
                     userDto.setEmail(u.getEmail());
                     userDto.setPassword(u.getPassword());
                     userDto.setRole(u.getRole());
+                    userDto.setMobileNumber(u.getMobileNumber());
                     return userDto;
                 }).orElse(null);
     }

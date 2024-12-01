@@ -1,0 +1,5 @@
+package com.rentspace.bookingservice.entity;
+
+public class BaseEntity {
+
+}
