@@ -7,8 +7,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ResponseStatus(NOT_FOUND)
 public class UserNotFoundException extends RuntimeException {
-    public UserNotFoundException(String resourceName, String fieldName, Object fieldValue) {
-
-        super(format("%s not found with %s : '%s'", resourceName, fieldName, fieldValue));
+    public UserNotFoundException(String entity, String field, Object value) {
+        super(String.format("%s with %s '%s' not found.", entity, field, value));
     }
 }

@@ -1,15 +1,16 @@
 package com.rentspace.userservice.service;
 
-import com.rentspace.userservice.dto.UserDto;
+import com.rentspace.userservice.dto.UserCreateDto;
+import com.rentspace.userservice.dto.UserResponseDto;
 
 public interface UserService {
-    String createUser(UserDto userDto);
+    UserResponseDto createUser(UserCreateDto userCreateDto);
 
-    UserDto getUserByEmail(String email);
+    UserResponseDto getUserByEmail(String email);
 
-    UserDto getUserById(Long userId);
+    UserResponseDto getUserById(Long userId);
 
-    UserDto updateUser(UserDto userDto);
+    UserResponseDto updateUser(Long userId, UserCreateDto userCreateDto);
 
-    String deleteUser(Long userId);
+    void deleteUser(Long userId);
 }

@@ -1,6 +1,7 @@
 package com.rentspace.userservice.service;
 
-import com.rentspace.userservice.dto.UserDto;
+import com.rentspace.userservice.dto.UserCreateDto;
+import com.rentspace.userservice.dto.UserResponseDto;
 import com.rentspace.userservice.entity.User;
 import com.rentspace.userservice.exception.UserAlreadyExistsException;
 import com.rentspace.userservice.exception.UserNotFoundException;
@@ -23,67 +24,76 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String createUser(UserDto userDto) {
+    public UserResponseDto createUser(UserCreateDto userDto) {
         log.info("Creating new user: {}", userDto);
 
         if (userRepository.existsByEmail(userDto.getEmail()) || userRepository.existsByMobileNumber(userDto.getMobileNumber())) {
             throw new UserAlreadyExistsException("User", "email/phone", userDto.getEmail());
         }
-        User savedUser = userRepository.save(userMapper.toEntity(userDto));
+        User user = userMapper.toEntity(userDto);
+        User savedUser = userRepository.save(user);
 
         log.info("User created successfully with ID: {}", savedUser.getId());
-        return format("User created successfully with ID: %s", savedUser.getId());
+        return userMapper.toResponseDto(savedUser);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto getUserByEmail(String email) {
+    public UserResponseDto getUserByEmail(String email) {
         log.info("Fetching user with email: {}", email);
 
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UserNotFoundException("User", "email", email)
         );
-        UserDto userDto = userMapper.toDto(user);
-        log.info("User fetched successfully with Email: {}", userDto.getEmail());
-        return userDto;
+        UserResponseDto userResponseDto = userMapper.toResponseDto(user);
+        log.info("User fetched successfully with Email: {}", userResponseDto.getEmail());
+        return userResponseDto;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto getUserById(Long userId) {
+    public UserResponseDto getUserById(Long userId) {
         log.info("Fetching user with ID: {}", userId);
 
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException("User", "userId", userId)
         );
-        UserDto userDto = userMapper.toDto(user);
-        log.info("User fetched successfully with ID: {}", userDto.getId());
-        return userDto;
+        UserResponseDto userResponseDto = userMapper.toResponseDto(user);
+        log.info("User fetched successfully with ID: {}", userResponseDto.getId());
+        return userResponseDto;
     }
 
     @Override
     @Transactional
-    public UserDto updateUser(UserDto userDto) {
-        log.info("Updating user with ID: {}", userDto.getId());
+    public UserResponseDto updateUser(Long userId, UserCreateDto userDto) {
+        log.info("Updating user with ID: {}", userId);
 
-        User user = userRepository.findById(userDto.getId()).orElseThrow(
-                () -> new UserNotFoundException("User", "userId", userDto.getId())
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("User", "userId", userId)
         );
+
+        if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail())) {
+            throw new UserAlreadyExistsException("User", "email", userDto.getEmail());
+        }
+        if (!user.getMobileNumber().equals(userDto.getMobileNumber()) && userRepository.existsByMobileNumber(userDto.getMobileNumber())) {
+            throw new UserAlreadyExistsException("User", "mobileNumber", userDto.getMobileNumber());
+        }
+
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
         user.setRole(userDto.getRole());
         user.setMobileNumber(userDto.getMobileNumber());
 
-        User savedUser = userRepository.save(updateDBUser(user, userDto));
+        User updatedUser = userRepository.save(user);
 
-        log.info("User updated successfully with ID: {}", savedUser.getId());
-        return userMapper.toDto(savedUser);
+        log.info("User updated successfully with ID: {}", updatedUser.getId());
+        return userMapper.toResponseDto(updatedUser);
     }
 
     @Override
     @Transactional
-    public String deleteUser(Long userId) {
+    public void deleteUser(Long userId) {
         log.info("Deleting user with ID: {}", userId);
 
         if (!userRepository.existsById(userId)) {
@@ -92,15 +102,5 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
 
         log.info("User deleted successfully with ID: {}", userId);
-        return format("User deleted successfully with ID: %s", userId);
-    }
-
-    private User updateDBUser(User user, UserDto userDto) {
-        user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
-        user.setRole(userDto.getRole());
-        user.setMobileNumber(userDto.getMobileNumber());
-        return user;
     }
 }
