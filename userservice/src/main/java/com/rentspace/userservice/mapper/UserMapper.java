@@ -1,40 +1,17 @@
 package com.rentspace.userservice.mapper;
 
-import com.rentspace.userservice.dto.UserDto;
+import com.rentspace.userservice.dto.UserCreateDto;
+import com.rentspace.userservice.dto.UserResponseDto;
 import com.rentspace.userservice.entity.User;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-import java.util.Optional;
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-@Component
-public class UserMapper implements BaseMapper<User, UserDto> {
-
-    @Override
-    public User toEntity(UserDto userDto) {
-        return Optional.ofNullable(userDto)
-                .map(d -> {
-                    User user = new User();
-                    user.setName(d.getName());
-                    user.setEmail(d.getEmail());
-                    user.setPassword(d.getPassword());
-                    user.setRole(d.getRole());
-                    user.setMobileNumber(d.getMobileNumber());
-                    return user;
-                }).orElse(null);
-    }
-
-    @Override
-    public UserDto toDto(User user) {
-        return Optional.ofNullable(user)
-                .map(u -> {
-                    UserDto userDto = new UserDto();
-                    userDto.setId(u.getId());
-                    userDto.setName(u.getName());
-                    userDto.setEmail(u.getEmail());
-                    userDto.setPassword(u.getPassword());
-                    userDto.setRole(u.getRole());
-                    userDto.setMobileNumber(u.getMobileNumber());
-                    return userDto;
-                }).orElse(null);
-    }
+    @Mapping(target = "id", ignore = true)
+    User toEntity(UserCreateDto userCreateDto);
+    UserResponseDto toResponseDto(User user);
 }

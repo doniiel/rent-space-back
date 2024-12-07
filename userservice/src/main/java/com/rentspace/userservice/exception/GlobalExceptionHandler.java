@@ -1,5 +1,6 @@
 package com.rentspace.userservice.exception;
 
+import com.rentspace.userservice.dto.ErrorResponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,31 +28,59 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull HttpHeaders headers,
             @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
-        Map<String, String> errors = new HashMap<>();
+        StringBuilder errorMessage = new StringBuilder("Validation failed for arguments: ");
+
         List<ObjectError> errorList = ex.getBindingResult().getAllErrors();
-
-        errorList.forEach(error -> {
+        for (ObjectError error : errorList) {
             String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
+            String message = error.getDefaultMessage();
+            errorMessage.append(fieldName).append(" (").append(message).append("), ");
+        }
 
-            errors.put(fieldName, errorMessage);
-        });
+        if (errorMessage.length() > 0) {
+            errorMessage.setLength(errorMessage.length() - 2);
+        }
 
-        return new ResponseEntity<>(errors, BAD_REQUEST);
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                BAD_REQUEST.value(),
+                errorMessage.toString(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFound(UserNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), NOT_FOUND);
+    public ResponseEntity<ErrorResponseDto> handleUserNotFound(UserNotFoundException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, NOT_FOUND);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<String> handleResourceNotFound(UserAlreadyExistsException ex) {
-        return new ResponseEntity<>(ex.getMessage(), CONFLICT);
+    public ResponseEntity<ErrorResponseDto> handleResourceNotFound(UserAlreadyExistsException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                CONFLICT.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGlobalException(RuntimeException ex) {
-        return new ResponseEntity<>(ex.getMessage(), BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDto> handleGlobalException(RuntimeException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                INTERNAL_SERVER_ERROR.value(),
+                "An unexpected error occurred.",
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, INTERNAL_SERVER_ERROR);
     }
 }

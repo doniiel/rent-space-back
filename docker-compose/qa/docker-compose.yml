@@ -1,0 +1,109 @@
+services:
+  configservice:
+    image: d0niiel/configservice:s1
+    container_name: configservice_rs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8071/actuator/health/readiness || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "8071:8071"
+    networks:
+      - rentspace
+
+  eurekaservice:
+    image: d0niiel/eurekaservice:s1
+    container_name: eurekaservice_rs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health/readiness || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      configservice:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaservice"
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+    ports:
+      - "8761:8761"
+    networks:
+      - rentspace
+
+  userservicedb:
+    container_name: userservicedb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: userservicedb
+    image: postgres:15
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "5432:5432"
+    networks:
+      - rentspace
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "5050:80"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost" ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "True"
+      PGADMIN_LOG_LEVEL: "DEBUG"
+    depends_on:
+      userservicedb:
+        condition: service_healthy
+    volumes:
+      - ./postgres_db_data/servers.json:/pgadmin4/servers.json
+      - ./postgres_db_data/pgpass:/pgpass
+    user: root
+    entrypoint: /bin/sh -c "chmod 600 /pgpass && /entrypoint.sh"
+
+  userservice:
+    image: d0niiel/userservice:s1
+    container_name: userservice_rs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health/readiness || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eurekaservice:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "userservice"
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaservice:8761/
+    ports:
+      - "8080:8080"
+    networks:
+      - rentspace
+
+
+networks:
+  rentspace:
+    driver: bridge

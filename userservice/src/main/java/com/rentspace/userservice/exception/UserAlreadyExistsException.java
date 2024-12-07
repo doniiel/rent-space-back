@@ -8,8 +8,7 @@ import static org.springframework.http.HttpStatus.CONFLICT;
 
 @ResponseStatus(CONFLICT)
 public class UserAlreadyExistsException extends RuntimeException {
-
-    public UserAlreadyExistsException(String resourceName, String fieldName, Object fieldValue) {
-        super(format("%s already exists with given input data %s : '%s'", resourceName, fieldName, fieldValue));
+    public UserAlreadyExistsException(String entity, String field, Object value) {
+        super(String.format("%s with %s '%s' already exists.", entity, field, value));
     }
 }

@@ -74,35 +74,4 @@ public class PhotosServiceImpl implements PhotosService {
                 .map(Photos::getUrl)
                 .toList();
     }
-
-//    public void deletePhoto(Long listingId, String fileName) {
-//        try {
-//            // Find the listing by ID
-//            Listings listings = listingsRepository.findById(listingId)
-//                    .orElseThrow(() -> new RuntimeException("Listing not found"));
-//
-//            // Find the photo in the database by its URL (fileName)
-//            Photos photo = photosRepository.findByListings_IdAndUrl(listingId, fileName)
-//                    .orElseThrow(() -> new RuntimeException("Photo not found"));
-//
-//            // Remove the photo from the listing
-//            listings.getPhotos().remove(photo);
-//            listingsRepository.save(listings);
-//
-//            // Delete the photo from Minio
-//            minioClient.removeObject(
-//                    RemoveObjectArgs.builder()
-//                            .bucket(minioProperties.getBucket())
-//                            .object(fileName)
-//                            .build()
-//            );
-//
-//            // Delete the photo record from the database
-//            photosRepository.delete(photo);
-//
-//        } catch (MinioException | IOException e) {
-//            throw new RuntimeException("Failed to delete photo: " + e.getMessage(), e);
-//        }
-//    }
-
 }
