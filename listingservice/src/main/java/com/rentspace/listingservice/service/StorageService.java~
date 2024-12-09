@@ -1,0 +1,4 @@
+package com.rentspace.listingservice.service;
+
+public interface StorageService {
+}

@@ -7,6 +7,6 @@ import static org.springframework.http.HttpStatus.*;
 @ResponseStatus(CONFLICT)
 public class ListingAlreadyExistsException extends RuntimeException{
     public ListingAlreadyExistsException(String resourceName, String fieldName, Object fieldValue) {
-        super(String.format("%s already exists with given input data %s : '%s'", resourceName, fieldName, fieldValue));
+        super(String.format("%s already exists with %s : '%s'", resourceName, fieldName, fieldValue));
     }
 }
