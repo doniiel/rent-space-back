@@ -1,7 +1,7 @@
 package com.rentspace.listingservice.service.impl;
 
-import com.rentspace.listingservice.entity.Listings;
-import com.rentspace.listingservice.entity.Photos;
+import com.rentspace.listingservice.entity.Listing;
+import com.rentspace.listingservice.entity.Photo;
 import com.rentspace.listingservice.repository.ListingsRepository;
 import com.rentspace.listingservice.repository.PhotosRepository;
 import com.rentspace.listingservice.service.PhotosService;
@@ -32,10 +32,10 @@ public class PhotosServiceImpl implements PhotosService {
     public List<String> uploadPhotos(Long listingId, List<MultipartFile> files) {
         List<String> uploadedFileUrls = new ArrayList<>();
 
-        Listings listings = listingsRepository.findById(listingId)
+        Listing listing = listingsRepository.findById(listingId)
                 .orElseThrow(() -> new RuntimeException("Объявление не найдено"));
 
-        List<Photos> photoList = new ArrayList<>();
+        List<Photo> photoList = new ArrayList<>();
 
         for (MultipartFile file : files) {
             try (InputStream inputStream = file.getInputStream()) {
@@ -50,8 +50,8 @@ public class PhotosServiceImpl implements PhotosService {
                                 .build()
                 );
 
-                Photos photo = new Photos();
-                photo.setListings(listings);
+                Photo photo = new Photo();
+                photo.setListing(listing);
                 photo.setUrl(objectName);
                 photoList.add(photo);
                 uploadedFileUrls.add(objectName);
@@ -61,8 +61,8 @@ public class PhotosServiceImpl implements PhotosService {
             }
         }
 
-        listings.setPhotos(photoList);
-        listingsRepository.save(listings);
+        listing.setPhotos(photoList);
+        listingsRepository.save(listing);
         photosRepository.saveAll(photoList);
         return uploadedFileUrls;
     }
@@ -71,7 +71,7 @@ public class PhotosServiceImpl implements PhotosService {
     public List<String> getPhotos(Long listingId) {
         return photosRepository.findByListings_Id(listingId)
                 .stream()
-                .map(Photos::getUrl)
+                .map(Photo::getUrl)
                 .toList();
     }
 }
