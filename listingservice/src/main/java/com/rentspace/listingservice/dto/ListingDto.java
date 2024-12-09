@@ -7,9 +7,8 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ListingsDto {
+public class ListingDto {
 
-    @NotNull(message = "Listing ID cannot be null.")
     private Long id;
 
     @NotBlank(message = "Title cannot be empty.")
@@ -21,7 +20,7 @@ public class ListingsDto {
     private String description;
 
     @NotNull(message = "Price per night cannot be null.")
-    @DecimalMin(value = "0.1", inclusive = true, message = "Price per night must be greater than zero.")
+    @DecimalMin(value = "0.1", message = "Price per night must be greater than zero.")
     private Double pricePerNight;
 
     @NotBlank(message = "Location cannot be blank.")
@@ -34,5 +33,5 @@ public class ListingsDto {
     @Valid
     @Size(min = 1, message = "At least one photo is required.")
     @Size(max = 10, message = "A listing cannot have more than 10 photos.")
-    private List<PhotosDto> photos;
+    private List<PhotoDto> photos;
 }

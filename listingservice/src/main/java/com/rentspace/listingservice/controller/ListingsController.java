@@ -1,10 +1,9 @@
 package com.rentspace.listingservice.controller;
 
-import com.rentspace.listingservice.dto.ListingsDto;
+import com.rentspace.listingservice.dto.ListingDto;
 import com.rentspace.listingservice.repository.ListingsRepository;
 import com.rentspace.listingservice.repository.PhotosRepository;
 import com.rentspace.listingservice.service.ListingsService;
-import com.rentspace.listingservice.service.impl.PhotosServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,31 +23,28 @@ import static org.springframework.http.HttpStatus.OK;
 public class ListingsController {
 
     private final ListingsService listingsService;
-    private final PhotosServiceImpl photoService;
-    private final PhotosRepository photosRepository;
-    private final ListingsRepository listingsRepository;
 
-    @GetMapping("/{listingId}")
-    public ResponseEntity<ListingsDto> getListings(@PathVariable Long listingId) {
+    @GetMapping("/{id}")
+    public ResponseEntity<ListingDto> getListings(@PathVariable Long id) {
         return ResponseEntity
                 .status(OK)
-                .body(listingsService.getListingById(listingId));
+                .body(listingsService.getListingById(id));
     }
 
     @PostMapping()
-    public ResponseEntity<String> createListings(@Valid @RequestBody ListingsDto listingsDto) {
+    public ResponseEntity<ListingDto> createListings(@Valid @RequestBody ListingDto listingDto) {
         return ResponseEntity
                 .status(CREATED)
-                .body(listingsService.createListing(listingsDto));
+                .body(listingsService.createListing(listingDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ListingsDto> updateListings(@PathVariable Long id,
-                                                      @Valid @RequestBody ListingsDto listingsDto) {
-        listingsDto.setId(id);
+    public ResponseEntity<ListingDto> updateListings(@PathVariable Long id,
+                                                     @Valid @RequestBody ListingDto listingDto) {
+        listingDto.setId(id);
         return ResponseEntity
                 .status(OK)
-                .body(listingsService.updateListing(listingsDto));
+                .body(listingsService.updateListing(listingDto));
     }
     @DeleteMapping("/{listingId}")
     public ResponseEntity<String> deleteListings(@PathVariable Long listingId) {
@@ -56,25 +52,4 @@ public class ListingsController {
                 .status(OK)
                 .body(listingsService.deleteListing(listingId));
     }
-
-    @PostMapping("/{listingId}/photos")
-    public ResponseEntity<List<String>> uploadPhoto(@PathVariable Long listingId, @RequestParam("file") List<MultipartFile> file) {
-        return ResponseEntity
-                .status(CREATED)
-                .body(photoService.uploadPhotos(listingId, file));
-    }
-
-    @GetMapping("/{listingId}/photos")
-    public ResponseEntity<List<String>> getPhotos(@PathVariable Long listingId) {
-        return ResponseEntity
-                .status(OK)
-                .body(photoService.getPhotos(listingId));
-    }
-
-//    @DeleteMapping("/{listingId}/photos/{photoId}")
-//    public ResponseEntity<String> deletePhoto(@PathVariable Long listingId, @PathVariable Long photoId) {
-//        return ResponseEntity
-//                .status(OK)
-//                .body(photoService.deletePhoto(listingId, photoId));
-//    }
 }
