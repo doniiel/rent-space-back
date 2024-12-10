@@ -1,7 +1,0 @@
-package com.rentspace.bookingservice.util;
-
-public enum Status {
-    PENDING,
-
-    COMPLETED
-}
