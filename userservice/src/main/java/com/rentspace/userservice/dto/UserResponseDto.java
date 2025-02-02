@@ -16,7 +16,7 @@ public class UserResponseDto {
     @Schema(
         description = "User name", example = "John Doe"
     )
-    private String name;
+    private String username;
     @Schema(
         description = "User email", example = "5Xl7g@example.com"
     )

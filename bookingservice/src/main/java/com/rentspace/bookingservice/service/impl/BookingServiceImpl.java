@@ -19,8 +19,6 @@ import java.util.List;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository repository;
-    private final UserClient userClient;
-    private final ListingClient listingClient;
 
     @Override
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) {

@@ -1,4 +1,4 @@
-package com.rentspace.userservice.service;
+package com.rentspace.userservice.service.impl;
 
 import com.rentspace.userservice.dto.UserCreateDto;
 import com.rentspace.userservice.dto.UserResponseDto;
@@ -7,6 +7,7 @@ import com.rentspace.userservice.exception.UserAlreadyExistsException;
 import com.rentspace.userservice.exception.UserNotFoundException;
 import com.rentspace.userservice.mapper.UserMapper;
 import com.rentspace.userservice.repository.UserRepository;
+import com.rentspace.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException("User", "mobileNumber", userDto.getMobileNumber());
         }
 
-        user.setName(userDto.getName());
+        user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
         user.setRole(userDto.getRole());

@@ -32,21 +32,21 @@ services:
             file: common-config.yml
             service: base-service
 
-    userservice:
-        image: d0niiel/userservice:s1
-        container_name: userservice
-        extends:
-            file: common-config.yml
-            service: app-service
-        ports:
-            - "8080:8080"
-        depends_on:
-            userservicedb:
-                condition: service_healthy
-        environment:
-            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
-            SPRING_DATASOURCE_USERNAME: postgres
-            SPRING_DATASOURCE_PASSWORD: postgres
+#    userservice:
+#        image: d0niiel/userservice:s1
+#        container_name: userservice
+#        extends:
+#            file: common-config.yml
+#            service: app-service
+#        ports:
+#            - "8080:8080"
+#        depends_on:
+#            userservicedb:
+#                condition: service_healthy
+#        environment:
+#            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+#            SPRING_DATASOURCE_USERNAME: postgres
+#            SPRING_DATASOURCE_PASSWORD: postgres
 
 
 networks:

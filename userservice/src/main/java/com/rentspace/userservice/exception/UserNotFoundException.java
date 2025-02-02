@@ -10,4 +10,7 @@ public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String entity, String field, Object value) {
         super(String.format("%s with %s '%s' not found.", entity, field, value));
     }
+    public UserNotFoundException(String message) {
+        super(message);
+    }
 }
