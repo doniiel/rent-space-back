@@ -14,7 +14,8 @@ services:
             POSTGRES_DB: userservicedb
         ports:
             - 5432:5432
-
+        networks:
+            - rentspace
     pgadmin:
         container_name: pgadmin
         image: dpage/pgadmin4
@@ -34,13 +35,15 @@ services:
             - ./postgres_db_data/pgpass:/pgpass
         user: root
         entrypoint: /bin/sh -c "chmod 600 /pgpass && /entrypoint.sh"
+        networks:
+            - rentspace
 #        extends:
 #            file: common-config.yml
 #            service: base-service
 
     configservice:
         container_name: configservice
-        image: rentspaceback/config:v1
+        image: d0niiel/configservice:v1
         ports:
             - "8071:8071"
         restart: always
@@ -49,10 +52,12 @@ services:
             interval: 10s
             timeout: 5s
             retries: 10
+        networks:
+            - rentspace
 
     discoveryservice:
         container_name: discoveryservice
-        image: rentspaceback/discovery:v1
+        image: d0niiel/discoveryservice:v1
         ports:
             - "8761:8761"
         restart: always
@@ -67,9 +72,11 @@ services:
         depends_on:
             configservice:
                 condition: service_healthy
+        networks:
+            - rentspace
 
     userservice:
-        image: rentspaceback/userservice:v1
+        image: d0niiel/userservice:v1
         container_name: userservice
         restart: always
 #        extends:
@@ -89,7 +96,8 @@ services:
             SPRING_PROFILES_ACTIVE: prod
             SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
             EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
-
+        networks:
+            - rentspace
 
 networks:
     rentspace:

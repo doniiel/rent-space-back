@@ -1,0 +1,242 @@
+{
+	"info": {
+		"_postman_id": "6242c883-22bb-4de6-b1ca-ce0f7b395068",
+		"name": "RentSpace",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41519037"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"John5\",\n  \"email\": \"5Xl55g@example.com\",\n  \"password\": \"ldfn5454,.5\",\n  \"phone\": \"12345678912\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"John5\",\n    \"password\": \"ldfn5454,.5\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Refresh-Token",
+								"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huNSIsImlhdCI6MTczODY2OTM5NCwiZXhwIjoxNzM5Mjc0MTk0fQ.fMKtvB7vkyAan9dri4Y5baFtKlftb-repERLmMATCko",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "get by email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huNSIsImlhdCI6MTczODY2OTcxMywiZXhwIjoxNzM4NjczMzEzLCJyb2xlIjoiVVNFUiJ9.k2vXzpBP1DBvkJnP2Vpry2Obym6VPFsd0CyvemIy_7U",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/by-email/5Xl55g@example.com",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"by-email",
+								"5Xl55g@example.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get by id",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"john_doe\",\n  \"password\": \"SecurePass123\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"1234567890\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "delete user",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking",
+			"item": [
+				{
+					"name": "http://localhost:9085/api/v1/booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ4IiwiaWF0IjoxNzM4NDkzMTQ3LCJleHAiOjE3Mzg0OTY3NDd9.1LqzDnQJBQkAw37rt9atXVy-xx-gDQFFAUW_qhSm4d8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bookingDetails\" : \"Daniyal stenid sen\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9085/api/v1/booking",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9085",
+							"path": [
+								"api",
+								"v1",
+								"booking"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
