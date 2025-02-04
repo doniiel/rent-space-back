@@ -13,8 +13,8 @@
         <module>user-service</module>
         <module>listing-service</module>
         <module>discovery-service</module>
-        <module>configservice</module>
-        <module>bookingservice</module>
+        <module>config-service</module>
+        <module>booking-service</module>
     </modules>
 
     <name>RentSpace Backend</name>
@@ -35,7 +35,7 @@
         <config.version>4.2.0</config.version>
         <openfeign.version>4.2.0</openfeign.version>
         <lombok.version>1.18.30</lombok.version>
-        <jjwt.version>0.12.6</jjwt.version>
+        <jjwt.version>0.11.5</jjwt.version>
         <swagger.version>2.6.0</swagger.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <postgresql.version>42.7.3</postgresql.version>

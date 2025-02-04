@@ -1,8 +1,10 @@
 package com.rentspace.userservice.service.impl;
 
 import com.rentspace.userservice.dto.UserCreateDto;
-import com.rentspace.userservice.dto.UserResponseDto;
+import com.rentspace.userservice.dto.UserCreateRequest;
+import com.rentspace.userservice.dto.UserDto;
 import com.rentspace.userservice.entity.User;
+import com.rentspace.userservice.enums.Role;
 import com.rentspace.userservice.exception.UserAlreadyExistsException;
 import com.rentspace.userservice.exception.UserNotFoundException;
 import com.rentspace.userservice.mapper.UserMapper;
@@ -10,6 +12,7 @@ import com.rentspace.userservice.repository.UserRepository;
 import com.rentspace.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,52 +24,61 @@ import static java.lang.String.format;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
     @Override
     @Transactional
-    public UserResponseDto createUser(UserCreateDto userDto) {
-        log.info("Creating new user: {}", userDto);
+    public UserDto createUser(UserCreateRequest request) {
+        log.info("Creating new user {}", request);
 
-        if (userRepository.existsByEmail(userDto.getEmail()) || userRepository.existsByMobileNumber(userDto.getMobileNumber())) {
-            throw new UserAlreadyExistsException("User", "email/phone", userDto.getEmail());
+        if (userRepository.existsByPhone(request.getPhone()) || userRepository.existsByEmail(request.getEmail())) {
+            throw new UserAlreadyExistsException("User", "email/phone", request.getEmail());
         }
-        User user = userMapper.toEntity(userDto);
+
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new UserAlreadyExistsException("User", "username", request.getEmail());
+        }
+
+        User user = userMapper.toEntity(request);
+        user.setRole(Role.USER);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         User savedUser = userRepository.save(user);
 
         log.info("User created successfully with ID: {}", savedUser.getId());
-        return userMapper.toResponseDto(savedUser);
+        return userMapper.toResponseDto(user);
     }
+
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDto getUserByEmail(String email) {
+    public UserDto getUserByEmail(String email) {
         log.info("Fetching user with email: {}", email);
 
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UserNotFoundException("User", "email", email)
         );
-        UserResponseDto userResponseDto = userMapper.toResponseDto(user);
-        log.info("User fetched successfully with Email: {}", userResponseDto.getEmail());
-        return userResponseDto;
+        UserDto userDto = userMapper.toResponseDto(user);
+        log.info("User fetched successfully with Email: {}", userDto.getEmail());
+        return userDto;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDto getUserById(Long userId) {
+    public UserDto getUserById(Long userId) {
         log.info("Fetching user with ID: {}", userId);
 
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException("User", "userId", userId)
         );
-        UserResponseDto userResponseDto = userMapper.toResponseDto(user);
-        log.info("User fetched successfully with ID: {}", userResponseDto.getId());
-        return userResponseDto;
+        UserDto userDto = userMapper.toResponseDto(user);
+        log.info("User fetched successfully with ID: {}", userDto.getId());
+        return userDto;
     }
 
     @Override
     @Transactional
-    public UserResponseDto updateUser(Long userId, UserCreateDto userDto) {
+    public UserDto updateUser(Long userId, UserCreateDto userDto) {
         log.info("Updating user with ID: {}", userId);
 
         User user = userRepository.findById(userId).orElseThrow(
@@ -76,15 +88,17 @@ public class UserServiceImpl implements UserService {
         if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail())) {
             throw new UserAlreadyExistsException("User", "email", userDto.getEmail());
         }
-        if (!user.getMobileNumber().equals(userDto.getMobileNumber()) && userRepository.existsByMobileNumber(userDto.getMobileNumber())) {
+        if (!user.getPhone().equals(userDto.getMobileNumber()) && userRepository.existsByPhone(userDto.getMobileNumber())) {
             throw new UserAlreadyExistsException("User", "mobileNumber", userDto.getMobileNumber());
         }
 
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
+        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        }
         user.setRole(userDto.getRole());
-        user.setMobileNumber(userDto.getMobileNumber());
+        user.setPhone(userDto.getMobileNumber());
 
         User updatedUser = userRepository.save(user);
 

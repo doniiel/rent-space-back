@@ -8,7 +8,7 @@ import lombok.Data;
     name = "UserResponse",
     description = "Shema to hold user information"
 )
-public class UserResponseDto {
+public class UserDto {
     @Schema(
         description = "User ID", example = "1"
     )
@@ -24,7 +24,7 @@ public class UserResponseDto {
     @Schema(
         description = "User mobile number", example = "1234567890"
     )
-    private String mobileNumber;
+    private String phone;
     @Schema(
         description = "User role", example = "ADMIN"
     )

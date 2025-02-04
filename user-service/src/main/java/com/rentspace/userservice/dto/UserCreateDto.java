@@ -1,6 +1,6 @@
 package com.rentspace.userservice.dto;
 
-import com.rentspace.userservice.util.Role;
+import com.rentspace.userservice.enums.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -6,20 +6,33 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Map;
 
 @Component
-public class JwtTokenUtil {
+public class JwtUtil {
 
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
-    @Value("${jwt.expiration-time}")
-    private long EXPIRATION_TIME;
+    @Value("${jwt.access-expiration-time}")
+    private long ACCESS_EXPIRATION_TIME;
+    @Value("${jwt.refresh-expiration-time}")
+    private long REFRESH_EXPIRATION_TIME;
 
-    public String generateToken(String username) {
+    public String generateAccessToken(String username, Map<String, Object> claims, String role) {
+        claims.put("role", role);
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION_TIME))
+                .addClaims(claims)
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
+    public String generateRefreshToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
@@ -31,6 +44,15 @@ public class JwtTokenUtil {
                 .getBody()
                 .getSubject();
     }
+
+    public String extractRole(String token) {
+        return (String) Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role");
+    }
+
     public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }

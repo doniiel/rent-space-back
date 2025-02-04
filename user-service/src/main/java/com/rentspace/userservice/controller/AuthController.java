@@ -1,16 +1,15 @@
 package com.rentspace.userservice.controller;
 
-import com.rentspace.userservice.dto.UserCreateDto;
-import com.rentspace.userservice.dto.UserLoginDto;
-import com.rentspace.userservice.dto.UserResponseDto;
+import com.rentspace.userservice.dto.LoginRequest;
+import com.rentspace.userservice.dto.RegisterRequest;
 import com.rentspace.userservice.service.AuthService;
-import com.rentspace.userservice.service.UserService;
-import com.rentspace.userservice.util.JwtTokenUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.HttpStatus.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -18,18 +17,27 @@ import static org.springframework.http.HttpStatus.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserService userService;
-    private final JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserLoginDto userLoginDto) {
-        String token = authService.authenticateUser(userLoginDto);
-        return ResponseEntity.status(OK).body(token);
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(authService.login(request.getUsername(), request.getPassword()));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> register(@RequestBody UserCreateDto userCreateDto) {
-        return ResponseEntity.status(CREATED).body(userService.createUser(userCreateDto));
+    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(authService.register(request));
+    }
+
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(authService.refresh(refreshToken));
+
     }
 }
 

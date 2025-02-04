@@ -1,6 +1,6 @@
 package com.rentspace.userservice.entity;
 
-import com.rentspace.userservice.util.Role;
+import com.rentspace.userservice.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -10,39 +10,40 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @ToString(exclude = {"password"})
 @EntityListeners(AuditingEntityListener.class)
-public class User implements UserDetails {
+public class User implements UserDetails, Serializable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    private String firstname;
+    private String lastname;
     private String username;
     private String email;
     private String password;
-
-    @Column(name = "mobile_number")
-    private String mobileNumber;
+    private String phone;
 
     @Enumerated(STRING)
     private Role role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserProfiles profile;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)

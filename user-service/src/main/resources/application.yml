@@ -21,3 +21,8 @@ management:
     health:
       probes:
         enabled: true
+
+jwt:
+  secret-key: "ZGlnNF4lXiYqKCo0MjRnZXdnZXdma2Vmfmg4gr25fbg15"
+  access-expiration-time: 3600000
+  refresh-expiration-time: 604800000

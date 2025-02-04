@@ -1,6 +1,7 @@
-package com.rentspace.userservice.util;
+package com.rentspace.userservice.enums;
 
 public enum Role {
-    ADMIN,
-    USER
+    USER,
+    MANAGER,
+    ADMIN
 }
