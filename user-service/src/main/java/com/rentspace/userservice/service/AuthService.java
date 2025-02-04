@@ -6,8 +6,8 @@ import java.util.Map;
 
 public interface AuthService {
 
-    Map<String, String> login(String username, String password); // DONE
-    Map<String, Object> register(RegisterRequest request); // DONE
-    Map<String, String> refresh(String token); // DONE
+    Map<String, String> authenticateAndGenerateTokens(String username, String password); // DONE
+    Map<String, Object> registerUserAndGenerateTokens(RegisterRequest request); // DONE
+    Map<String, String> refreshAccessToken(String token); // DONE
 
 }

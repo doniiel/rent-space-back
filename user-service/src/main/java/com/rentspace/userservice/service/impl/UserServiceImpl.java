@@ -1,6 +1,6 @@
 package com.rentspace.userservice.service.impl;
 
-import com.rentspace.userservice.dto.UserCreateDto;
+import com.rentspace.userservice.dto.UpdateUserRequest;
 import com.rentspace.userservice.dto.UserCreateRequest;
 import com.rentspace.userservice.dto.UserDto;
 import com.rentspace.userservice.entity.User;
@@ -16,8 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static java.lang.String.format;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,12 +30,9 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserCreateRequest request) {
         log.info("Creating new user {}", request);
 
-        if (userRepository.existsByPhone(request.getPhone()) || userRepository.existsByEmail(request.getEmail())) {
-            throw new UserAlreadyExistsException("User", "email/phone", request.getEmail());
-        }
-
+        validateEmailAndPhone(request.getEmail(), request.getPhone());
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UserAlreadyExistsException("User", "username", request.getEmail());
+            throw new UserAlreadyExistsException("User", "username", request.getUsername());
         }
 
         User user = userMapper.toEntity(request);
@@ -67,41 +62,29 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto getUserById(Long userId) {
         log.info("Fetching user with ID: {}", userId);
-
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException("User", "userId", userId)
-        );
-        UserDto userDto = userMapper.toResponseDto(user);
-        log.info("User fetched successfully with ID: {}", userDto.getId());
-        return userDto;
+        User user = getExistingUser(userId);
+        return userMapper.toResponseDto(user);
     }
-
     @Override
     @Transactional
-    public UserDto updateUser(Long userId, UserCreateDto userDto) {
+    public UserDto updateUser(Long userId, UpdateUserRequest request) {
         log.info("Updating user with ID: {}", userId);
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException("User", "userId", userId)
-        );
+        var user = getExistingUser(userId);
+        validateUniqueEmailAndPhone(user, request);
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
 
-        if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail())) {
-            throw new UserAlreadyExistsException("User", "email", userDto.getEmail());
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new UserNotFoundException("User", "username", request.getUsername());
         }
-        if (!user.getPhone().equals(userDto.getMobileNumber()) && userRepository.existsByPhone(userDto.getMobileNumber())) {
-            throw new UserAlreadyExistsException("User", "mobileNumber", userDto.getMobileNumber());
+        user.setUsername(request.getUsername());
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-
-        user.setUsername(userDto.getUsername());
-        user.setEmail(userDto.getEmail());
-        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        }
-        user.setRole(userDto.getRole());
-        user.setPhone(userDto.getMobileNumber());
+        user.setRole(Role.valueOf(request.getRole()));
 
         User updatedUser = userRepository.save(user);
-
         log.info("User updated successfully with ID: {}", updatedUser.getId());
         return userMapper.toResponseDto(updatedUser);
     }
@@ -110,12 +93,33 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long userId) {
         log.info("Deleting user with ID: {}", userId);
-
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User", "userId", userId);
         }
         userRepository.deleteById(userId);
-
         log.info("User deleted successfully with ID: {}", userId);
+    }
+
+    private User getExistingUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User", "userId", userId));
+    }
+
+    private void validateEmailAndPhone(String email, String phone) {
+        if (userRepository.existsByEmail(email)) {
+            throw new UserAlreadyExistsException("User", "email", email);
+        }
+        if (userRepository.existsByPhone(phone)) {
+            throw new UserAlreadyExistsException("User", "phone", phone);
+        }
+    }
+
+    private void validateUniqueEmailAndPhone(User user, UpdateUserRequest request) {
+        if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
+            throw new UserAlreadyExistsException("User", "email", request.getEmail());
+        }
+        if (!user.getPhone().equals(request.getPhone()) && userRepository.existsByPhone(request.getPhone())) {
+            throw new UserAlreadyExistsException("User", "mobileNumber", request.getPhone());
+        }
     }
 }

@@ -4,7 +4,6 @@ import com.rentspace.userservice.dto.RegisterRequest;
 import com.rentspace.userservice.dto.UserCreateRequest;
 import com.rentspace.userservice.entity.User;
 import com.rentspace.userservice.exception.UserNotFoundException;
-import com.rentspace.userservice.mapper.UserMapper;
 import com.rentspace.userservice.service.AuthService;
 import com.rentspace.userservice.service.UserService;
 import com.rentspace.userservice.util.JwtUtil;
@@ -22,58 +21,35 @@ import java.util.Map;
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
-    private final UserMapper userMapper;
     private final JwtUtil jwtTokenUtil;
 
+
     @Override
-    public Map<String, String> login(String username, String password) {
+    public Map<String, String> authenticateAndGenerateTokens(String username, String password) {
         User user = authenticateUser(username, password);
-
-        Map<String, String> tokens = new HashMap<>();
-        String accessToken = jwtTokenUtil.generateAccessToken(user.getUsername(), new HashMap<>(), user.getRole().name());
-        String refreshToken = jwtTokenUtil.generateRefreshToken(user.getUsername());
-
-        tokens.put("access_token", accessToken);
-        tokens.put("refresh_token", refreshToken);
-
-        return tokens;
+        return generateTokens(user.getUsername(), user.getRole().name());
     }
 
     @Override
-    public Map<String, Object> register(RegisterRequest request) {
-        Map<String, Object> result = new HashMap<>();
-
+    public Map<String, Object> registerUserAndGenerateTokens(RegisterRequest request) {
         UserCreateRequest userCreate = UserCreateRequest.builder()
                 .username(request.getUsername())
                 .password(request.getPassword())
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .build();
+
         var user = userService.createUser(userCreate);
-
-        String accessToken = jwtTokenUtil.generateAccessToken(user.getUsername(), new HashMap<>(), user.getRole());
-        String refreshToken = jwtTokenUtil.generateRefreshToken(user.getUsername());
-
-        result.put("access_token", accessToken);
-        result.put("refresh_token", refreshToken);
+        Map<String, Object> result = new HashMap<>(generateTokens(user.getUsername(), user.getRole()));
         result.put("user", user);
         return result;
     }
 
     @Override
-    public Map<String, String> refresh(String token) {
+    public Map<String, String> refreshAccessToken(String token) {
         String username = jwtTokenUtil.extractUsername(token);
         String role = jwtTokenUtil.extractRole(token);
-        Map<String, String> tokens = new HashMap<>();
-
-        if (username != null) {
-            String newAccessToken = jwtTokenUtil.generateAccessToken(username, new HashMap<>(), role);
-            String newRefreshToken = jwtTokenUtil.generateRefreshToken(username);
-
-            tokens.put("access_token", newAccessToken);
-            tokens.put("refresh_token", newRefreshToken);
-        }
-        return tokens;
+        return generateTokens(username, role);
     }
 
     private User authenticateUser(String username, String password) {
@@ -81,11 +57,17 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(username, password)
         );
 
-        if (authentication.isAuthenticated()) {
-            var user = (User) authentication.getPrincipal();
-            return user;
-        } else {
+        if (!authentication.isAuthenticated()) {
             throw new UserNotFoundException("Invalid credentials");
         }
+
+        return (User) authentication.getPrincipal();
+    }
+
+    private Map<String, String> generateTokens(String username, String role) {
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("access_token", jwtTokenUtil.generateAccessToken(username, new HashMap<>(), role));
+        tokens.put("refresh_token", jwtTokenUtil.generateRefreshToken(username));
+        return tokens;
     }
 }

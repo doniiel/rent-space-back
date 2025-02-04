@@ -22,21 +22,21 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(authService.login(request.getUsername(), request.getPassword()));
+                .body(authService.authenticateAndGenerateTokens(request.getUsername(), request.getPassword()));
     }
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(authService.register(request));
+                .body(authService.registerUserAndGenerateTokens(request));
     }
 
 
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, String>> refreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(authService.refresh(refreshToken));
+                .body(authService.refreshAccessToken(refreshToken));
 
     }
 }

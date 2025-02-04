@@ -1,11 +1,17 @@
 services:
     userservicedb:
         container_name: userservicedb
+        image: postgres:15
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-U", "postgres" ]
+            timeout: 10s
+            retries: 10
+            interval: 10s
+            start_period: 10s
         environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
             POSTGRES_DB: userservicedb
-        extends:
-            file: common-config.yml
-            service: db-service
         ports:
             - 5432:5432
 
@@ -28,25 +34,61 @@ services:
             - ./postgres_db_data/pgpass:/pgpass
         user: root
         entrypoint: /bin/sh -c "chmod 600 /pgpass && /entrypoint.sh"
-        extends:
-            file: common-config.yml
-            service: base-service
+#        extends:
+#            file: common-config.yml
+#            service: base-service
 
-#    userservice:
-#        image: d0niiel/userservice:s1
-#        container_name: userservice
+    configservice:
+        container_name: configservice
+        image: rentspaceback/config:v1
+        ports:
+            - "8071:8071"
+        restart: always
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:8071/actuator/health/readiness || exit 1"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+    discoveryservice:
+        container_name: discoveryservice
+        image: rentspaceback/discovery:v1
+        ports:
+            - "8761:8761"
+        restart: always
+        environment:
+            SPRING_PROFILES_ACTIVE: prod
+            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health/readiness || exit 1"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+        depends_on:
+            configservice:
+                condition: service_healthy
+
+    userservice:
+        image: rentspaceback/userservice:v1
+        container_name: userservice
+        restart: always
 #        extends:
 #            file: common-config.yml
 #            service: app-service
-#        ports:
-#            - "8080:8080"
-#        depends_on:
-#            userservicedb:
-#                condition: service_healthy
-#        environment:
-#            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
-#            SPRING_DATASOURCE_USERNAME: postgres
-#            SPRING_DATASOURCE_PASSWORD: postgres
+        ports:
+            - "8080:8080"
+        depends_on:
+            discoveryservice:
+                condition: service_healthy
+            userservicedb:
+                condition: service_healthy
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: postgres
+            SPRING_PROFILES_ACTIVE: prod
+            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
 
 
 networks:
