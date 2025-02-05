@@ -60,6 +60,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    public User getUserByUsername(String username) {
+        log.info("Fetching user with username: {}", username);
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UserNotFoundException("User", "username", username)
+        );
+        return user;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public UserDto getUserById(Long userId) {
         log.info("Fetching user with ID: {}", userId);
         User user = getExistingUser(userId);

@@ -1,4 +1,4 @@
-package com.rentspace.userservice.util;
+package com.rentspace.userservice.jwt;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -9,8 +9,7 @@ import java.util.Date;
 import java.util.Map;
 
 @Component
-public class JwtUtil {
-
+public class JwtService {
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
     @Value("${jwt.access-expiration-time}")

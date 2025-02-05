@@ -1,6 +1,7 @@
 package com.rentspace.userservice.jwt;
 
-import com.rentspace.userservice.util.JwtUtil;
+import com.rentspace.userservice.entity.Token;
+import com.rentspace.userservice.repository.TokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 
 import static com.rentspace.userservice.util.TokenUtil.*;
 
@@ -24,7 +26,8 @@ import static com.rentspace.userservice.util.TokenUtil.*;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter  extends OncePerRequestFilter {
 
-    private final JwtUtil jwtTokenUtil;
+    private final JwtService jwtTokenUtil;
+    private final TokenRepository tokenRepository;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -53,6 +56,12 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
 
     private void authenticationUser(String token) {
         try {
+            Optional<Token> storedToken = tokenRepository.findByToken(token);
+            if (storedToken.isEmpty() || storedToken.get().isExpired() || storedToken.get().isRevoked()) {
+                log.warn("Invalid or revokerd JWT token: " + token);
+                return;
+            }
+
             String username = jwtTokenUtil.extractUsername(token);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
