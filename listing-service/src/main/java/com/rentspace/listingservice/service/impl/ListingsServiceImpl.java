@@ -1,25 +1,22 @@
 package com.rentspace.listingservice.service.impl;
 
 import com.rentspace.listingservice.dto.ListingDto;
-import com.rentspace.listingservice.dto.PhotoDto;
+import com.rentspace.listingservice.dto.ListingPhotoDto;
 import com.rentspace.listingservice.entity.Listing;
-import com.rentspace.listingservice.entity.Photo;
+import com.rentspace.listingservice.entity.ListingPhoto;
 import com.rentspace.listingservice.exception.ListingAlreadyExistsException;
-import com.rentspace.listingservice.exception.ResourceNotFoundException;
+import com.rentspace.listingservice.exception.ListingNotFoundException;
 import com.rentspace.listingservice.mapper.ListingMapper;
-import com.rentspace.listingservice.mapper.PhotoMapper;
 import com.rentspace.listingservice.repository.ListingsRepository;
-import com.rentspace.listingservice.repository.PhotosRepository;
+import com.rentspace.listingservice.repository.ListingPhotoRepository;
+import com.rentspace.listingservice.service.ListingPhotoService;
 import com.rentspace.listingservice.service.ListingsService;
-import com.rentspace.listingservice.storage.StorageException;
-import com.rentspace.listingservice.storage.StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
@@ -30,59 +27,31 @@ import static java.time.LocalDateTime.now;
 public class ListingsServiceImpl implements ListingsService {
 
     private final ListingsRepository listingsRepository;
-    private final PhotosRepository photosRepository;
     private final ListingMapper listingMapper;
-    private final PhotoMapper photoMapper;
-    private final StorageService storageService;
-
-    @Override
-    @Transactional(readOnly = true)
-    public ListingDto getListingById(Long listingId) {
-        log.info("Fetching listing with id: {}", listingId);
-
-        Listing listing = listingsRepository.findById(listingId).orElseThrow(
-                () -> new ResourceNotFoundException("Listing", "listingId", listingId));
-
-        List<Photo> photos = photosRepository.findByListings_Id(listing.getId());
-
-        if (photos.isEmpty()) {
-            log.warn("No photos found for listing with ID: {}", listingId);
-        }
-
-        ListingDto listingDto = listingMapper.toDto(listing);
-        List<PhotoDto> photoDtos = photoMapper.toDtoList(photos);
-        listingDto.setPhotos(photoDtos);
-
-        log.info("Fetched listing: {}", listingDto);
-        return listingDto;
-    }
+    private final ListingPhotoService listingPhotoService;
 
     @Override
     @Transactional
     public ListingDto createListing(ListingDto listingDto) {
         log.info("Creating new listing: {}", listingDto);
 
-        if (listingDto.getId() != null && listingsRepository.existsById(listingDto.getId())) {
+        if (listingDto.getId() != null && listingsRepository.existsById(listingDto.getId())) { // check have any listing with this id
             throw new ListingAlreadyExistsException("Listing", "listingId", listingDto.getId());
         }
 
-        Listing listing = listingMapper.toEntity(listingDto);
+        Listing listing = listingMapper.toEntity(listingDto); // save listing in the database
         Listing savedListing = listingsRepository.save(listing);
 
-       List<Photo> photos = listingDto.getPhotos().stream()
-                       .filter(photoDto -> photoDto.getFile() != null && !photoDto.getFile().isEmpty())
-                       .map(photoDto -> uploadPhoto(savedListing, photoDto))
-                       .collect(Collectors.toList());
+        List<ListingPhoto> listingPhotos = null;
+        if (listingDto.getPhotos() != null  && !listingDto.getPhotos().isEmpty()) {
+            listingPhotos = listingPhotoService.savePhotos(savedListing, listingDto.getPhotos());
+        }
 
-       photosRepository.saveAll(photos);
-       savedListing.setPhotos(photos);
-       listingsRepository.save(savedListing);
+        savedListing.setListingPhotos(listingPhotos);
+        listingsRepository.save(savedListing);
 
-       ListingDto savedDto = listingMapper.toDto(savedListing);
-       List<PhotoDto> photoDtos = photos.stream()
-                       .map(photoMapper::toDto)
-                       .collect(Collectors.toList());
-       savedDto.setPhotos(photoDtos);
+        ListingDto savedDto = listingMapper.toDto(savedListing);
+        savedDto.setPhotos(listingPhotoService.toDtoList(listingPhotos));
 
         log.info("Listing created successfully with ID: {}", savedListing.getId());
         return savedDto;
@@ -90,37 +59,64 @@ public class ListingsServiceImpl implements ListingsService {
 
     @Override
     @Transactional
-    public ListingDto updateListing(ListingDto listingDto) {
+    public ListingDto updateListing(Long id, ListingDto listingDto) {
         log.info("Updating listing with ID: {}", listingDto.getId());
 
-        Listing existingListing = listingsRepository.findById(listingDto.getId()).orElseThrow(
-                () -> new ResourceNotFoundException("Listing", "listingId", listingDto.getId())
+        Listing existingListing = listingsRepository.findById(listingDto.getId()).orElseThrow( // check have any listing with this id
+                () -> new ListingNotFoundException("Listing", "listingId", id)
         );
 
-        listingMapper.updateEntityFromDto(listingDto, existingListing);
+        existingListing.setTitle(listingDto.getTitle());
+        existingListing.setDescription(listingDto.getDescription());
+        existingListing.setAddress(listingDto.getAddress());
+        existingListing.setCity(listingDto.getCity());
+        existingListing.setCountry(listingDto.getCountry());
+        existingListing.setLatitude(listingDto.getLatitude());
+        existingListing.setLongitude(listingDto.getLongitude());
+        existingListing.setType(listingDto.getType());
+        existingListing.setMaxGuests(listingDto.getMaxGuests());
+        existingListing.setPricePerNight(listingDto.getPricePerNight());
         existingListing.setUpdatedAt(now());
         existingListing.setUpdatedBy("LISTINGSERVICE");
 
-        List<Photo> oldPhotos = existingListing.getPhotos();
-        deletePhotos(oldPhotos);
+        List<ListingPhoto> listingPhotos = null;
+        if (listingDto.getPhotos() != null && !listingDto.getPhotos().isEmpty()) {
+            List<ListingPhoto> oldListingPhotos = existingListing.getListingPhotos();
+            listingPhotoService.deletePhotos(oldListingPhotos);
+            listingPhotos = listingPhotoService.savePhotos(existingListing, listingDto.getPhotos());
+        }
 
-        List<Photo> newPhotos = listingDto.getPhotos().stream()
-                .filter(photoDto -> photoDto.getFile() != null && !photoDto.getFile().isEmpty())
-                .map(photoDto -> uploadPhoto(existingListing, photoDto))
-                .collect(Collectors.toList());
-
-        photosRepository.saveAll(newPhotos);
-        existingListing.setPhotos(newPhotos);
+        existingListing.setListingPhotos(listingPhotos);
         listingsRepository.save(existingListing);
 
         ListingDto updatedDto = listingMapper.toDto(existingListing);
-        List<PhotoDto> photoDtos = newPhotos.stream()
-                .map(photoMapper::toDto)
-                .collect(Collectors.toList());
-        updatedDto.setPhotos(photoDtos);
+        updatedDto.setPhotos(listingPhotoService.toDtoList(listingPhotos));
 
         log.info("Listing updated successfully with ID: {}", updatedDto.getId());
         return updatedDto;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ListingDto getListingById(Long listingId) {
+        log.info("Fetching listing with id: {}", listingId);
+
+        Listing listing = listingsRepository.findById(listingId).orElseThrow(
+                () -> new ListingNotFoundException("Listing", "listingId", listingId));
+
+        List<ListingPhoto> listingPhotos = listingPhotoService.getAllPhotos(listingId);
+
+        ListingDto listingDto = listingMapper.toDto(listing);
+        listingDto.setPhotos(listingPhotoService.toDtoList(listingPhotos));
+
+        log.info("Fetched listing: {}", listingDto);
+        return listingDto;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ListingDto> getAllListings() {
+        return null;
     }
 
     @Override
@@ -129,10 +125,11 @@ public class ListingsServiceImpl implements ListingsService {
         log.info("Deleting listing with ID: {}", listingId);
 
         Listing listing = listingsRepository.findById(listingId).orElseThrow(
-                () -> new ResourceNotFoundException("Listing", "listingId", listingId));
+                () -> new ListingNotFoundException("Listing", "listingId", listingId)
+        );
 
-        List<Photo> photos = listing.getPhotos();
-        deletePhotos(photos);
+        List<ListingPhoto> listingPhotos = listing.getListingPhotos();
+        listingPhotoService.deletePhotos(listingPhotos);
 
         listingsRepository.delete(listing);
 
@@ -140,23 +137,23 @@ public class ListingsServiceImpl implements ListingsService {
         return format("Listing deleted successfully with ID: %s", listingId);
     }
 
-    private Photo uploadPhoto(Listing listing, PhotoDto photoDto) {
-        String fileName = storageService.uploadFile(photoDto.getFile(), "listings");
-        return Photo.builder()
-                .listing(listing)
-                .url(fileName)
-                .build();
-    }
-    private void deletePhotos(List<Photo> photos) {
-        photos.forEach(photo -> {
-            try {
-                storageService.deleteFile(photo.getUrl(), "listings");
-            } catch (Exception e) {
-                log.error("Failed to delete photos url: {}", e.getMessage());
-                throw new StorageException("Failed to delete photos from Minio: " + e.getMessage(), e);
-            }
-        });
-        photosRepository.deleteAll(photos);
-    }
+//    private ListingPhoto uploadPhoto(Listing listing, ListingPhotoDto listingPhotoDto) {
+//        String fileName = storageService.uploadFile(listingPhotoDto.getFile(), "listings");
+//        return ListingPhoto.builder()
+//                .listing(listing)
+//                .photoUrl(fileName)
+//                .build();
+//    }
+//    private void deletePhotos(List<ListingPhoto> listingPhotos) {
+//        listingPhotos.forEach(listingPhoto -> {
+//            try {
+//                storageService.deleteFile(listingPhoto.getPhotoUrl(), "listings");
+//            } catch (Exception e) {
+//                log.error("Failed to delete listingPhotos url: {}", e.getMessage());
+//                throw new StorageException("Failed to delete listingPhotos from Minio: " + e.getMessage(), e);
+//            }
+//        });
+//        listingPhotoRepository.deleteAll(listingPhotos);
+//    }
 
 }

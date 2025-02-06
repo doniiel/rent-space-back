@@ -1,5 +1,6 @@
 package com.rentspace.listingservice.storage;
 
+import com.rentspace.listingservice.exception.StorageException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;

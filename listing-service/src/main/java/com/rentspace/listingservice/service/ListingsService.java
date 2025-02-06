@@ -1,16 +1,13 @@
 package com.rentspace.listingservice.service;
 
 import com.rentspace.listingservice.dto.ListingDto;
-import com.rentspace.listingservice.entity.Listing;
+
+import java.util.List;
 
 public interface ListingsService {
-
-
-    ListingDto getListingById(Long listingId);
-
     ListingDto createListing(ListingDto listingDto);
-
-    ListingDto updateListing(ListingDto listingDto);
-
+    ListingDto getListingById(Long listingId);
+    List<ListingDto> getAllListings();
+    ListingDto updateListing(Long id, ListingDto listingDto);
     String deleteListing(Long listingId);
 }

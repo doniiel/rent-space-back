@@ -1,6 +1,5 @@
-package com.rentspace.listingservice.storage;
+package com.rentspace.listingservice.exception;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import static org.springframework.http.HttpStatus.*;

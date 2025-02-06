@@ -41,6 +41,20 @@ services:
 #            file: common-config.yml
 #            service: base-service
 
+    minio:
+        container_name: minio
+        image: minio/minio:latest
+        ports:
+            - "9000:9000"
+        volumes:
+            - minio_data:/data
+        command: server /data
+        environment:
+            MINIO_ROOT_USER: minioadmin
+            MINIO_ROOT_PASSWORD: minioadmin
+        networks:
+            - rentspace
+
     configservice:
         container_name: configservice
         image: d0niiel/configservice:v1
@@ -75,29 +89,32 @@ services:
         networks:
             - rentspace
 
-#    userservice:
-#        image: d0niiel/userservice:v1
-#        container_name: userservice
-#        restart: always
-##        extends:
-##            file: common-config.yml
-##            service: app-service
-#        ports:
-#            - "8080:8080"
-#        depends_on:
-#            discoveryservice:
-#                condition: service_healthy
-#            userservicedb:
-#                condition: service_healthy
-#        environment:
-#            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
-#            SPRING_DATASOURCE_USERNAME: postgres
-#            SPRING_DATASOURCE_PASSWORD: postgres
-#            SPRING_PROFILES_ACTIVE: prod
-#            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
-#            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
-#        networks:
-#            - rentspace
+    userservice:
+        image: d0niiel/userservice:v1
+        container_name: userservice
+        restart: always
+#        extends:
+#            file: common-config.yml
+#            service: app-service
+        ports:
+            - "8080:8080"
+        depends_on:
+            discoveryservice:
+                condition: service_healthy
+            userservicedb:
+                condition: service_healthy
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: postgres
+            SPRING_PROFILES_ACTIVE: prod
+            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+        networks:
+            - rentspace
+
+volumes:
+    minio_data:
 
 networks:
     rentspace:

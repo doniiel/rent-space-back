@@ -1,12 +1,10 @@
 package com.rentspace.listingservice.storage.impl;
 
-import com.rentspace.listingservice.storage.StorageException;
+import com.rentspace.listingservice.exception.StorageException;
 import com.rentspace.listingservice.storage.StorageService;
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
+import io.minio.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +18,8 @@ import java.util.stream.Collectors;
 public class MinioStorageServiceImpl implements StorageService {
 
     private final MinioClient minioClient;
-    private final String bucketName;
+    @Value("${minio.bucket}")
+    private String bucketName;
 
     @Override
     public String uploadFile(MultipartFile file, String directory) throws StorageException {

@@ -1,14 +1,15 @@
 package com.rentspace.listingservice.config;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 @Data
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "minio")
+@AllArgsConstructor
+@NoArgsConstructor
 public class MinioProperties {
 
     private String bucket;

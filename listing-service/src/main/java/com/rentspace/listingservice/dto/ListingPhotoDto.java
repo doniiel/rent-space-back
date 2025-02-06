@@ -6,10 +6,10 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data
-public class PhotoDto {
+public class ListingPhotoDto {
 
     private Long id;
-    private String url;
+    private String photoUrl;
 
     @NotNull(message = "File cannot be null.")
     @NotEmpty(message = "File cannot be empty.")

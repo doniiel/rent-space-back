@@ -4,13 +4,13 @@ import com.rentspace.listingservice.dto.ListingDto;
 import com.rentspace.listingservice.entity.Listing;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = PhotoMapper.class)
+@Mapper(componentModel = "spring", uses = ListingPhotoMapper.class)
 public interface ListingMapper {
 
-    @Mapping(target = "photos", ignore = true)
+//    @Mapping(target = "listingPhotos", ignore = true)
     ListingDto toDto(Listing listing);
 
-    @Mapping(target = "photos", ignore = true)
+    @Mapping(target = "listingPhotos", ignore = true)
     Listing toEntity(ListingDto listingDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
