@@ -1,55 +1,94 @@
 package com.rentspace.listingservice.service.impl;
 
-import com.rentspace.listingservice.dto.ListingPhotoDto;
 import com.rentspace.listingservice.entity.Listing;
 import com.rentspace.listingservice.entity.ListingPhoto;
-import com.rentspace.listingservice.mapper.ListingPhotoMapper;
+import com.rentspace.listingservice.exception.ListingNotFoundException;
 import com.rentspace.listingservice.repository.ListingPhotoRepository;
+import com.rentspace.listingservice.repository.ListingsRepository;
 import com.rentspace.listingservice.service.ListingPhotoService;
 import com.rentspace.listingservice.storage.StorageService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ListingPhotoServiceImpl implements ListingPhotoService {
 
     private final StorageService storageService;
-    private final ListingPhotoRepository repository;
-    private final ListingPhotoMapper photoMapper;
+    private final ListingsRepository listingsRepository;
+    private final ListingPhotoRepository photoRepository;
 
     @Override
-    public List<ListingPhoto> savePhotos(Listing listing, List<MultipartFile> photos) {
-        List<String> photoUrls = storageService.uploadFiles(photos, "listings/" + listing.getId());
-        for (String photoUrl : photoUrls) {
-            ListingPhoto photo = new ListingPhoto();
-            photo.setListing(listing);
-            photo.setPhotoUrl(photoUrl);
-            repository.save(photo);
+    @Transactional
+    public List<ListingPhoto> savePhotos(Long listingId, List<MultipartFile> photos) {
+        Listing listing = listingsRepository.findById(listingId)
+                .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId));
+
+        return savePhotos(listing, photos);
+    }
+
+
+    private List<ListingPhoto> savePhotos(Listing listing, List<MultipartFile> photos) {
+        if (photos == null || photos.isEmpty()) {
+            return List.of();
         }
-        return repository.findByListing(listing);
+
+        List<ListingPhoto> savedPhotos = photos.stream()
+                .map(photo -> {
+                    String filePath = storageService.uploadFile(photo, "listings/" + listing.getId());
+                    String fileUrl = storageService.getFileUrl(filePath, null);
+                    return ListingPhoto.builder()
+                            .listing(listing)
+                            .photoUrl(fileUrl)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return photoRepository.saveAll(savedPhotos);
     }
 
     @Override
+    @Transactional
     public void deletePhotos(List<ListingPhoto> listingPhotos) {
-        listingPhotos.forEach(listingPhoto -> {
-            storageService.deleteFile(listingPhoto.getPhotoUrl(), "listings");
+        if (listingPhotos == null || listingPhotos.isEmpty()) {
+            return;
+        }
+
+        listingPhotos.forEach(photo -> {
+            storageService.deleteFile(photo.getPhotoUrl(), "listings/" + photo.getListing().getId());
+            log.info("Удалено фото: {}", photo.getPhotoUrl());
         });
-        repository.deleteAll(listingPhotos);
+
+        photoRepository.deleteAll(listingPhotos);
     }
 
     @Override
-    public List<ListingPhotoDto> toDtoList(List<ListingPhoto> listingPhotos) {
-        return photoMapper.toDtoList(listingPhotos);
-    }
+    @Transactional
+    public void updatePhotos(Long listingId, List<MultipartFile> newPhotos, List<String> deleteUrls) {
+        List<ListingPhoto> existingPhotos = photoRepository.findByListingId(listingId);
 
-    @Override
-    public List<ListingPhotoDto> getAllPhotos(Long listingId) {
-        List<ListingPhoto> listingPhotos = repository.findByListingId(listingId);
-        return toDtoList(listingPhotos);
+        // Загружаем listing, если фото отсутствуют
+        Listing listing = existingPhotos.isEmpty()
+                ? listingsRepository.findById(listingId)
+                .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId))
+                : existingPhotos.get(0).getListing();
+
+        List<ListingPhoto> photosToDelete = existingPhotos.stream()
+                .filter(photo -> deleteUrls.contains(photo.getPhotoUrl()))
+                .collect(Collectors.toList());
+
+        deletePhotos(photosToDelete);
+
+        List<ListingPhoto> addedPhotos = savePhotos(listing, newPhotos);
+
+        listing.getPhotos().clear();
+        listing.getPhotos().addAll(addedPhotos);
     }
 }

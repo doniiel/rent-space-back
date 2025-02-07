@@ -7,8 +7,9 @@ import java.io.InputStream;
 import java.util.List;
 
 public interface StorageService {
-    String uploadFile(MultipartFile file, String directory) throws StorageException;
-    List<String> uploadFiles(List<MultipartFile> files, String directory) throws StorageException;
-    InputStream downloadFile(String fileName, String directory) throws StorageException;
-    void deleteFile(String fileName, String directory) throws StorageException;
+    String uploadFile(MultipartFile file, String directory);
+    List<String> uploadFiles(List<MultipartFile> files, String directory);
+    String getFileUrl(String fileName, String directory);
+    InputStream downloadFile(String fileName, String directory);
+    void deleteFile(String fileName, String directory);
 }

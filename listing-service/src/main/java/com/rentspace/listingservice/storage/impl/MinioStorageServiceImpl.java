@@ -20,9 +20,11 @@ public class MinioStorageServiceImpl implements StorageService {
     private final MinioClient minioClient;
     @Value("${minio.bucket}")
     private String bucketName;
+    @Value("${minio.url}")
+    private String minioUrl;
 
     @Override
-    public String uploadFile(MultipartFile file, String directory) throws StorageException {
+    public String uploadFile(MultipartFile file, String directory) {
         try (InputStream inputStream = file.getInputStream()) {
             String objectName = directory + "/" + UUID.randomUUID() +  "_" + file.getOriginalFilename();
 
@@ -41,14 +43,19 @@ public class MinioStorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<String> uploadFiles(List<MultipartFile> files, String directory) throws StorageException {
+    public List<String> uploadFiles(List<MultipartFile> files, String directory) {
         return files.stream()
                 .map(file -> uploadFile(file, directory))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public InputStream downloadFile(String fileName, String directory) throws StorageException {
+    public String getFileUrl(String fileName, String directory) {
+        return String.format("%s/%s/%s", minioUrl, bucketName, fileName);
+    }
+
+    @Override
+    public InputStream downloadFile(String fileName, String directory) {
         try {
             return minioClient.getObject(
                     GetObjectArgs.builder()

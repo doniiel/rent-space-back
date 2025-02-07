@@ -69,5 +69,5 @@ public class Listing {
     private String updatedBy;
 
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ListingPhoto> listingPhotos;
+    private List<ListingPhoto> photos;
 }
