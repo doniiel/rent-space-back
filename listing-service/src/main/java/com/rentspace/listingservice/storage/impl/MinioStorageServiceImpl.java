@@ -2,8 +2,12 @@ package com.rentspace.listingservice.storage.impl;
 
 import com.rentspace.listingservice.exception.StorageException;
 import com.rentspace.listingservice.storage.StorageService;
-import io.minio.*;
+import io.minio.GetObjectArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MinioStorageServiceImpl implements StorageService {
@@ -71,13 +76,19 @@ public class MinioStorageServiceImpl implements StorageService {
     @Override
     public void deleteFile(String fileName, String directory) throws StorageException {
         try {
+            String objectPath = directory + "/" + fileName;
+            log.info("Попытка удаления файла из MinIO: {}", objectPath);
+
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
                             .bucket(bucketName)
-                            .object(directory + "/" + fileName)
+                            .object(objectPath)
                             .build()
             );
+
+            log.info("Файл успешно удален из MinIO: {}", objectPath);
         } catch (Exception e) {
+            log.error("Ошибка при удалении файла из MinIO: {}", e.getMessage(), e);
             throw new StorageException("Failed to delete file from Minio: " + e.getMessage(), e);
         }
     }

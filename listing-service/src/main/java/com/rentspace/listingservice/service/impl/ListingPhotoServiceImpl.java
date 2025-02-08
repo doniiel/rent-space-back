@@ -62,8 +62,16 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
         }
 
         listingPhotos.forEach(photo -> {
-            storageService.deleteFile(photo.getPhotoUrl(), "listings/" + photo.getListing().getId());
-            log.info("Удалено фото: {}", photo.getPhotoUrl());
+            // 1. Парсим URL, оставляем только имя файла
+            String fileUrl = photo.getPhotoUrl();
+            String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+
+            log.info("Удаление фото из MinIO: {}", fileName);
+
+            // 2. Передаем только имя файла и директорию
+            storageService.deleteFile(fileName, "listings/" + photo.getListing().getId());
+
+            log.info("Удалено фото: {}", fileName);
         });
 
         photoRepository.deleteAll(listingPhotos);
