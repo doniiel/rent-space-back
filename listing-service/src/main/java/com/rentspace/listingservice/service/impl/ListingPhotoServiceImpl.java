@@ -62,15 +62,11 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
         }
 
         listingPhotos.forEach(photo -> {
-            // 1. Парсим URL, оставляем только имя файла
             String fileUrl = photo.getPhotoUrl();
             String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
 
             log.info("Удаление фото из MinIO: {}", fileName);
-
-            // 2. Передаем только имя файла и директорию
             storageService.deleteFile(fileName, "listings/" + photo.getListing().getId());
-
             log.info("Удалено фото: {}", fileName);
         });
 
@@ -82,7 +78,6 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
     public void updatePhotos(Long listingId, List<MultipartFile> newPhotos, List<String> deleteUrls) {
         List<ListingPhoto> existingPhotos = photoRepository.findByListingId(listingId);
 
-        // Загружаем listing, если фото отсутствуют
         Listing listing = existingPhotos.isEmpty()
                 ? listingsRepository.findById(listingId)
                 .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId))
@@ -95,7 +90,6 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
         deletePhotos(photosToDelete);
 
         List<ListingPhoto> addedPhotos = savePhotos(listing, newPhotos);
-
         listing.getPhotos().clear();
         listing.getPhotos().addAll(addedPhotos);
     }

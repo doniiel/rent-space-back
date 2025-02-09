@@ -24,8 +24,8 @@ public class Bookings {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private Long userId;
     private Long listingId;
+    private Long userId;
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;
