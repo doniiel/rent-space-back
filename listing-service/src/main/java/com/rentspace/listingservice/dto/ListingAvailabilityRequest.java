@@ -5,8 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class ListingAvailabilityDto {
-    private Long id;
+public class ListingAvailabilityRequest {
     private Long listingId;
     private LocalDate startDate;
     private LocalDate endDate;
