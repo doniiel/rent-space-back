@@ -47,7 +47,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"John5\",\n    \"password\": \"ldfn5454,.5\"\n}",
+							"raw": "{\n    \"username\": \"John2\",\n    \"password\": \"ldfn5454,.\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -78,7 +78,7 @@
 						"header": [
 							{
 								"key": "Refresh-Token",
-								"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huNSIsImlhdCI6MTczODY2OTM5NCwiZXhwIjoxNzM5Mjc0MTk0fQ.fMKtvB7vkyAan9dri4Y5baFtKlftb-repERLmMATCko",
+								"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTI2NjUxOCwiZXhwIjoxNzM5ODcxMzE4fQ.IV_IGZuo2nf9fCK1yJKrq1NUHuryAG8eQXJC0dJRfAQ",
 								"type": "text"
 							}
 						],
@@ -94,6 +94,38 @@
 								"v1",
 								"auth",
 								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTI2NjYzNywiZXhwIjoxNzM5MjcwMjM3fQ.QnnJuueWjqVJHJZAAFrYR-xsofCx33-ONlO3PlG34qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
 							]
 						}
 					},
@@ -231,6 +263,433 @@
 								"api",
 								"v1",
 								"booking"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Listing",
+			"item": [
+				{
+					"name": "get listing",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "get all listing",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "get all listing by user",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "create listing",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczODkzMTYxNSwiZXhwIjoxNzM4OTM1MjE1LCJyb2xlIjoiVVNFUiJ9.9aGPV8ZdcC9PRbHYBFJKyvdJq13fc_SsGTgHB50OnmA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 1,\n  \"title\": \"Cozy Apartment\",\n  \"description\": \"A beautiful apartment in the city center.\",\n  \"address\": \"123 Main St\",\n  \"city\": \"New York\",\n  \"country\": \"USA\",\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060,\n  \"type\": \"APARTMENT\",\n  \"maxGuests\": 4,\n  \"pricePerNight\": 120.0\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update listing",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczODkzMTYxNSwiZXhwIjoxNzM4OTM1MjE1LCJyb2xlIjoiVVNFUiJ9.9aGPV8ZdcC9PRbHYBFJKyvdJq13fc_SsGTgHB50OnmA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Luxury Apartment\",\n  \"description\": \"A luxurious apartment with stunning views.\",\n  \"address\": \"456 Elm St\",\n  \"city\": \"Los Angeles\",\n  \"country\": \"USA\",\n  \"latitude\": 34.0522,\n  \"longitude\": -118.2437,\n  \"type\": \"APARTMENT\",\n  \"maxGuests\": 5,\n  \"pricePerNight\": 200.0\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete listing",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczODkzNTEwMywiZXhwIjoxNzM4OTM4NzAzLCJyb2xlIjoiVVNFUiJ9.4V-XkODdmnqugEacvBQJXbRXiUhfKtTcj18Z533FgmE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add listing photo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczODkzMTYxNSwiZXhwIjoxNzM4OTM1MjE1LCJyb2xlIjoiVVNFUiJ9.9aGPV8ZdcC9PRbHYBFJKyvdJq13fc_SsGTgHB50OnmA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photos",
+									"type": "file",
+									"src": [
+										"/home/daniyal/Documents/projects/startup/quramDetect/image1.jpg",
+										"/home/daniyal/Documents/projects/startup/quramDetect/image2.jpg",
+										"/home/daniyal/Documents/projects/startup/quramDetect/image3.jpg"
+									]
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/1/photos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"1",
+								"photos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get listing photo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTQ0NjMwNiwiZXhwIjoxNzM5NDQ5OTA2LCJyb2xlIjoiVVNFUiJ9.q0lxRLSWCbNCeN-jtQJbqg7JTV7Eyb90AL99Mqk-wrI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/1/photos/8e5da998-dbe0-480f-8905-c88a51723bbd_image1.jpg",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"1",
+								"photos",
+								"8e5da998-dbe0-480f-8905-c88a51723bbd_image1.jpg"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete listing photo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTQ0NjMwNiwiZXhwIjoxNzM5NDQ5OTA2LCJyb2xlIjoiVVNFUiJ9.q0lxRLSWCbNCeN-jtQJbqg7JTV7Eyb90AL99Mqk-wrI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "deleteUrls",
+									"value": "8e5da998-dbe0-480f-8905-c88a51723bbd_image1.jpg",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/1/photos\n",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"1",
+								"photos\n"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get listing availability",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "create listing availability",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTQ0NjMwNiwiZXhwIjoxNzM5NDQ5OTA2LCJyb2xlIjoiVVNFUiJ9.q0lxRLSWCbNCeN-jtQJbqg7JTV7Eyb90AL99Mqk-wrI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"listingId\": 4,\n  \"startDate\": \"2023-09-01\",\n  \"endDate\": \"2023-09-30\",\n  \"available\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/4/availability",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"4",
+								"availability"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "set listing availability",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTQ0NjMwNiwiZXhwIjoxNzM5NDQ5OTA2LCJyb2xlIjoiVVNFUiJ9.q0lxRLSWCbNCeN-jtQJbqg7JTV7Eyb90AL99Mqk-wrI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"listingId\": 4,\n  \"startDate\": \"2023-10-01\",\n  \"endDate\": \"2023-10-31\",\n  \"available\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/4/availability",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"4",
+								"availability"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get listing amenities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/4/amenities",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"4",
+								"amenities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add listing amenities",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/4/amenities",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"4",
+								"amenities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete listing amenities",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7777/api/v1/listings/4/amenities",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"v1",
+								"listings",
+								"4",
+								"amenities"
 							]
 						}
 					},
