@@ -23,7 +23,6 @@ import static jakarta.persistence.GenerationType.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString(exclude = {"listingPhotos"})
 @EntityListeners(AuditingEntityListener.class)
 public class Listing {
 

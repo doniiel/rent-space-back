@@ -27,17 +27,17 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
 
     @Override
     @Transactional
-    public List<ListingPhoto> savePhotos(Long listingId, List<MultipartFile> photos) {
+    public void savePhotos(Long listingId, List<MultipartFile> photos) {
         Listing listing = listingsRepository.findById(listingId)
                 .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId));
 
-        return savePhotos(listing, photos);
+        savePhotos(listing, photos);
     }
 
 
-    private List<ListingPhoto> savePhotos(Listing listing, List<MultipartFile> photos) {
+    private void savePhotos(Listing listing, List<MultipartFile> photos) {
         if (photos == null || photos.isEmpty()) {
-            return List.of();
+            return;
         }
 
         List<ListingPhoto> savedPhotos = photos.stream()
@@ -51,7 +51,7 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
                 })
                 .collect(Collectors.toList());
 
-        return photoRepository.saveAll(savedPhotos);
+        photoRepository.saveAll(savedPhotos);
     }
 
     @Override
@@ -60,7 +60,6 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
         if (listingPhotos == null || listingPhotos.isEmpty()) {
             return;
         }
-
         listingPhotos.forEach(photo -> {
             String fileUrl = photo.getPhotoUrl();
             String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
@@ -75,22 +74,29 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
 
     @Override
     @Transactional
-    public void updatePhotos(Long listingId, List<MultipartFile> newPhotos, List<String> deleteUrls) {
+    public void deletePhotos(Long listingId, List<String> deleteUrls) {
+        if (deleteUrls == null || deleteUrls.isEmpty()) {
+            return;
+        }
         List<ListingPhoto> existingPhotos = photoRepository.findByListingId(listingId);
-
-        Listing listing = existingPhotos.isEmpty()
-                ? listingsRepository.findById(listingId)
-                .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId))
-                : existingPhotos.get(0).getListing();
-
         List<ListingPhoto> photosToDelete = existingPhotos.stream()
                 .filter(photo -> deleteUrls.contains(photo.getPhotoUrl()))
                 .collect(Collectors.toList());
 
-        deletePhotos(photosToDelete);
+        if (photosToDelete.isEmpty()) {
+            return;
+        }
 
-        List<ListingPhoto> addedPhotos = savePhotos(listing, newPhotos);
-        listing.getPhotos().clear();
-        listing.getPhotos().addAll(addedPhotos);
+        Listing listing = photosToDelete.get(0).getListing();
+        listing.getPhotos().removeAll(photosToDelete);
+
+        photosToDelete.forEach(photo -> {
+            String fileUrl = photo.getPhotoUrl();
+            String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+            log.info("Удаление фото из хранилища: {}", fileName);
+            storageService.deleteFile(fileName, "listings/" + listingId);
+            log.info("Фото удалено: {}", fileName);
+        });
+        photoRepository.deleteAll(photosToDelete);
     }
 }

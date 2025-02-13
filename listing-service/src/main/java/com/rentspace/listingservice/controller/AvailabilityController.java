@@ -3,6 +3,7 @@
     import com.rentspace.listingservice.dto.ListingAvailabilityDto;
     import com.rentspace.listingservice.dto.ListingAvailabilityRequest;
     import com.rentspace.listingservice.service.ListingAvailabilityService;
+    import jakarta.validation.Valid;
     import lombok.RequiredArgsConstructor;
     import org.springframework.http.ResponseEntity;
     import org.springframework.web.bind.annotation.*;
@@ -11,22 +12,22 @@
 
     @RestController
     @RequiredArgsConstructor
-    @RequestMapping("/api/v1/availability")
+    @RequestMapping("/api/v1/listings/{listingId}/availability")
     public class AvailabilityController {
         private final ListingAvailabilityService service;
 
-        @GetMapping("/{listingId}")
+        @GetMapping
         public ResponseEntity<List<ListingAvailabilityDto>> getAvailabilityByListingId(@PathVariable Long listingId) {
             return ResponseEntity.ok(service.getAvailabilityByListing(listingId));
         }
 
-        @PostMapping("create/{listingId}")
-        public ResponseEntity<ListingAvailabilityDto> createAvailability(@PathVariable Long listingId, @RequestBody ListingAvailabilityRequest request) {
+        @PostMapping
+        public ResponseEntity<ListingAvailabilityDto> createAvailability(@PathVariable Long listingId, @Valid @RequestBody ListingAvailabilityRequest request) {
             return ResponseEntity.ok(service.setAvailability(listingId, request));
         }
 
-        @PutMapping("update/{listingId}")
-        public ResponseEntity<ListingAvailabilityDto> updateAvailability(@PathVariable Long listingId, @RequestBody ListingAvailabilityRequest request) {
+        @PutMapping
+        public ResponseEntity<ListingAvailabilityDto> updateAvailability(@PathVariable Long listingId, @Valid @RequestBody ListingAvailabilityRequest request) {
             return ResponseEntity.ok(service.setAvailability(listingId, request));
         }
     }

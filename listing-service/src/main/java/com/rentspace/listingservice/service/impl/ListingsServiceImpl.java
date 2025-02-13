@@ -78,10 +78,7 @@ public class ListingsServiceImpl implements ListingsService {
     public void deleteListing(Long listingId) {
         Listing listing = listingsRepository.findById(listingId)
                 .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId));
-
-        // Удаление фото перед удалением объявления
         listingPhotoService.deletePhotos(listing.getPhotos());
-
         listingsRepository.delete(listing);
         log.info("Удалено объявление с ID: {}", listingId);
     }
