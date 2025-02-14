@@ -9,6 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -28,12 +30,14 @@ public class ListingAmenities implements Serializable {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "listing_id", nullable = false, unique = true)
+    @JoinColumn(name = "listing_id", nullable = false)
     private Listing listing;
 
+    @ElementCollection(targetClass = AmenityType.class)
     @Enumerated(STRING)
+    @CollectionTable(name = "listing_amenity_types", joinColumns = @JoinColumn(name = "listing_amenity_id"))
     @Column(name = "amenity_type")
-    private AmenityType amenityType;
+    private Set<AmenityType> amenityTypes;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

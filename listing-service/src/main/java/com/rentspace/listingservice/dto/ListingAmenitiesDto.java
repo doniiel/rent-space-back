@@ -4,12 +4,14 @@ import com.rentspace.listingservice.enums.AmenityType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Data
 public class ListingAmenitiesDto {
     private Long id;
     private Long listingId;
-    private AmenityType amenityType;
+    private Set<AmenityType> amenityTypes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

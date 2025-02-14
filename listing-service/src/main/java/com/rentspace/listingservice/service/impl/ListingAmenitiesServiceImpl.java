@@ -12,8 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -24,29 +23,60 @@ public class ListingAmenitiesServiceImpl implements ListingAmenitiesService {
     private final ListingAmenitiesMapper mapper;
 
     @Override
-    public List<ListingAmenitiesDto> getAmenitiesByListing(Long listingId) {
-        return repository.findByListingId(listingId).stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public ListingAmenitiesDto getAmenitiesByListing(Long listingId) {
+        ListingAmenities amenities = repository.findByListingId(listingId).orElseThrow(
+                () -> new ListingNotFoundException("Listing", "listingId", listingId));
+        return mapper.toDto(amenities);
     }
 
     @Override
-    public ListingAmenitiesDto addAmenityToListing(Long listingId, AmenityType amenityType) {
-        var listing  = listingsRepository.findById(listingId).orElseThrow(
-                () -> new ListingNotFoundException("Listing", "listingId", listingId));
-        ListingAmenities amenities = new ListingAmenities();
-        amenities.setListing(listing);
-        amenities.setAmenityType(amenityType);
+    public ListingAmenitiesDto addAmenitiesToListing(Long listingId, Set<AmenityType> amenityTypes) {
+        ListingAmenities amenities = repository.findByListingId(listingId)
+                .orElseGet(() -> {
+                    var newAmenities = new ListingAmenities();
+                    newAmenities.setListing(listingsRepository.findById(listingId)
+                            .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId)));
+                    newAmenities.setAmenityTypes(new HashSet<>());
+                    return newAmenities;
+                });
+
+        Set<AmenityType> currAmenities = amenities.getAmenityTypes();
+        if (currAmenities == null) {
+            currAmenities = new HashSet<>();
+        }
+        currAmenities.addAll(amenityTypes);
+        amenities.setAmenityTypes(currAmenities);
         repository.save(amenities);
         return mapper.toDto(amenities);
     }
 
     @Override
-    public void removeAmenityFromListing(Long listingId, Long amenityId) {
-        var listing = listingsRepository.findById(listingId).orElseThrow(
-                () -> new ListingNotFoundException("Listing", "listingId", listingId));
-        List<ListingAmenities> amenitiesList = repository.findByListingId(listingId);
-        amenitiesList.removeIf(amenity -> amenity.getId().equals(amenityId));
-        repository.saveAll(amenitiesList);
+    public ListingAmenitiesDto updateAmenitiesForListing(Long listingId, Set<AmenityType> amenityTypes) {
+        ListingAmenities amenities = repository.findByListingId(listingId)
+                .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId));
+        amenities.setAmenityTypes(amenityTypes);
+        repository.save(amenities);
+        return mapper.toDto(amenities);
+    }
+
+    @Override
+    public ListingAmenitiesDto removeAmenityFromListing(Long listingId, AmenityType amenityType) {
+        ListingAmenities amenities = repository.findByListingId(listingId)
+                .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId));
+        Set<AmenityType> currentAmenities = amenities.getAmenityTypes();
+        if (currentAmenities != null) {
+            currentAmenities.remove(amenityType);
+            amenities.setAmenityTypes(currentAmenities);
+            repository.save(amenities);
+        }
+        return mapper.toDto(amenities);
+    }
+
+    @Override
+    public void removeAllAmenitiesFromListing(Long listingId) {
+        ListingAmenities amenities = repository.findByListingId(listingId)
+                .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId));
+        amenities.setAmenityTypes(Collections.emptySet());
+        repository.save(amenities);
     }
 }
