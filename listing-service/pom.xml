@@ -93,6 +93,17 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Spring Cloud Dependencies -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
 		<!-- MapStruct Dependency -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
@@ -120,4 +131,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<build>
+		<finalName>app</finalName>
+	</build>
 </project>

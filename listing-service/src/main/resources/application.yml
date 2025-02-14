@@ -1,26 +1,23 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: "listingservice"
-  datasource:
-    url: jdbc:postgresql://localhost:5432/userservicedb
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+  config:
+    import: "optional:configserver:http://localhost:8071/"
 
-server:
-  port: 7777
-
-minio:
-  bucket: "images"
-  url: "http://localhost:9000/"
-  accessKey: "minioadmin"
-  secretKey: "minioadmin"
-jwt:
-  secret-key: "ZGlnNF4lXiYqKCo0MjRnZXdnZXdma2Vmfmg4gr25fbg15"
-  access-expiration-time: 3600000
-  refresh-expiration-time: 604800000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    liveness-state:
+      enabled: true
+    readiness-state:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true

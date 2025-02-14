@@ -114,6 +114,31 @@ services:
         networks:
             - rentspace
 
+    listingservice:
+        image: d0niiel/listingservice:v1
+        container_name: listingservice
+        restart: always
+        ports:
+            - "8082:8082"
+        depends_on:
+            discoveryservice:
+                condition: service_healthy
+            userservicedb:
+                condition: service_healthy
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: postgres
+            SPRING_PROFILES_ACTIVE: prod
+            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+            MINIO_BUCKET: images
+            MINIO_URL: http://minio:9000/
+            MINIO_ACCESSKEY: minioadmin
+            MINIO_SECRETKEY: minioadmin
+        networks:
+            - rentspace
+
 volumes:
     minio_data:
 
