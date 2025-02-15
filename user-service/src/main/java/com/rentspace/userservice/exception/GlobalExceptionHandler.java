@@ -14,9 +14,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -37,7 +35,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             errorMessage.append(fieldName).append(" (").append(message).append("), ");
         }
 
-        if (errorMessage.length() > 0) {
+        if (!errorMessage.isEmpty()) {
             errorMessage.setLength(errorMessage.length() - 2);
         }
 
@@ -73,8 +71,41 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, CONFLICT);
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidCredentials(InvalidCredentialsException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                UNAUTHORIZED.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(TokenInvalidException.class)
+    public ResponseEntity<ErrorResponseDto> handleTokenInvalid(TokenInvalidException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                UNAUTHORIZED.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(TokenNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleTokenNotFound(TokenNotFoundException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                UNAUTHORIZED.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleGlobalException(RuntimeException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleGlobalException(WebRequest request) {
         ErrorResponseDto errorResponse = new ErrorResponseDto(
                 request.getDescription(false).replace("uri=", ""),
                 INTERNAL_SERVER_ERROR.value(),

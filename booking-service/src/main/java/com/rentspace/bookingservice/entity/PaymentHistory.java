@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentTransactions implements Serializable {
+public class PaymentHistory implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,6 +4,7 @@ import com.rentspace.listingservice.dto.ListingCreateRequest;
 import com.rentspace.listingservice.dto.ListingDto;
 import com.rentspace.listingservice.dto.ListingUpdateRequest;
 import com.rentspace.listingservice.entity.Listing;
+import com.rentspace.listingservice.exception.InvalidListingDataException;
 import com.rentspace.listingservice.exception.ListingNotFoundException;
 import com.rentspace.listingservice.mapper.ListingMapper;
 import com.rentspace.listingservice.repository.ListingsRepository;
@@ -29,6 +30,9 @@ public class ListingsServiceImpl implements ListingsService {
     @Override
     @Transactional
     public ListingDto createListing(ListingCreateRequest request) {
+//        if (!isValidListingData(request)) {
+//            throw  new InvalidListingDataException("Invalid listing data");
+//        }
         Listing listing = listingMapper.toEntity(request);
         listingsRepository.save(listing);
 

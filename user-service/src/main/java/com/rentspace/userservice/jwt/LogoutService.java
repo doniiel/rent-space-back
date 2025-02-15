@@ -1,5 +1,6 @@
 package com.rentspace.userservice.jwt;
 
+import com.rentspace.userservice.exception.TokenNotFoundException;
 import com.rentspace.userservice.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +25,7 @@ public class LogoutService implements LogoutHandler {
             String token = authHeader.substring(PREFIX_LENGTH);
 
             var changedtoken = tokenRepository.findByToken(token).orElseThrow(
-                    () -> new RuntimeException("Token not found")
+                    () -> new TokenNotFoundException("Token : " + token + " not found")
             );
             changedtoken.setExpired(true);
             changedtoken.setRevoked(true);

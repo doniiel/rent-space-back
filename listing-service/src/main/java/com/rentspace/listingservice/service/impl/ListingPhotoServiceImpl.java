@@ -3,6 +3,8 @@ package com.rentspace.listingservice.service.impl;
 import com.rentspace.listingservice.entity.Listing;
 import com.rentspace.listingservice.entity.ListingPhoto;
 import com.rentspace.listingservice.exception.ListingNotFoundException;
+import com.rentspace.listingservice.exception.ListingPhotosNotFoundException;
+import com.rentspace.listingservice.exception.PhotosUploadException;
 import com.rentspace.listingservice.repository.ListingPhotoRepository;
 import com.rentspace.listingservice.repository.ListingsRepository;
 import com.rentspace.listingservice.service.ListingPhotoService;
@@ -30,10 +32,12 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
     public void savePhotos(Long listingId, List<MultipartFile> photos) {
         Listing listing = listingsRepository.findById(listingId)
                 .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId));
-
-        savePhotos(listing, photos);
+        try {
+            savePhotos(listing, photos);
+        } catch (Exception ex) {
+            throw new PhotosUploadException("Error uploading photos");
+        }
     }
-
 
     private void savePhotos(Listing listing, List<MultipartFile> photos) {
         if (photos == null || photos.isEmpty()) {
@@ -84,7 +88,7 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
                 .collect(Collectors.toList());
 
         if (photosToDelete.isEmpty()) {
-            return;
+            throw new ListingPhotosNotFoundException("Photo for deletion not found");
         }
 
         Listing listing = photosToDelete.get(0).getListing();

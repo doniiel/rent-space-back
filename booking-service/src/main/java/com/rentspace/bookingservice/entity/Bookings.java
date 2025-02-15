@@ -9,8 +9,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.EnumType.*;
-import static jakarta.persistence.GenerationType.*;
+import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Getter
 @Setter
@@ -18,7 +18,7 @@ import static jakarta.persistence.GenerationType.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bookings")
-public class Bookings {
+public class Bookings extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

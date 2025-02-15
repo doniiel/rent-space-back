@@ -118,6 +118,12 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- Swagger Dependencies -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		</dependency>
+
 <!--		&lt;!&ndash; Database Migrations &ndash;&gt;-->
 <!--		<dependency>-->
 <!--			<groupId>org.flywaydb</groupId>-->

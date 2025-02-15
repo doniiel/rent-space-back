@@ -4,6 +4,7 @@ import com.rentspace.userservice.dto.RegisterRequest;
 import com.rentspace.userservice.dto.UserCreateRequest;
 import com.rentspace.userservice.entity.Token;
 import com.rentspace.userservice.entity.User;
+import com.rentspace.userservice.exception.InvalidCredentialsException;
 import com.rentspace.userservice.exception.UserNotFoundException;
 import com.rentspace.userservice.repository.TokenRepository;
 import com.rentspace.userservice.service.AuthService;
@@ -61,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
         );
 
         if (!authentication.isAuthenticated()) {
-            throw new UserNotFoundException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         return (User) authentication.getPrincipal();
