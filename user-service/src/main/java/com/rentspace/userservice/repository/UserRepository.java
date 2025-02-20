@@ -1,6 +1,6 @@
 package com.rentspace.userservice.repository;
 
-import com.rentspace.userservice.entity.User;
+import com.rentspace.userservice.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

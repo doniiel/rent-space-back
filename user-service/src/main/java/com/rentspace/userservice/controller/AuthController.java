@@ -2,6 +2,7 @@ package com.rentspace.userservice.controller;
 
 import com.rentspace.userservice.dto.LoginRequest;
 import com.rentspace.userservice.dto.RegisterRequest;
+import com.rentspace.userservice.service.AccountVerificationService;
 import com.rentspace.userservice.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final AccountVerificationService verificationService;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
@@ -27,6 +29,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
+        Map<String, Object> response = authService.registerUserAndGenerateTokens(request);
+        verificationService.sendVerificationEmail(authService.findUserByUsername(request.getUsername()));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(authService.registerUserAndGenerateTokens(request));
@@ -37,7 +41,12 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> refreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(authService.refreshAccessToken(refreshToken));
+    }
 
+    @GetMapping("/confirm")
+    public ResponseEntity<String> confirmAccount(@RequestParam String token) {
+        verificationService.confirmAccount(token);
+        return ResponseEntity.ok("Account successfully confirmed!");
     }
 }
 

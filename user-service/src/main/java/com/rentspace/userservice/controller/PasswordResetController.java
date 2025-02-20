@@ -20,17 +20,15 @@ public class PasswordResetController {
 
     @PostMapping("/forgot")
     public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-        String resetCode = passwordResetService.generateResetCode();
-        passwordResetService.sendResetCode(email, resetCode);
-        return ResponseEntity.status(OK).body("Код сброса отправлен на email.");
+        passwordResetService.sendResetCode(email);
+        return ResponseEntity.status(OK).body("Reset code sent to email.");
     }
 
     @PostMapping("/reset")
-    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String resetCode, @RequestParam String newPassword) {
-        if (passwordResetService.validateResetCode(email, resetCode)) {
-            return ResponseEntity.status(OK).body("Пароль сброшен успешно.");
-        } else {
-            return ResponseEntity.status(FORBIDDEN).body("Неверный код сброса.");
-        }
+    public ResponseEntity<String> resetPassword(@RequestParam String email,
+                                                @RequestParam String resetCode,
+                                                @RequestParam String newPassword) {
+        passwordResetService.resetPassword(email, resetCode, newPassword);
+        return ResponseEntity.status(OK).body("Password successfully reset.");
     }
 }

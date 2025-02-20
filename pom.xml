@@ -16,6 +16,7 @@
         <module>config-service</module>
         <module>booking-service</module>
         <module>core</module>
+        <module>review-service</module>
         <module>payment-service</module>
         <module>notification-service</module>
         <module>gateway-service</module>
@@ -47,6 +48,7 @@
         <postgresql.version>42.7.3</postgresql.version>
         <h2database.version>2.2.224</h2database.version>
         <minio.version>8.5.11</minio.version>
+        <kafka.version>3.3.2</kafka.version>
         <flyway.version>11.3.0</flyway.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -212,6 +214,13 @@
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>
                 <version>${minio.version}</version>
+            </dependency>
+
+            <!-- KAFKA DEPENDENCY-->
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${kafka.version}</version>
             </dependency>
 
             <!-- TESTING DEPENDENCY -->

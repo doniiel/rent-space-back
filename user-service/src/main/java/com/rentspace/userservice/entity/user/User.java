@@ -1,4 +1,4 @@
-package com.rentspace.userservice.entity;
+package com.rentspace.userservice.entity.user;
 
 import com.rentspace.userservice.enums.Role;
 import jakarta.persistence.*;
@@ -61,6 +61,8 @@ public class User implements UserDetails, Serializable {
     @Column(name = "updated_by")
     private String updatedBy;
 
+    private boolean isVerified;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(() -> "ROLE_" + role.name());
@@ -68,7 +70,7 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isVerified;
     }
 
     @Override

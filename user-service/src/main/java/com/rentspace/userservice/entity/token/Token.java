@@ -1,5 +1,6 @@
-package com.rentspace.userservice.entity;
+package com.rentspace.userservice.entity.token;
 
+import com.rentspace.userservice.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 

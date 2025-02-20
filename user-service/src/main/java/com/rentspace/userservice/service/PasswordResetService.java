@@ -4,13 +4,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface PasswordResetService {
-
-    // Генерация случайного кода для сброса пароля
-    public String generateResetCode();
-
-    // Отправка кода сброса пароля на email пользователя
-    public void sendResetCode(String email, String resetCode);
-
-    // Проверка правильности кода сброса
+    public void sendResetCode(String email);
     public boolean validateResetCode(String email, String resetCode);
+    public void resetPassword(String email, String resetCode, String newPassword);
 }

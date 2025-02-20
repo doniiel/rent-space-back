@@ -2,10 +2,9 @@ package com.rentspace.userservice.service.impl;
 
 import com.rentspace.userservice.dto.RegisterRequest;
 import com.rentspace.userservice.dto.UserCreateRequest;
-import com.rentspace.userservice.entity.Token;
-import com.rentspace.userservice.entity.User;
+import com.rentspace.userservice.entity.token.Token;
+import com.rentspace.userservice.entity.user.User;
 import com.rentspace.userservice.exception.InvalidCredentialsException;
-import com.rentspace.userservice.exception.UserNotFoundException;
 import com.rentspace.userservice.repository.TokenRepository;
 import com.rentspace.userservice.service.AuthService;
 import com.rentspace.userservice.service.UserService;

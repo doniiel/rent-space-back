@@ -1,5 +1,6 @@
 package com.rentspace.bookingservice.jwt;
 
+import com.rentspace.bookingservice.exception.TokenExpiredException;
 import com.rentspace.bookingservice.util.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -32,8 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>()));
                 }
             } catch (ExpiredJwtException e) {
-                // Обработка истекшего токена
-                // Например, отправить ошибку или вернуть ответ с кодом 401
+                throw new TokenExpiredException("Token has expired");
             }
         }
 

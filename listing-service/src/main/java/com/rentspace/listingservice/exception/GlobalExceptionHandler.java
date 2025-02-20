@@ -126,6 +126,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         );
         return new ResponseEntity<>(errorResponse, CONFLICT);
     }
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<ErrorResponseDto> handleTokenExpiredException(TokenExpiredException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                INTERNAL_SERVER_ERROR.value(),
+                "An unexpected error occurred.",
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, UNAUTHORIZED);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleException(WebRequest request) {

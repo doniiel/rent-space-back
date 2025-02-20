@@ -1,4 +1,4 @@
-package com.rentspace.userservice.entity;
+package com.rentspace.userservice.entity.user;
 
 import com.rentspace.userservice.enums.Currency;
 import com.rentspace.userservice.enums.Language;

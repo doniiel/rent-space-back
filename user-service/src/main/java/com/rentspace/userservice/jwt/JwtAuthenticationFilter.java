@@ -1,6 +1,6 @@
 package com.rentspace.userservice.jwt;
 
-import com.rentspace.userservice.entity.Token;
+import com.rentspace.userservice.entity.token.Token;
 import com.rentspace.userservice.repository.TokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;

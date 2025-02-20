@@ -1,9 +1,6 @@
 package com.rentspace.bookingservice.service.impl;
 
-import com.rentspace.bookingservice.client.ListingClient;
-import com.rentspace.bookingservice.client.UserClient;
-import com.rentspace.bookingservice.dto.BookingRequestDto;
-import com.rentspace.bookingservice.dto.BookingResponseDto;
+import com.rentspace.bookingservice.dto.BookingDto;
 import com.rentspace.bookingservice.repository.BookingRepository;
 import com.rentspace.bookingservice.service.BookingService;
 import lombok.RequiredArgsConstructor;
@@ -21,27 +18,27 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository repository;
 
     @Override
-    public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) {
+    public BookingDto createBooking(BookingRequestDto bookingRequestDto) {
         return null;
     }
 
     @Override
-    public BookingResponseDto cancelBooking(Long bookingId) {
+    public BookingDto cancelBooking(Long bookingId) {
         return null;
     }
 
     @Override
-    public BookingResponseDto confirmBooking(Long bookingId) {
+    public BookingDto confirmBooking(Long bookingId) {
         return null;
     }
 
     @Override
-    public List<BookingResponseDto> getBookingsByUserId(Long userId) {
+    public List<BookingDto> getBookingsByUserId(Long userId) {
         return null;
     }
 
     @Override
-    public List<BookingResponseDto> getBookingsByListingId(Long listingId) {
+    public List<BookingDto> getBookingsByListingId(Long listingId) {
         return null;
     }
 }
