@@ -7,6 +7,19 @@ spring:
   config:
     import: "optional:configserver:http://localhost:8071/"
 
+  kafka:
+    bootstrap-servers: localhost:9091, localhost:9092, localhost:9093
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      properties:
+        delivery.timeout.ms: 10000
+        linger-ms: 1000
+        request-timeout-ms: 10000
+        max-in-flight-requests-per-connection: 5
+        enable.idempotence: true
+
 management:
   endpoints:
     web:
@@ -33,3 +46,4 @@ app:
 event:
   topic:
     verification: account-verification
+    password-reset: password-reset

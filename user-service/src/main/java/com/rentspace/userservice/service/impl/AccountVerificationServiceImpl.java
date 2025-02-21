@@ -12,12 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import static com.rentspace.userservice.util.EmailTemplateUtil.VERIFICATION_MESSAGE;
 import static com.rentspace.userservice.util.EmailTemplateUtil.VERIFICATION_SUBJECT;
-import static com.rentspace.userservice.util.VerificationTokenUtil.generateConfirmAccountUrl;
+import static com.rentspace.userservice.util.EmailTemplateUtil.getVerificationMessage;
+import static com.rentspace.userservice.util.VerificationTokenUtil.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +28,11 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
 
     @Override
     public void sendVerificationEmail(User user) {
-        String token = UUID.randomUUID().toString();
+        String token = generateVerificationToken();
         VerificationToken verificationToken = VerificationToken.builder()
                 .token(token)
                 .user(user)
-                .expiryDate(LocalDateTime.now().plusHours(24))
+                .expiryDate(getExpiryDate())
                 .build();
         verificationTokenRepository.save(verificationToken);
 
@@ -44,7 +41,7 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
         AccountVerificationEvent event = AccountVerificationEvent.builder()
                 .email(user.getEmail())
                 .subject(VERIFICATION_SUBJECT)
-                .message(VERIFICATION_MESSAGE+ link)
+                .message(getVerificationMessage(link))
                 .build();
         kafkaTemplate.send(topicName, user.getEmail(), event);
 
@@ -54,7 +51,7 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
     public void confirmAccount(String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token).orElseThrow(
                 () -> new InvalidCredentialsException("Invalid verification token"));
-        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (isTokenExpired(verificationToken.getExpiryDate())) {
             throw new InvalidCredentialsException("Verification token has expired");
         }
 

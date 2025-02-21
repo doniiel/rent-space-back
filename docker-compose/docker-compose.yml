@@ -56,6 +56,66 @@ services:
         networks:
             - rentspace
 
+    kafka-1:
+        image: bitnami/kafka:latest
+        container_name: kafka-1
+        environment:
+            - KAFKA_CFG_NODE_ID=1
+            - KAFKA_CFG_PROCESS_ROLES=broker,controller
+            - KAFKA_KRAFT_CLUSTER_ID=
+            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9091
+            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9192,EXTERNAL://localhost:9091
+            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+        ports:
+            -   "9091:9091"
+        volumes:
+            -   kafka-data-1:/bitnami/kafka
+        networks:
+            - rentspace
+
+    kafka-2:
+        image: bitnami/kafka:latest
+        container_name: kafka-2
+        environment:
+            - KAFKA_CFG_NODE_ID=2
+            - KAFKA_CFG_PROCESS_ROLES=broker,controller
+            - KAFKA_KRAFT_CLUSTER_ID=
+            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9092
+            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9192,EXTERNAL://localhost:9092
+            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+        ports:
+            -   "9092:9092"
+        volumes:
+            -   kafka-data-2:/bitnami/kafka
+        networks:
+            - rentspace
+
+    kafka-3:
+        image: bitnami/kafka:latest
+        container_name: kafka-3
+        environment:
+            - KAFKA_CFG_NODE_ID=3
+            - KAFKA_CFG_PROCESS_ROLES=broker,controller
+            - KAFKA_KRAFT_CLUSTER_ID=
+            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9093
+            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9192,EXTERNAL://localhost:9093
+            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+        ports:
+            -   "9093:9093"
+        volumes:
+            -   kafka-data-3:/bitnami/kafka
+        networks:
+            - rentspace
+
     configservice:
         container_name: configservice
         image: d0niiel/configservice:v1
@@ -141,6 +201,9 @@ services:
 
 volumes:
     minio_data:
+    kafka-data-1:
+    kafka-data-2:
+    kafka-data-3:
 
 networks:
     rentspace:
