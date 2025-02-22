@@ -55,6 +55,11 @@ public class AuthServiceImpl implements AuthService {
         return generateTokens(username, role);
     }
 
+    @Override
+    public User findUserByUsername(String username) {
+        return userService.getUserByUsername(username);
+    }
+
     private User authenticateUser(String username, String password) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)

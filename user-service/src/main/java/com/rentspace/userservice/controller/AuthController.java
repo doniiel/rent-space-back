@@ -33,7 +33,7 @@ public class AuthController {
         verificationService.sendVerificationEmail(authService.findUserByUsername(request.getUsername()));
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(authService.registerUserAndGenerateTokens(request));
+                .body(response);
     }
 
 

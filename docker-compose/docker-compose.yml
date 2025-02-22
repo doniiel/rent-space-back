@@ -56,65 +56,65 @@ services:
         networks:
             - rentspace
 
-    kafka-1:
-        image: bitnami/kafka:latest
-        container_name: kafka-1
-        environment:
-            - KAFKA_CFG_NODE_ID=1
-            - KAFKA_CFG_PROCESS_ROLES=broker,controller
-            - KAFKA_KRAFT_CLUSTER_ID=
-            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9091
-            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9192,EXTERNAL://localhost:9091
-            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
-            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
-        ports:
-            -   "9091:9091"
-        volumes:
-            -   kafka-data-1:/bitnami/kafka
-        networks:
-            - rentspace
-
-    kafka-2:
-        image: bitnami/kafka:latest
-        container_name: kafka-2
-        environment:
-            - KAFKA_CFG_NODE_ID=2
-            - KAFKA_CFG_PROCESS_ROLES=broker,controller
-            - KAFKA_KRAFT_CLUSTER_ID=
-            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9092
-            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9192,EXTERNAL://localhost:9092
-            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
-            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
-        ports:
-            -   "9092:9092"
-        volumes:
-            -   kafka-data-2:/bitnami/kafka
-        networks:
-            - rentspace
-
-    kafka-3:
-        image: bitnami/kafka:latest
-        container_name: kafka-3
-        environment:
-            - KAFKA_CFG_NODE_ID=3
-            - KAFKA_CFG_PROCESS_ROLES=broker,controller
-            - KAFKA_KRAFT_CLUSTER_ID=
-            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9093
-            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9192,EXTERNAL://localhost:9093
-            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
-            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
-        ports:
-            -   "9093:9093"
-        volumes:
-            -   kafka-data-3:/bitnami/kafka
-        networks:
-            - rentspace
+#    kafka-1:
+#        image: bitnami/kafka:latest
+#        container_name: kafka-1
+#        environment:
+#            - KAFKA_CFG_NODE_ID=1
+#            - KAFKA_CFG_PROCESS_ROLES=broker,controller
+#            - KAFKA_KRAFT_CLUSTER_ID=nky7lYvIRimbvRyKeHU8-g
+#            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9092
+#            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9192,EXTERNAL://localhost:9092
+#            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+#            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+#            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+#            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+#        ports:
+#            -   "9091:9091"
+#        volumes:
+#            -   kafka-data-1:/bitnami/kafka
+#        networks:
+#            - rentspace
+#
+#    kafka-2:
+#        image: bitnami/kafka:latest
+#        container_name: kafka-2
+#        environment:
+#            - KAFKA_CFG_NODE_ID=2
+#            - KAFKA_CFG_PROCESS_ROLES=broker,controller
+#            - KAFKA_KRAFT_CLUSTER_ID=nky7lYvIRimbvRyKeHU8-g
+#            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9092
+#            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9192,EXTERNAL://localhost:9092
+#            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+#            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+#            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+#            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+#        ports:
+#            -   "9092:9092"
+#        volumes:
+#            -   kafka-data-2:/bitnami/kafka
+#        networks:
+#            - rentspace
+#
+#    kafka-3:
+#        image: bitnami/kafka:latest
+#        container_name: kafka-3
+#        environment:
+#            - KAFKA_CFG_NODE_ID=3
+#            - KAFKA_CFG_PROCESS_ROLES=broker,controller
+#            - KAFKA_KRAFT_CLUSTER_ID=nky7lYvIRimbvRyKeHU8-g
+#            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9092
+#            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9192,EXTERNAL://localhost:9092
+#            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+#            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+#            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+#            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+#        ports:
+#            -   "9093:9093"
+#        volumes:
+#            -   kafka-data-3:/bitnami/kafka
+#        networks:
+#            - rentspace
 
     configservice:
         container_name: configservice
@@ -150,54 +150,61 @@ services:
         networks:
             - rentspace
 
-    userservice:
-        image: d0niiel/userservice:v1
-        container_name: userservice
-        restart: always
-#        extends:
-#            file: common-config.yml
-#            service: app-service
-        ports:
-            - "8080:8080"
-        depends_on:
-            discoveryservice:
-                condition: service_healthy
-            userservicedb:
-                condition: service_healthy
-        environment:
-            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
-            SPRING_DATASOURCE_USERNAME: postgres
-            SPRING_DATASOURCE_PASSWORD: postgres
-            SPRING_PROFILES_ACTIVE: prod
-            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
-            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
-        networks:
-            - rentspace
-
-    listingservice:
-        image: d0niiel/listingservice:v1
-        container_name: listingservice
-        restart: always
-        ports:
-            - "8082:8082"
-        depends_on:
-            discoveryservice:
-                condition: service_healthy
-            userservicedb:
-                condition: service_healthy
-        environment:
-            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
-            SPRING_DATASOURCE_USERNAME: postgres
-            SPRING_DATASOURCE_PASSWORD: postgres
-            SPRING_PROFILES_ACTIVE: prod
-            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
-            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
-            MINIO_BUCKET: images
-            MINIO_URL: http://minio:9000/
-            MINIO_ACCESSKEY: minioadmin
-            MINIO_SECRETKEY: minioadmin
-        networks:
-            - rentspace
+#    userservice:
+#        image: d0niiel/userservice:v1
+#        container_name: userservice
+#        restart: always
+##        extends:
+##            file: common-config.yml
+##            service: app-service
+#        ports:
+#            - "8080:8080"
+#        depends_on:
+#            discoveryservice:
+#                condition: service_healthy
+#            userservicedb:
+#                condition: service_healthy
+#            kafka-1:
+#                condition: service_started
+#            kafka-2:
+#                condition: service_started
+#            kafka-3:
+#                condition: service_started
+#        environment:
+#            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+#            SPRING_DATASOURCE_USERNAME: postgres
+#            SPRING_DATASOURCE_PASSWORD: postgres
+#            SPRING_PROFILES_ACTIVE: prod
+#            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+#            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+#            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9192,kafka-2:9192,kafka-3:9192"
+#        networks:
+#            - rentspace
+#
+#    listingservice:
+#        image: d0niiel/listingservice:v1
+#        container_name: listingservice
+#        restart: always
+#        ports:
+#            - "8082:8082"
+#        depends_on:
+#            discoveryservice:
+#                condition: service_healthy
+#            userservicedb:
+#                condition: service_healthy
+#        environment:
+#            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+#            SPRING_DATASOURCE_USERNAME: postgres
+#            SPRING_DATASOURCE_PASSWORD: postgres
+#            SPRING_PROFILES_ACTIVE: prod
+#            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+#            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+#            MINIO_BUCKET: images
+#            MINIO_URL: http://minio:9000/
+#            MINIO_ACCESSKEY: minioadmin
+#            MINIO_SECRETKEY: minioadmin
+#        networks:
+#            - rentspace
 
 volumes:
     minio_data:
@@ -207,4 +214,5 @@ volumes:
 
 networks:
     rentspace:
+        name: rentspace
         driver: bridge
