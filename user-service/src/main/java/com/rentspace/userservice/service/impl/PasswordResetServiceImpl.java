@@ -1,8 +1,8 @@
 package com.rentspace.userservice.service.impl;
 
+import com.rentspace.core.event.PasswordResetEvent;
 import com.rentspace.userservice.entity.token.PasswordResetToken;
 import com.rentspace.userservice.entity.user.User;
-import com.rentspace.userservice.event.PasswordResetEvent;
 import com.rentspace.userservice.exception.InvalidCredentialsException;
 import com.rentspace.userservice.exception.UserNotFoundException;
 import com.rentspace.userservice.repository.PasswordResetTokenRepository;
