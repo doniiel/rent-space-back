@@ -28,7 +28,7 @@ public class NotificationConsumer {
     public void handleVerificationEvent(@Payload AccountVerificationEvent event) {
         Map<String, Object> emailVariables = new HashMap<>();
         emailVariables.put("name", event.getEmail().split("@")[0]); // Имя пользователя
-        emailVariables.put("verificationCode", event.getMessage()); // Код подтверждения
+        emailVariables.put("verificationCode", extractVerificationCode(event.getMessage())); // Код подтверждения
 
         processNotification(event.getEmail(), event.getSubject(), "email-verification", emailVariables, NotificationType.ACCOUNT_VERIFICATION);
     }
@@ -37,7 +37,7 @@ public class NotificationConsumer {
     public void handlePasswordResetEvent(@Payload PasswordResetEvent event) {
         Map<String, Object> emailVariables = new HashMap<>();
         emailVariables.put("name", event.getEmail().split("@")[0]); // Имя пользователя
-        emailVariables.put("resetCode", event.getMessage()); // Код сброса пароля
+        emailVariables.put("resetCode", extractVerificationCode(event.getMessage())); // Код сброса пароля
 
         processNotification(event.getEmail(), event.getSubject(), "email-password-reset", emailVariables, NotificationType.PASSWORD_RESET);
     }
@@ -55,5 +55,11 @@ public class NotificationConsumer {
             log.error("Failed to send {} email to {}. Error: ", type, email, e);
             notificationService.updateNotificationStatus(notification.getId(), NotificationStatus.FAILED);
         }
+    }
+    private String extractVerificationCode(String message) {
+        if (message != null && message.matches(".*\\d+$")) {
+            return message.replaceAll(".*?(\\d+)$", "$1");
+        }
+        return "ERROR_CODE";
     }
 }
