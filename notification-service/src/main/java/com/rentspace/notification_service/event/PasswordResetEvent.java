@@ -1,4 +1,4 @@
-package com.rentspace.userservice.event;
+package com.rentspace.notification_service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountVerificationEvent {
+public class PasswordResetEvent {
     private String email;
     private String subject;
     private String message;

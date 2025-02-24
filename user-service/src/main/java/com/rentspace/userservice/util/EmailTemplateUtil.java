@@ -6,7 +6,7 @@ public class EmailTemplateUtil {
     public static final String PASSWORD_RESET_SUBJECT = "Password Reset Request";
 
     public static String getVerificationMessage(String link) {
-        return "Please click the link to verify your account: " + link;
+        return VERIFICATION_MESSAGE + link;
     }
 
     public static String getPasswordResetMessage(String resetCode) {

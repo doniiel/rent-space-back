@@ -1,4 +1,4 @@
-package com.rentspace.userservice.event;
+package com.rentspace.notification_service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

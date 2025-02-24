@@ -24,15 +24,21 @@ public class Notifications implements Serializable {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-    private Long userId;
+
+    private String email;
+
     @Enumerated(STRING)
     private NotificationType type;
+
     private String message;
+
     @Enumerated(STRING)
     private NotificationStatus status;
+
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
 }

@@ -18,6 +18,11 @@
 	<description>User Service for RentSpace Backend</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.rentspace</groupId>
+			<artifactId>core</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 		<!-- Spring Boot Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -2,11 +2,11 @@ package com.rentspace.userservice.util;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class VerificationTokenUtil {
-
+    private static final SecureRandom RANDOM = new SecureRandom();
     private static final int EXPIRY_TIME_HOURS = 24;
     private static String confirmAccountUrl;
 
@@ -15,7 +15,8 @@ public class VerificationTokenUtil {
         confirmAccountUrl = url;
     }
     public static String generateVerificationToken() {
-        return UUID.randomUUID().toString();
+        int code = 100000 + RANDOM.nextInt(900000);
+        return String.valueOf(code);
     }
 
     public static LocalDateTime getExpiryDate() {
