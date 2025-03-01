@@ -1,6 +1,8 @@
 spring:
   application:
-    name: notification-service
+    name: "notificationservice"
+  config:
+    import: "optional:configserver:http://localhost:8071/"
 
   datasource:
     url: jdbc:postgresql://localhost:5432/userservicedb
@@ -33,7 +35,7 @@ spring:
       mail.smtp.starttls.required: true
 
 server:
-  port: 8082
+  port: 8083
 
 event:
   topic:
