@@ -12,3 +12,7 @@ spring:
 server:
   port: 9085
 
+event:
+  topic:
+    payment: payment-topic
+

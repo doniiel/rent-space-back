@@ -1,35 +1,33 @@
 package com.rentspace.bookingservice.entity;
 
-import com.rentspace.bookingservice.util.Status;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.rentspace.bookingservice.enums.BookingStatus;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Positive;
+import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.EnumType.STRING;
-import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Getter
 @Setter
 @Entity
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bookings")
-public class Bookings extends BaseEntity{
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-
+public class Booking extends BaseEntity implements Serializable {
     private Long listingId;
     private Long userId;
-
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+
+    @Positive
     private Double totalPrice;
+
     @Enumerated(STRING)
-    private Status status;
+    private BookingStatus status;
 }

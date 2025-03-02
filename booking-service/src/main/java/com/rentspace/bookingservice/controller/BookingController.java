@@ -2,18 +2,38 @@ package com.rentspace.bookingservice.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/booking")
+@RequestMapping("/api/v1/bookings")
 public class BookingController {
+
     @PostMapping
-    public String createBooking(@RequestBody String bookingDetails) {
-        // Логика для создания бронирования
-        return "Booking created successfully!";
+    public ResponseEntity<?> createBooking() {
+
     }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getBookingsByUserId() {
+
+    }
+
+    @PatchMapping("/{bookingId}/cancel")
+    public ResponseEntity<?> cancelBooking() {
+
+    }
+
+    @PostMapping("/payments")
+    public ResponseEntity<?> createPayment() {
+
+    }
+
+    @GetMapping("/payments/{userId}")
+    public ResponseEntity<?> getPaymentsByUserId() {
+
+    }
+
+
 }
