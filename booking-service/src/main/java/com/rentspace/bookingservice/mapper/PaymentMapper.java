@@ -1,6 +1,6 @@
 package com.rentspace.bookingservice.mapper;
 
-import com.rentspace.bookingservice.entity.Booking;
+import com.rentspace.bookingservice.dto.PaymentTransactionDto;
 import com.rentspace.bookingservice.entity.PaymentTransaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
