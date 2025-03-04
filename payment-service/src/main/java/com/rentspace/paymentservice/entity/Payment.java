@@ -27,7 +27,7 @@ public class Payment {
 
     private Long userId;
     @Column(nullable = false)
-    private BigDecimal amount;
+    private Double amount;
 
     @Enumerated(STRING)
     @Column(nullable = false)
