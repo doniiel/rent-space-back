@@ -1,6 +1,5 @@
 package com.rentspace.bookingservice.dto;
 
-import com.rentspace.bookingservice.enums.PaymentStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;

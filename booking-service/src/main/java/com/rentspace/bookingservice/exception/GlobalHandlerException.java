@@ -1,12 +1,12 @@
 package com.rentspace.bookingservice.exception;
 
 import com.rentspace.core.dto.ErrorResponseDto;
+import feign.FeignException;
 import lombok.NonNull;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,7 +15,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
@@ -43,6 +42,22 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponseDto, BAD_REQUEST);
     }
 
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<ErrorResponseDto> handleFeignException(FeignException ex, WebRequest request) {
+        HttpStatus httpStatus = BAD_REQUEST;
+
+        if (ex.status() == 404) {
+            httpStatus = NOT_FOUND;
+        }
+
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                httpStatus.value(),
+                "External service error: " + ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponseDto, httpStatus);
+    }
 
     @ExceptionHandler(BookingNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleResourceNotFound(BookingNotFoundException ex, WebRequest request) {
@@ -56,7 +71,7 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(BookingAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handleResourceNotFound(BookingAlreadyExistsException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleAlreadyExists(BookingAlreadyExistsException ex, WebRequest request) {
         ErrorResponseDto errorResponse = new ErrorResponseDto(
                 request.getDescription(false).replace("uri=", ""),
                 CONFLICT.value(),
@@ -78,7 +93,7 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(TokenExpiredException.class)
-    public ResponseEntity<ErrorResponseDto> handleResourceNotFound(TokenExpiredException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleExpired(TokenExpiredException ex, WebRequest request) {
         ErrorResponseDto errorResponse = new ErrorResponseDto(
                 request.getDescription(false).replace("uri=", ""),
                 UNAUTHORIZED.value(),
@@ -86,6 +101,17 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponse, UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDto> handleResourceNotFound(IllegalArgumentException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                BAD_REQUEST.value(),
+                "Invalid status value. Allowed values: PENDING, SUCCESS, FAILED",
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

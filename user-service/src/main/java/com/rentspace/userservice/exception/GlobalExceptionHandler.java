@@ -1,6 +1,8 @@
 package com.rentspace.userservice.exception;
 
-import com.rentspace.userservice.dto.ErrorResponseDto;
+
+import com.rentspace.core.dto.ErrorResponseDto;
+import com.rentspace.core.exception.UserNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -49,17 +51,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleUserNotFound(UserNotFoundException ex, WebRequest request) {
-        ErrorResponseDto errorResponse = new ErrorResponseDto(
-                request.getDescription(false).replace("uri=", ""),
-                NOT_FOUND.value(),
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
-        return new ResponseEntity<>(errorResponse, NOT_FOUND);
-    }
-
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDto> handleResourceNotFound(UserAlreadyExistsException ex, WebRequest request) {
         ErrorResponseDto errorResponse = new ErrorResponseDto(
@@ -102,6 +93,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponse, UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleUserNotFound(UserNotFoundException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)

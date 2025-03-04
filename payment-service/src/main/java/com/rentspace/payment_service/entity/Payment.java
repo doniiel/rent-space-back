@@ -3,6 +3,8 @@ package com.rentspace.payment_service.entity;
 import com.rentspace.payment_service.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -10,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Currency;
 
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -18,20 +21,27 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Builder @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class Payments {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     private Long userId;
+    @Column(nullable = false)
     private BigDecimal amount;
+
+    @Enumerated(STRING)
+    @Column(nullable = false)
     private Currency currency;
+
+    @Enumerated(STRING)
     private PaymentStatus status;
-    @CreatedDate
+
+    @CreationTimestamp
     @Column(updatable = false, insertable = false)
     private LocalDateTime createdDate;
-    @LastModifiedDate
-    private LocalDateTime updatedDate;
 
+    @UpdateTimestamp
+    private LocalDateTime updatedDate;
 }

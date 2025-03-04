@@ -1,11 +1,10 @@
 package com.rentspace.bookingservice.entity;
 
-import com.rentspace.bookingservice.enums.PaymentStatus;
+import com.rentspace.core.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 import static jakarta.persistence.EnumType.STRING;
 
@@ -21,7 +20,7 @@ public class PaymentTransaction extends BaseEntity implements Serializable {
     private Booking booking;
 
     private Long userId;
-    private BigDecimal amount;
+    private Double amount;
 
     @Enumerated(STRING)
     private PaymentStatus status;

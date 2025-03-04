@@ -10,6 +10,7 @@ import com.rentspace.bookingservice.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper mapper;
 
     @Override
+    @Transactional
     public BookingDto createBooking(CreateBookingRequest request) {
         Booking booking = Booking.builder()
                 .userId(request.getUserId())
@@ -34,11 +36,13 @@ public class BookingServiceImpl implements BookingService {
                 .endDate(request.getEndDate())
                 .status(PENDING)
                 .build();
+        log.info("Creating booking for User ID: {}, Listing ID: {}", request.getUserId(), request.getListingId());
         Booking savedBooking = repository.save(booking);
         return mapper.toDto(savedBooking);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingDto getBookingById(Long bookingId) {
         Booking existBooking = repository.findById(bookingId).orElseThrow(
                 () -> new BookingNotFoundException("Booking", "Id", bookingId));
@@ -46,6 +50,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto cancelBooking(Long bookingId) {
         Booking existBooking = repository.findById(bookingId).orElseThrow(
                 () -> new BookingNotFoundException("Booking", "Id", bookingId));
@@ -55,6 +60,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> getAllBookingsByUserId(Long userId) {
         List<Booking> bookings = repository.findByUserId(userId);
         return bookings.stream()

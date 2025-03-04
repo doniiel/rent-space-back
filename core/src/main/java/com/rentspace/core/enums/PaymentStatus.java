@@ -1,4 +1,4 @@
-package com.rentspace.bookingservice.enums;
+package com.rentspace.core.enums;
 
 public enum PaymentStatus {
     PENDING,
