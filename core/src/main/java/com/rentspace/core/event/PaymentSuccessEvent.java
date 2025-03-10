@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PaymentSuccessEvent {
     private Long bookingId;
+    private Long paymentId;
 }

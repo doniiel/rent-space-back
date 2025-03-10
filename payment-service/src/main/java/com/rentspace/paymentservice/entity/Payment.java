@@ -1,17 +1,16 @@
 package com.rentspace.paymentservice.entity;
 
 import com.rentspace.core.enums.PaymentStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.io.Serializable;
 import java.util.Currency;
 
 import static jakarta.persistence.EnumType.STRING;
-import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "payments")
@@ -19,27 +18,16 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Builder @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class Payment {
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-
+public class Payment extends BaseEntity implements Serializable {
     private Long userId;
+    private Long bookingId;
+
     @Column(nullable = false)
     private Double amount;
 
-    @Enumerated(STRING)
     @Column(nullable = false)
-    private Currency currency;
+    private String currency;
 
     @Enumerated(STRING)
     private PaymentStatus status;
-
-    @CreationTimestamp
-    @Column(updatable = false, insertable = false)
-    private LocalDateTime createdDate;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedDate;
 }

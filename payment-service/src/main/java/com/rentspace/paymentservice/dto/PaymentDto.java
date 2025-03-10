@@ -12,8 +12,9 @@ import java.util.Currency;
 public class PaymentDto {
     private Long id;
     private Long userId;
+    private Long bookingId;
     private Double amount;
-    private Currency currency;
+    private String currency;
     private PaymentStatus paymentStatus;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
