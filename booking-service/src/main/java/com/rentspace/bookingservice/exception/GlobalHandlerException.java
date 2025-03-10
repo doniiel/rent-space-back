@@ -81,17 +81,6 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, CONFLICT);
     }
 
-    @ExceptionHandler(PaymentTransactionNotFound.class)
-    public ResponseEntity<ErrorResponseDto> handleResourceNotFound(PaymentTransactionNotFound ex, WebRequest request) {
-        ErrorResponseDto errorResponse = new ErrorResponseDto(
-                request.getDescription(false).replace("uri=", ""),
-                NOT_FOUND.value(),
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
-        return new ResponseEntity<>(errorResponse, NOT_FOUND);
-    }
-
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<ErrorResponseDto> handleExpired(TokenExpiredException ex, WebRequest request) {
         ErrorResponseDto errorResponse = new ErrorResponseDto(
