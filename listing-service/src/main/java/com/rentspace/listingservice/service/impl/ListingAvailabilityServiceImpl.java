@@ -1,5 +1,6 @@
 package com.rentspace.listingservice.service.impl;
 
+import com.rentspace.core.exception.ListingNotAvailableException;
 import com.rentspace.listingservice.dto.ListingAvailabilityDto;
 import com.rentspace.listingservice.dto.ListingAvailabilityRequest;
 import com.rentspace.listingservice.entity.Listing;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,14 +59,14 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
         return mapper.toDto(availability);
     }
     @Override
-    public boolean isAvailable(Long listingId, LocalDate startDate, LocalDate endDate) {
+    public boolean isAvailable(Long listingId, LocalDateTime startDate , LocalDateTime endDate) {
         log.info("Checking availability for listingId={} from {} to {}", listingId, startDate, endDate);
         return !availabilityRepository.existsByListingIdAndAvailableTrueAndStartDateBeforeAndEndDateAfter(
                 listingId, endDate, startDate);
     }
 
     @Override
-    public ListingAvailabilityDto bookAvailability(Long listingId, LocalDate startDate, LocalDate endDate) {
+    public ListingAvailabilityDto bookAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Booking availability for listingId={} from {} to {}", listingId, startDate, endDate);
 
         if (!availabilityRepository.existsByListingIdAndAvailableTrueAndStartDateBeforeAndEndDateAfter(
@@ -81,7 +83,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
     }
 
     @Override
-    public void cancelBooking(Long listingId, LocalDate startDate, LocalDate endDate) {
+    public void cancelBooking(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Canceling booking for listingId={} from {} to {}", listingId, startDate, endDate);
 
         int deletedCount = availabilityRepository.deleteByListingIdAndStartDateAndEndDateAndAvailableFalse(
@@ -90,6 +92,33 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
         if (deletedCount == 0) {
             throw new IllegalStateException("No booking found to cancel for listingId=" + listingId +
                     " from " + startDate + " to " + endDate);
+        }
+    }
+
+    @Override
+    public void blockAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
+        log.info("Blocking availability for listingId={} from {} to {}", listingId, startDate, endDate);
+        if (!isAvailable(listingId, startDate, endDate)) {
+            throw new ListingNotAvailableException(listingId, startDate.toString(), endDate.toString());
+        }
+
+        var listingAvailable = getListingById(listingId);
+        ListingAvailability availability = createAvailability(listingAvailable, startDate, endDate, false);
+        availabilityRepository.save(availability);
+
+        log.info("Successfully blocked availability for listingId={} from {} to {}", listingId, startDate, endDate);
+    }
+
+    @Override
+    public void unblockAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
+        log.info("Unblocking availability for listingId={} from {} to {}", listingId, startDate, endDate);
+
+        int deletedCount = availabilityRepository.deleteByListingIdAndStartDateAndEndDateAndAvailableFalse(
+                listingId, startDate, endDate);
+        if (deletedCount == 0) {
+            log.warn("No booking found to unblock for listingId={} from {} to {}", listingId, startDate, endDate);
+        } else {
+            log.info("Successfully unblocked availability for listingId={} from {} to {}", listingId, startDate, endDate);
         }
     }
 

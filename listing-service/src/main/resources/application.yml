@@ -6,6 +6,17 @@ spring:
     name: "listingservice"
   config:
     import: "optional:configserver:http://localhost:8071/"
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "*"
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
 
 management:
   endpoints:
@@ -21,3 +32,9 @@ management:
     health:
       probes:
         enabled: true
+
+event:
+  topic:
+    listing: listing-availability
+    listing-response: listing-availability-response
+    listing-unblock: listing-unblock

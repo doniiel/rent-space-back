@@ -30,8 +30,8 @@ public class ListingAvailability implements Serializable {
     @JoinColumn(name = "listing_id", nullable = false)
     private Listing listing;
 
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private boolean available;
 
     @CreatedDate

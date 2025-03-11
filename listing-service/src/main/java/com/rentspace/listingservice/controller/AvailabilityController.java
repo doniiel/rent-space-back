@@ -42,4 +42,21 @@
             boolean available = service.isAvailable(listingId, LocalDate.parse(startDate), LocalDate.parse(endDate));
             return ResponseEntity.ok(available);
         }
+
+        @PostMapping("/block")
+        public ResponseEntity<Void> blockAvailability(@PathVariable Long listingId,
+                                                      @RequestParam String startDate,
+                                                      @RequestParam String endDate) {
+            service.blockAvailability(listingId, LocalDate.parse(startDate), LocalDate.parse(endDate));
+            return ResponseEntity.ok().build();
+        }
+
+        @DeleteMapping("/unblock")
+        public ResponseEntity<Void> unblockAvailability(@PathVariable Long listingId,
+                                                      @RequestParam String startDate,
+                                                      @RequestParam String endDate) {
+
+            service.unblockAvailability(listingId, LocalDate.parse(startDate), LocalDate.parse(endDate));
+            return ResponseEntity.ok().build();
+        }
     }

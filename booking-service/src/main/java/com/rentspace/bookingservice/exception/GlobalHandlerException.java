@@ -1,6 +1,7 @@
 package com.rentspace.bookingservice.exception;
 
 import com.rentspace.core.dto.ErrorResponseDto;
+import com.rentspace.core.exception.ListingNotAvailableException;
 import feign.FeignException;
 import lombok.NonNull;
 import org.springframework.http.HttpHeaders;
@@ -98,6 +99,17 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
                 request.getDescription(false).replace("uri=", ""),
                 BAD_REQUEST.value(),
                 "Invalid status value. Allowed values: PENDING, SUCCESS, FAILED",
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ListingNotAvailableException.class)
+    public ResponseEntity<ErrorResponseDto> handleListingNotAvailable(ListingNotAvailableException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                BAD_REQUEST.value(),
+                ex.getMessage(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);

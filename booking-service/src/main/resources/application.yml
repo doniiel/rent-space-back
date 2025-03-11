@@ -24,6 +24,7 @@ server:
 event:
   topic:
     payment: payment-topic
-
+    listing: listing-availability
+    listing-response: listing-availability-response
 listing-service:
   url: http://localhost:8082/api/v1/listings

@@ -1,0 +1,66 @@
+package com.rentspace.listingservice.handler;
+
+import com.rentspace.core.enums.ListingStatus;
+import com.rentspace.core.event.ListingAvailabilityEvent;
+import com.rentspace.core.event.ListingAvailableResponse;
+import com.rentspace.core.event.ListingUnblockEvent;
+import com.rentspace.listingservice.service.ListingAvailabilityService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ListingHandler {
+    private final ListingAvailabilityService service;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    @Value("${event.topic.listing}")
+    private String availableTopic;
+
+    @KafkaListener(topics = "${event.topic.listing}, ${event.topic.listing-availability}", groupId = "${spring.kafka.consumer.group-id}")
+    public void handleListingAvailabilityEvent(@Payload ListingAvailabilityEvent event) {
+        log.info("Received listing availability event for booking ID: {}", event.getBookingId());
+
+        boolean isAvailable = service.isAvailable(event.getListingId(), event.getStartDate(), event.getEndDate());
+
+        ListingAvailableResponse response;
+        if (isAvailable) {
+            service.blockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
+
+            response = ListingAvailableResponse.builder()
+                    .bookingId(event.getBookingId())
+                    .listingId(event.getListingId())
+                    .status(ListingStatus.AVAILABLE.name())
+                    .build();
+
+            kafkaTemplate.send(availableTopic, response);
+            log.info("Sent listing available response for booking ID: {}", event.getBookingId());
+        } else {
+            response = ListingAvailableResponse.builder()
+                    .bookingId(event.getBookingId())
+                    .listingId(event.getListingId())
+                    .status(ListingStatus.UNAVAILABLE.name())
+                    .build();
+
+            kafkaTemplate.send(availableTopic, response);
+            log.info("Sent listing unavailable response for booking ID: {}", event.getBookingId());
+        }
+    }
+
+    @KafkaListener(topics = "listing-unblock", groupId = "${spring.kafka.consumer.group-id}")
+    public void handlerListingUnblock(@Payload ListingUnblockEvent event) {
+        log.info("Received listing unblock event for booking ID: {}", event.getBookingId());
+
+        service.unblockAvailability(event.getListingId(), LocalDateTime.parse(event.getStartDate()), LocalDateTime.parse(event.getEndDate()));
+
+        log.info("Successfully unblocked availability for listingId={} from {} to {}", event.getListingId(), event.getStartDate(), event.getEndDate());
+    }
+}

@@ -12,16 +12,21 @@ import com.rentspace.core.event.PaymentFailureEvent;
 import com.rentspace.core.event.PaymentSuccessEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BookingConsumer {
+public class BookingHandler {
     private final BookingService service;
     private final BookingRepository repository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    @Value("${event.topic.payment}")
+    private String paymentTopic;
 
     @KafkaListener(topics = "${event.topic.payment-success}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlerSuccessPaymentEvent(@Payload PaymentSuccessEvent event) {
@@ -45,13 +50,18 @@ public class BookingConsumer {
             Booking booking = repository.findById(event.getBookingId())
                     .orElseThrow(() -> new BookingNotFoundException("Booking", "bookingId", event.getBookingId()));
 
-            BookingCreatedEvent event = BookingCreatedEvent.builder()
+            BookingCreatedEvent bookingCreatedEvent = BookingCreatedEvent.builder()
                     .bookingId(booking.getId())
                     .userId(booking.getUserId())
                     .listingId(booking.getListingId())
                     .totalPrice(booking.getTotalPrice())
                     .build();
-            
+
+            kafkaTemplate.send(paymentTopic, bookingCreatedEvent);
+            log.info("Sent payment request for booking ID: {}", event.getBookingId());
+        } else {
+            log.warn("Listing is not available. Canceling booking ID: {}", event.getBookingId());
+            service.deleteBooking(event.getBookingId());
         }
 
     }
