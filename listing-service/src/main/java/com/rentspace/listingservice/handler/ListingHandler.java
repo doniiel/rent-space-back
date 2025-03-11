@@ -13,7 +13,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -22,10 +21,10 @@ import java.time.LocalDateTime;
 public class ListingHandler {
     private final ListingAvailabilityService service;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    @Value("${event.topic.listing}")
-    private String availableTopic;
+    @Value("${event.topic.listing.availability.response}")
+    private String responseTopic;
 
-    @KafkaListener(topics = "${event.topic.listing}, ${event.topic.listing-availability}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "${event.topic.listing.availability.request}", groupId = "${spring.kafka.consumer.group-id}")
     public void handleListingAvailabilityEvent(@Payload ListingAvailabilityEvent event) {
         log.info("Received listing availability event for booking ID: {}", event.getBookingId());
 
@@ -41,7 +40,7 @@ public class ListingHandler {
                     .status(ListingStatus.AVAILABLE.name())
                     .build();
 
-            kafkaTemplate.send(availableTopic, response);
+            kafkaTemplate.send(responseTopic, response);
             log.info("Sent listing available response for booking ID: {}", event.getBookingId());
         } else {
             response = ListingAvailableResponse.builder()
@@ -50,12 +49,12 @@ public class ListingHandler {
                     .status(ListingStatus.UNAVAILABLE.name())
                     .build();
 
-            kafkaTemplate.send(availableTopic, response);
+            kafkaTemplate.send(responseTopic, response);
             log.info("Sent listing unavailable response for booking ID: {}", event.getBookingId());
         }
     }
 
-    @KafkaListener(topics = "listing-unblock", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "${event.topic.listing.availability.unblock}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlerListingUnblock(@Payload ListingUnblockEvent event) {
         log.info("Received listing unblock event for booking ID: {}", event.getBookingId());
 

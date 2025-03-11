@@ -61,7 +61,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
     @Override
     public boolean isAvailable(Long listingId, LocalDateTime startDate , LocalDateTime endDate) {
         log.info("Checking availability for listingId={} from {} to {}", listingId, startDate, endDate);
-        return !availabilityRepository.existsByListingIdAndAvailableTrueAndStartDateBeforeAndEndDateAfter(
+        return !availabilityRepository.existsByListingIdAndAvailableTrueAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
                 listingId, endDate, startDate);
     }
 
@@ -69,7 +69,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
     public ListingAvailabilityDto bookAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Booking availability for listingId={} from {} to {}", listingId, startDate, endDate);
 
-        if (!availabilityRepository.existsByListingIdAndAvailableTrueAndStartDateBeforeAndEndDateAfter(
+        if (!availabilityRepository.existsByListingIdAndAvailableTrueAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
                 listingId, startDate, endDate)) {
             throw new IllegalStateException("Listing is not available for the selected dates.");
         }

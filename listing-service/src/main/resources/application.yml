@@ -35,6 +35,9 @@ management:
 
 event:
   topic:
-    listing: listing-availability
-    listing-response: listing-availability-response
-    listing-unblock: listing-unblock
+    listing:
+      availability:
+        request: "listing-availability-request"
+        response: "listing-availability-response"
+        block: "listing-availability-block"
+        unblock: "listing-availability-unblock"
