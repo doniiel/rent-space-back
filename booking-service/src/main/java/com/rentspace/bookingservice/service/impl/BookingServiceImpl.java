@@ -1,5 +1,6 @@
 package com.rentspace.bookingservice.service.impl;
 
+import com.rentspace.bookingservice.client.ListingClient;
 import com.rentspace.bookingservice.dto.BookingDto;
 import com.rentspace.bookingservice.dto.CreateBookingRequest;
 import com.rentspace.bookingservice.entity.Booking;
@@ -9,6 +10,7 @@ import com.rentspace.bookingservice.mapper.BookingMapper;
 import com.rentspace.bookingservice.repository.BookingRepository;
 import com.rentspace.bookingservice.service.BookingService;
 import com.rentspace.core.event.BookingCreatedEvent;
+import com.rentspace.core.exception.ListingNotAvailableException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,12 +32,29 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository repository;
     private final BookingMapper mapper;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ListingClient listingClient;
     @Value("${event.topic.payment}")
     private String paymentTopic;
 
     @Override
     @Transactional
     public BookingDto createBooking(CreateBookingRequest request) {
+        log.info("Checking availability for listing ID: {} from {} to {}",
+                request.getListingId(), request.getStartDate(), request.getEndDate());
+        Boolean isAvailable = listingClient.checkAvailability(
+                request.getListingId(),
+                request.getStartDate().toString(),
+                request.getEndDate().toString()
+        );
+
+        if (Boolean.FALSE.equals(isAvailable)) {
+            throw new ListingNotAvailableException(
+                    request.getListingId(),
+                    request.getStartDate().toString(),
+                    request.getEndDate().toString()
+            );
+        }
+
         Booking booking = Booking.builder()
                 .userId(request.getUserId())
                 .listingId(request.getListingId())

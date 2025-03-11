@@ -25,3 +25,5 @@ event:
   topic:
     payment: payment-topic
 
+listing-service:
+  url: http://localhost:8082/api/v1/listings
