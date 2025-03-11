@@ -3,10 +3,12 @@ package com.rentspace.listingservice.dto;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 public class ListingAvailabilityRequest {
     private Long listingId;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private boolean available;
 }

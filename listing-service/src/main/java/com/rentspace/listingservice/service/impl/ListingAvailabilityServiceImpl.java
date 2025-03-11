@@ -5,6 +5,7 @@ import com.rentspace.listingservice.dto.ListingAvailabilityDto;
 import com.rentspace.listingservice.dto.ListingAvailabilityRequest;
 import com.rentspace.listingservice.entity.Listing;
 import com.rentspace.listingservice.entity.ListingAvailability;
+import com.rentspace.listingservice.exception.InvalidDateRangeException;
 import com.rentspace.listingservice.exception.ListingNotFoundException;
 import com.rentspace.listingservice.mapper.ListingAvailabilityMapper;
 import com.rentspace.listingservice.repository.ListingAvailabilityRepository;
@@ -15,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,7 +49,6 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
         log.info("Set availability for listingId={} from {} to {} (available={})",
                 listingId, request.getStartDate(), request.getEndDate(), request.isAvailable());
 
-
         var listing = getListingById(listingId);
 
         ListingAvailability availability = createAvailability(
@@ -66,38 +65,11 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
     }
 
     @Override
-    public ListingAvailabilityDto bookAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
-        log.info("Booking availability for listingId={} from {} to {}", listingId, startDate, endDate);
-
-        if (!availabilityRepository.existsByListingIdAndAvailableTrueAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-                listingId, startDate, endDate)) {
-            throw new IllegalStateException("Listing is not available for the selected dates.");
-        }
-
-        var listing = getListingById(listingId);
-
-        ListingAvailability availability = createAvailability(listing, startDate, endDate, false);
-        availability = availabilityRepository.save(availability);
-
-        return mapper.toDto(availability);
-    }
-
-    @Override
-    public void cancelBooking(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
-        log.info("Canceling booking for listingId={} from {} to {}", listingId, startDate, endDate);
-
-        int deletedCount = availabilityRepository.deleteByListingIdAndStartDateAndEndDateAndAvailableFalse(
-                listingId, startDate, endDate);
-
-        if (deletedCount == 0) {
-            throw new IllegalStateException("No booking found to cancel for listingId=" + listingId +
-                    " from " + startDate + " to " + endDate);
-        }
-    }
-
-    @Override
     public void blockAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Blocking availability for listingId={} from {} to {}", listingId, startDate, endDate);
+
+        validateDateRange(startDate, endDate);
+        checkOverlap(listingId, startDate, endDate);
         if (!isAvailable(listingId, startDate, endDate)) {
             throw new ListingNotAvailableException(listingId, startDate.toString(), endDate.toString());
         }
@@ -122,7 +94,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
         }
     }
 
-    private ListingAvailability createAvailability(Listing listing, LocalDate startDate, LocalDate endDate, boolean available) {
+    private ListingAvailability createAvailability(Listing listing, LocalDateTime startDate, LocalDateTime endDate, boolean available) {
         return ListingAvailability.builder()
                 .listing(listing)
                 .startDate(startDate)
@@ -134,5 +106,18 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
     private Listing getListingById(Long listingId) {
         return listingsRepository.findById(listingId).orElseThrow(
                 () -> new ListingNotFoundException("Listing", "listingId", listingId));
+    }
+
+    private void validateDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate.isAfter(endDate)) {
+            throw new InvalidDateRangeException(startDate.toString(), endDate.toString());
+        }
+    }
+
+    private void checkOverlap(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
+        if (availabilityRepository.existsByListingIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                listingId, startDate, endDate)) {
+            throw new ListingNotAvailableException(listingId, startDate.toString(), endDate.toString());
+        }
     }
 }

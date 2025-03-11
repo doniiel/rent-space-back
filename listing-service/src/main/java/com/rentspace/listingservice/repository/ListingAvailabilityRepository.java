@@ -12,8 +12,10 @@ import java.util.List;
 public interface ListingAvailabilityRepository extends JpaRepository<ListingAvailability, Long> {
     List<ListingAvailability> findByListingId(Long listingId);
     boolean existsByListingIdAndAvailableTrueAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-        Long listingId, LocalDateTime startDate, LocalDateTime endDate
-    );
+        Long listingId, LocalDateTime startDate, LocalDateTime endDate);
     int deleteByListingIdAndStartDateAndEndDateAndAvailableFalse(
             Long listingId, LocalDateTime startDate, LocalDateTime endDate);
+    boolean existsByListingIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+            Long listingId, LocalDateTime startDate, LocalDateTime endDate
+    );
 }

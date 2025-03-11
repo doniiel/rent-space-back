@@ -49,7 +49,7 @@ public class ListingHandler {
                     .status(ListingStatus.UNAVAILABLE.name())
                     .build();
 
-            kafkaTemplate.send(responseTopic, response);
+            kafkaTemplate.send(responseTopic, event.getListingId().toString(), response);
             log.info("Sent listing unavailable response for booking ID: {}", event.getBookingId());
         }
     }
