@@ -14,6 +14,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 @Slf4j
 @Service
@@ -57,9 +58,13 @@ public class ListingHandler {
     @KafkaListener(topics = "${event.topic.listing.availability.unblock}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlerListingUnblock(@Payload ListingUnblockEvent event) {
         log.info("Received listing unblock event for booking ID: {}", event.getBookingId());
-
-        service.unblockAvailability(event.getListingId(), LocalDateTime.parse(event.getStartDate()), LocalDateTime.parse(event.getEndDate()));
-
-        log.info("Successfully unblocked availability for listingId={} from {} to {}", event.getListingId(), event.getStartDate(), event.getEndDate());
+        try {
+            service.unblockAvailability(event.getListingId(), LocalDateTime.parse(event.getStartDate()), LocalDateTime.parse(event.getEndDate()));
+            log.info("Successfully unblocked availability for listingId={} from {} to {}", event.getListingId(), event.getStartDate(), event.getEndDate());
+        } catch (DateTimeParseException e) {
+            log.error("Failed to parse dates for unblock event: bookingId: {}, startDate: {}, endDate: {}",
+                    event.getBookingId(), event.getStartDate(), event.getEndDate());
+            throw new IllegalArgumentException("Invalid date format in unblock event", e);
+        }
     }
 }

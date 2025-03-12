@@ -1,6 +1,5 @@
 package com.rentspace.bookingservice.service.impl;
 
-import com.rentspace.bookingservice.client.ListingClient;
 import com.rentspace.bookingservice.dto.BookingDto;
 import com.rentspace.bookingservice.dto.CreateBookingRequest;
 import com.rentspace.bookingservice.entity.Booking;
@@ -31,8 +30,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository repository;
     private final BookingMapper mapper;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final ListingClient listingClient;
-    @Value("${event.topic.listing}")
+    @Value("${event.topic.listing.availability.request}")
     private String listingTopic;
     @Value("${event.topic.listing-unblock}")
     private String listingUnblockTopic;
@@ -40,29 +38,32 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto createBooking(CreateBookingRequest request) {
-        log.info("Sending availability check event for listingId {}, startDate {}, endDate {}",
+        log.info("Creating booking for listingId {}, startDate {}, endDate {}",
                 request.getListingId(), request.getStartDate(), request.getEndDate());
+
+        if (request.getStartDate().isAfter(request.getEndDate())) {
+            throw new IllegalArgumentException("Start date must be before end date");
+        }
+
         Booking booking = Booking.builder()
                 .userId(request.getUserId())
                 .listingId(request.getListingId())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
+                .totalPrice(request.getTotalPrice())
                 .status(PENDING)
                 .build();
 
         Booking savedBooking = repository.save(booking);
 
         ListingAvailabilityEvent event = ListingAvailabilityEvent.builder()
-                .bookingId(booking.getId())
+                .bookingId(savedBooking.getId())
                 .listingId(request.getListingId())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .build();
 
-
-        kafkaTemplate.send(listingTopic, event);
-        log.info("Sent listing availability event for booking ID: {}", savedBooking.getId());
-
+        sendListingAvailabilityEvent(savedBooking, event);
         return mapper.toDto(savedBooking);
     }
 
@@ -93,6 +94,7 @@ public class BookingServiceImpl implements BookingService {
                 .build();
 
         kafkaTemplate.send(listingUnblockTopic, event);
+        log.info("Sent listing unblock event for booking ID: {}", bookingId);
     }
 
     @Override
@@ -117,5 +119,16 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void deleteBooking(Long bookingId) {
         repository.deleteById(bookingId);
+    }
+
+    private void sendListingAvailabilityEvent(Booking booking, ListingAvailabilityEvent event) {
+        try {
+            kafkaTemplate.send(listingTopic, booking.getId().toString(), event);
+            log.info("Sent listing availability event for booking ID: {}", booking.getId());
+        } catch (Exception e) {
+            log.error("Failed to send Kafka event for booking ID: {}", booking.getId());
+            repository.delete(booking);
+            throw e;
+        }
     }
 }

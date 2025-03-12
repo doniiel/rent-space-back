@@ -60,11 +60,14 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
     @Override
     public boolean isAvailable(Long listingId, LocalDateTime startDate , LocalDateTime endDate) {
         log.info("Checking availability for listingId={} from {} to {}", listingId, startDate, endDate);
-        return !availabilityRepository.existsByListingIdAndAvailableTrueAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-                listingId, endDate, startDate);
+        boolean isOverlap = availabilityRepository.existsByListingIdAndAvailableTrueAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                listingId, startDate, endDate
+        );
+        return !isOverlap;
     }
 
     @Override
+    @Transactional
     public void blockAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Blocking availability for listingId={} from {} to {}", listingId, startDate, endDate);
 
@@ -82,6 +85,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
     }
 
     @Override
+    @Transactional
     public void unblockAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Unblocking availability for listingId={} from {} to {}", listingId, startDate, endDate);
 

@@ -23,8 +23,13 @@ server:
 
 event:
   topic:
+    listing:
+      availability:
+        request: "listing-availability-request"
+        response: "listing-availability-response"
+        block: "listing-availability-block"
+        unblock: "listing-availability-unblock"
     payment: payment-topic
-    listing: listing-availability
-    listing-response: listing-availability-response
+
 listing-service:
   url: http://localhost:8082/api/v1/listings

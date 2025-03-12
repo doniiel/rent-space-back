@@ -38,9 +38,10 @@ public class BookingHandler {
     public void handlerFailurePaymentEvent(@Payload PaymentFailureEvent event) {
         log.info("Received payment failure event for booking ID: {}", event.getBookingId());
         service.updateBookingStatus(event.getBookingId(), BookingStatus.CANCELLED);
+        service.cancelBooking(event.getBookingId());
     }
 
-    @KafkaListener(topics = "${event.topic.listing-response}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "${event.topic.listing.availability.response}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlerListingAvailabilityEvent(@Payload ListingAvailableResponse event) {
         log.info("Received listing availability response for booking ID: {}", event.getBookingId());
 
@@ -61,9 +62,7 @@ public class BookingHandler {
             log.info("Sent payment request for booking ID: {}", event.getBookingId());
         } else {
             log.warn("Listing is not available. Canceling booking ID: {}", event.getBookingId());
-            service.deleteBooking(event.getBookingId());
+            service.cancelBooking(event.getBookingId());
         }
-
     }
-
 }
