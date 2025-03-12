@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PaymentConsumer {
+public class PaymentHandler {
     private final PaymentService paymentService;
 
     @KafkaListener(topics = "${event.topic.payment}", groupId = "${spring.kafka.consumer.group-id}")

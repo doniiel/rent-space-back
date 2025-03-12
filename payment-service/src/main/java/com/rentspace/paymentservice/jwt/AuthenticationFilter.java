@@ -1,6 +1,7 @@
-package com.rentspace.listingservice.jwt;
+package com.rentspace.paymentservice.jwt;
 
 import com.rentspace.core.exception.TokenExpiredException;
+import com.rentspace.paymentservice.utils.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class AuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Override

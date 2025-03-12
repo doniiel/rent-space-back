@@ -8,7 +8,6 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Currency;
 
 import static jakarta.persistence.EnumType.STRING;
 
