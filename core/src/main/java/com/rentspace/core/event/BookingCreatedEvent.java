@@ -14,4 +14,5 @@ public class BookingCreatedEvent {
     private Long listingId;
     private Long userId;
     private Double totalPrice;
+    private String currency;
 }

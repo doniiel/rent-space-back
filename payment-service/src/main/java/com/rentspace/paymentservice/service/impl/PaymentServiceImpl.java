@@ -5,6 +5,7 @@ import com.rentspace.core.enums.PaymentStatus;
 import com.rentspace.core.event.PaymentFailureEvent;
 import com.rentspace.core.event.PaymentSuccessEvent;
 import com.rentspace.core.exception.PaymentNotFoundException;
+import com.rentspace.core.util.ValidationUtils;
 import com.rentspace.paymentservice.client.UserClient;
 import com.rentspace.paymentservice.dto.PaymentDto;
 import com.rentspace.paymentservice.entity.Payment;
@@ -42,7 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
         validatePaymentInput(userId, bookingId, currency, amount);
         UserDto user = fetchUser(userId);
         Payment payment = buildPayment(user.getId(), bookingId, amount, currency);
-        Payment savedPayment = repository.save(payment);
+        Payment savedPayment = savePayment(payment);
         return mapper.toDto(savedPayment);
     }
 
@@ -136,10 +137,10 @@ public class PaymentServiceImpl implements PaymentService {
             return;
         }
         if (payment.getStatus() == PaymentStatus.SUCCESS) {
-            PaymentSuccessEvent event = new PaymentSuccessEvent(payment.getBookingId(), payment.getId());
+            PaymentSuccessEvent event = createPaymentSuccessEvent(payment.getBookingId(), payment.getId());
             publisher.publish(paymentSuccessTopic, payment.getId(), event, "payment success");
-        } else if (payment.getStatus() == PaymentStatus.FAILURE) {
-            PaymentFailureEvent event = new PaymentFailureEvent(payment.getBookingId(), payment.getId());
+        } else if (payment.getStatus() == PaymentStatus.FAILED) {
+            PaymentFailureEvent event = createPaymentFailureEvent(payment.getBookingId(), payment.getId());
             publisher.publish(paymentFailureTopic, payment.getId(), event, "payment failure");
         }
     }

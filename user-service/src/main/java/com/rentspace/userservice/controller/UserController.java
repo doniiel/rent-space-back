@@ -18,54 +18,58 @@ import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.*;
 
-@Tag(name = "Users REST API in RentSpace",
-        description = "REST APIs in RentSpace to CREATE, READ, UPDATE and DELETE users")
+@Tag(name = "Users REST API in RentSpace", description = "APIs to manage users")
 @RestController
 @RequestMapping("/api/v1/users")
 @Validated
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
 
-    @Operation(summary = "Get user by email", description = "Get User by Email inside RentSpace")
+    @Operation(summary = "Get user by email", description = "Retrieve user by email")
     @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
-    @GetMapping("/by-email/{email}")
-    public ResponseEntity<UserDto> getUserByEmail(@PathVariable @Email @NotBlank String email) {
-        return ResponseEntity.ok(userService.getUserByEmail(email));
+    @GetMapping
+    public ResponseEntity<UserDto> getUserByEmail(@RequestParam @Email @NotBlank String email) {
+        return ResponseEntity
+                .status(OK)
+                .body(userService.getUserByEmail(email));
     }
 
-    @Operation(summary = "Get user by ID", description = "Get User by ID inside RentSpace")
+    @Operation(summary = "Get user by ID", description = "Retrieve user by ID")
     @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getUserById(userId));
+        return ResponseEntity
+                .status(OK)
+                .body(userService.getUserById(userId));
     }
 
-    @Operation(summary = "Create user", description = "Create User inside RentSpace")
+    @Operation(summary = "Create user", description = "Create a new user")
     @PreAuthorize("permitAll()")
     @PostMapping
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserCreateRequest request) {
-        return ResponseEntity.status(CREATED).body(userService.createUser(request));
+        return ResponseEntity
+                .status(CREATED)
+                .body(userService.createUser(request));
     }
 
-    @Operation(summary = "Update user", description = "Update User inside RentSpace")
+    @Operation(summary = "Update user", description = "Partially update user details")
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN') or #userId == authentication.principal.id")
     @PutMapping("/{userId}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long userId,
                                               @Valid @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(userId, request));
+        return ResponseEntity
+                .status(OK)
+                .body(userService.updateUser(userId, request));
     }
 
-    @Operation(
-            summary = "Delete user",
-            description = "Delete User inside RentSpace",
-            security = @SecurityRequirement(name = "bearerAuth")
-    )
+    @Operation(summary = "Delete user", description = "Delete a user")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .status(NO_CONTENT)
+                .build();
     }
 }
