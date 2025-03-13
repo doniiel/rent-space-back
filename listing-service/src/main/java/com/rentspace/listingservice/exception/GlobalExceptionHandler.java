@@ -1,5 +1,6 @@
 package com.rentspace.listingservice.exception;
 
+import com.rentspace.core.exception.TokenExpiredException;
 import com.rentspace.listingservice.dto.ErrorResponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;

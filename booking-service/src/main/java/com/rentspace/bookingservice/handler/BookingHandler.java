@@ -47,7 +47,7 @@ public class BookingHandler {
     public void handlerListingAvailabilityEvent(@Payload ListingAvailableResponse event) {
         log.info("Received listing availability response for booking ID: {}", event.getBookingId());
 
-        if (ListingStatus.AVAILABLE.equals(event.getStatus())) {
+        if (ListingStatus.AVAILABLE.name().equals(event.getStatus())) {
             log.info("Listing is available. Proceeding with booking ID: {}", event.getBookingId());
             try {
                 BookingDto booking = service.getBookingById(event.getBookingId());
