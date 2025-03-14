@@ -8,36 +8,39 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
+@Schema(name = "UpdateUserRequest", description = "Request to update user information")
 public class UpdateUserRequest {
-
-    @Schema(description = "User name", example = "John Doe")
-    @NotBlank(message = "Name cannot be empty.")
-    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    @NotBlank(message = "Username cannot be empty.")
+    @Size(min = 2, max = 50, message = "Username must be between 2 and 50 characters")
+    @Schema(description = "User`s username", example = "John Doe")
     private String username;
 
-    @Schema(description = "User first name", example = "John")
-    @Size(min = 2, max = 70, message = "Name must be between 2 and 70 characters")
+    @NotBlank(message = "Firstname cannot be empty.")
+    @Size(min = 2, max = 70, message = "Firstname must be between 2 and 70 characters")
+    @Schema(description = "User`s first name", example = "John")
     private String firstname;
 
-    @Schema(description = "User last name", example = "Doe")
-    @Size(min = 2, max = 70, message = "Name must be between 2 and 70 characters")
+    @NotBlank(message = "Lastname cannot be empty.")
+    @Size(min = 2, max = 70, message = "Lastname must be between 2 and 70 characters")
+    @Schema(description = "User`s last name", example = "Doe")
     private String lastname;
 
-    @Schema(description = "User password", example = "ldfn5454,.")
-    @NotBlank(message = "Password cannot be empty.")
-    @Size(min = 8, max = 50, message = "Password must be between 8 and 50 characters")
+    @NotBlank(message = "Password cannot be blank")
+    @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$", message = "Password must contain at least one letter and one number")
+    @Schema(description = "User`s password", example = "password123")
     private String password;
 
-    @Schema (description = "User email", example = "5Xl7g@example.com")
     @NotBlank(message = "Email cannot be empty.")
     @Email(message = "Email should be valid.")
+    @Schema (description = "User`s email address", example = "5Xl7g@example.com")
     private String email;
 
-    @Schema(description = "User mobile number", example = "12345678910")
     @NotBlank(message = "User number cannot be null or empty")
     @Pattern(regexp = "(^$|[0-9]{11})", message = "Account number must be 10 digits")
+    @Schema(description = "User`s phone number", example = "12345678910")
     private String phone;
 
-    @Schema(description = "User role", example = "ADMIN")
+    @Schema(description = "User role", example = "ADMIN", allowableValues = {"USER", "MANAGER", "ADMIN"})
     private String role;
 }

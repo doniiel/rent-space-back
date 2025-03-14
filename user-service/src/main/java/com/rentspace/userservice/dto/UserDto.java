@@ -1,32 +1,28 @@
 package com.rentspace.userservice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@Schema(
-    name = "UserResponse",
-    description = "Shema to hold user information"
-)
+@Schema(name = "UserResponse", description = "Shema to hold user information")
 public class UserDto {
-    @Schema(
-        description = "User ID", example = "1"
-    )
+    @NotNull(message = "User ID cannot be null")
+    @Schema(description = "User ID", example = "1")
     private Long id;
-    @Schema(
-        description = "User name", example = "John Doe"
-    )
+
+    @NotNull(message = "Username cannot be null")
+    @Schema(description = "User`s username", example = "John Doe")
     private String username;
-    @Schema(
-        description = "User email", example = "5Xl7g@example.com"
-    )
+
+    @NotNull(message = "Email cannot be null")
+    @Schema(description = "User`s email", example = "5Xl7g@example.com")
     private String email;
-    @Schema(
-        description = "User mobile number", example = "1234567890"
-    )
+
+    @NotNull(message = "Phone cannot be null")
+    @Schema(description = "User`s phone number", example = "1234567890")
     private String phone;
-    @Schema(
-        description = "User role", example = "ADMIN"
-    )
+
+    @Schema(description = "User`s role", example = "ADMIN", allowableValues = {"USER", "MANAGER", "ADMIN"})
     private String role;
 }

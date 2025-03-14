@@ -26,6 +26,16 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
+springdoc:
+  swagger-ui:
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+    enabled: true
+  api-docs:
+    path: /v3/api-docs
+
+
 management:
   endpoints:
     web:
@@ -58,3 +68,5 @@ logging:
   level:
     com.rentspace.userservice: DEBUG
     org.springframework.security: DEBUG
+    org.springdoc: DEBUG
+    org.springframework.web: DEBUG
