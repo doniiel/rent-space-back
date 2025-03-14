@@ -18,8 +18,12 @@ import java.util.Collections;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
+
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_username", columnList = "username"),
+        @Index(name = "idx_email", columnList = "email")
+})
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,30 +31,41 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @ToString(exclude = {"password"})
 @EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails, Serializable {
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    @Column(length = 70)
     private String firstname;
+
+    @Column(length = 70)
     private String lastname;
+
+    @Column(unique = true, nullable = false, length = 50)
     private String username;
+
+    @Column(unique = true, nullable = false, length = 100)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(length = 15)
     private String phone;
 
     @Enumerated(STRING)
+    @Column(nullable = false)
     private Role role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfiles profile;
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @CreatedBy
-    @Column(name = "created_by", updatable = false)
+    @Column(name = "created_by", updatable = false, length = 50)
     private String createdBy;
 
     @LastModifiedDate
@@ -58,9 +73,10 @@ public class User implements UserDetails, Serializable {
     private LocalDateTime updatedAt;
 
     @LastModifiedBy
-    @Column(name = "updated_by")
+    @Column(name = "updated_by", length = 50)
     private String updatedBy;
 
+    @Column(nullable = false)
     private boolean isVerified;
 
     @Override
@@ -70,9 +86,8 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return true; // isVerified --> TODO: активен после подтверждения
     }
-
     @Override
     public boolean isCredentialsNonExpired() {
         return true;

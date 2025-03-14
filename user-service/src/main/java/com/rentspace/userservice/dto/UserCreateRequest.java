@@ -2,9 +2,11 @@ package com.rentspace.userservice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @Schema(name = "UserCreateRequest", description = "Request to create a new user")
 public class UserCreateRequest {
     @NotBlank(message = "Username cannot be empty")

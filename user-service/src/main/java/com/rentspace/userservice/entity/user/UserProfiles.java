@@ -14,35 +14,39 @@ import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "user_profiles")
+@Table(name = "user_profiles", indexes = @Index(name = "idx_user_id", columnList = "user_id"))
+@Data
 @Builder
-@Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 public class UserProfiles implements Serializable {
-
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @Column(length = 500)
     private String bio;
+
     @Column(name = "avatar_url")
     private String avatarUrl;
 
     @Enumerated(STRING)
+    @Column(nullable = false)
     private Language language;
+
     @Enumerated(STRING)
+    @Column(nullable = false)
     private Currency currency;
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

@@ -1,7 +1,7 @@
 package com.rentspace.userservice.mapper;
 
+import com.rentspace.core.dto.UserDto;
 import com.rentspace.userservice.dto.UserCreateRequest;
-import com.rentspace.userservice.dto.UserDto;
 import com.rentspace.userservice.entity.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

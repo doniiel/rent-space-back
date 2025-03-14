@@ -1,8 +1,8 @@
 package com.rentspace.userservice.controller;
 
+import com.rentspace.core.dto.UserDto;
 import com.rentspace.userservice.dto.UpdateUserRequest;
 import com.rentspace.userservice.dto.UserCreateRequest;
-import com.rentspace.userservice.dto.UserDto;
 import com.rentspace.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

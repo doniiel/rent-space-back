@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
-
     private final UserRepository repository;
 
     @Bean
@@ -33,11 +32,6 @@ public class ApplicationConfig {
         authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
-    }
-
-    @Bean
-    public AuditorAware<String> auditorAware() {
-        return new AuditAwareImpl();
     }
 
     @Bean

@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,6 +88,7 @@ public class AuthServiceImpl implements AuthService {
                 .user(user)
                 .expired(false)
                 .revoked(false)
+                .expiryDate(LocalDateTime.now().plusDays(7))
                 .build();
         tokenRepository.save(token);
     }
