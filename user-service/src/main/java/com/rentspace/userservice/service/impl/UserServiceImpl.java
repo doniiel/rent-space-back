@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,18 +30,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserCreateRequest request) {
-        log.info("Creating new user {}", request);
+        log.info("Attempting to create user with username: {}", request.getUsername());
 
-        validateEmailAndPhone(request.getEmail(), request.getPhone());
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UserAlreadyExistsException("User", "username", request.getUsername());
-        }
-
-        User user = userMapper.toEntity(request);
-        user.setRole(Role.USER);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        checkUserUniqueness(request.getUsername(), request.getEmail(), request.getPhone());
+        User user = buildUserFromRequest(request);
         User savedUser = userRepository.save(user);
-
         log.info("User created successfully with ID: {}", savedUser.getId());
         return userMapper.toResponseDto(user);
     }
@@ -49,52 +44,32 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto getUserByEmail(String email) {
         log.info("Fetching user with email: {}", email);
-
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new UserNotFoundException("User", "email", email)
-        );
-        UserDto userDto = userMapper.toResponseDto(user);
-        log.info("User fetched successfully with Email: {}", userDto.getEmail());
-        return userDto;
+        return userMapper.toResponseDto(findUserByEmailOrThrow(email));
     }
 
     @Override
     @Transactional(readOnly = true)
     public User getUserByUsername(String username) {
         log.info("Fetching user with username: {}", username);
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UserNotFoundException("User", "username", username)
-        );
-        return user;
+        return findUserByUsernameOrThrow(username);
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserDto getUserById(Long userId) {
         log.info("Fetching user with ID: {}", userId);
-        User user = getExistingUser(userId);
-        return userMapper.toResponseDto(user);
+        return userMapper.toResponseDto(findUserByIdOrThrow(userId));
     }
+
     @Override
     @Transactional
     public UserDto updateUser(Long userId, UpdateUserRequest request) {
         log.info("Updating user with ID: {}", userId);
 
-        var user = getExistingUser(userId);
-        validateUniqueEmailAndPhone(user, request);
-        user.setEmail(request.getEmail());
-        user.setPhone(request.getPhone());
-
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UserNotFoundException("User", "username", request.getUsername());
-        }
-        user.setUsername(request.getUsername());
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-        }
-        user.setRole(Role.valueOf(request.getRole()));
-
+        User user = findUserByIdOrThrow(userId);
+        updateUserFields(user, request);
         User updatedUser = userRepository.save(user);
+
         log.info("User updated successfully with ID: {}", updatedUser.getId());
         return userMapper.toResponseDto(updatedUser);
     }
@@ -103,19 +78,25 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long userId) {
         log.info("Deleting user with ID: {}", userId);
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("User", "userId", userId);
-        }
-        userRepository.deleteById(userId);
+        User user = findUserByIdOrThrow(userId);
+        userRepository.delete(user);
         log.info("User deleted successfully with ID: {}", userId);
     }
 
-    private User getExistingUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User", "userId", userId));
+    private User buildUserFromRequest(UserCreateRequest request) {
+        return User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .phone(request.getPhone())
+                .role(Role.USER)
+                .build();
     }
 
-    private void validateEmailAndPhone(String email, String phone) {
+    private void checkUserUniqueness(String username, String email, String phone) {
+        if (userRepository.existsByUsername(username)) {
+            throw new UserAlreadyExistsException("User", "username", username);
+        }
         if (userRepository.existsByEmail(email)) {
             throw new UserAlreadyExistsException("User", "email", email);
         }
@@ -124,12 +105,58 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validateUniqueEmailAndPhone(User user, UpdateUserRequest request) {
-        if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
-            throw new UserAlreadyExistsException("User", "email", request.getEmail());
-        }
-        if (!user.getPhone().equals(request.getPhone()) && userRepository.existsByPhone(request.getPhone())) {
-            throw new UserAlreadyExistsException("User", "mobileNumber", request.getPhone());
-        }
+    private void updateUserFields(User user, UpdateUserRequest request) {
+        checkUniqueFieldsForUpdate(user, request);
+
+        Optional.ofNullable(request.getUsername()).ifPresent(user::setUsername);
+        Optional.ofNullable(request.getEmail()).ifPresent(user::setEmail);
+        Optional.ofNullable(request.getPhone()).ifPresent(user::setPhone);
+        Optional.ofNullable(request.getFirstname()).ifPresent(user::setFirstname);
+        Optional.ofNullable(request.getLastname()).ifPresent(user::setLastname);
+        Optional.ofNullable(request.getPassword())
+                .filter(password -> !password.isEmpty())
+                .map(passwordEncoder::encode)
+                .ifPresent(user::setPassword);
+        Optional.ofNullable(request.getRole())
+                .map(Role::valueOf)
+                .ifPresent(user::setRole);
+    }
+
+    private void checkUniqueFieldsForUpdate(User user, UpdateUserRequest request) {
+        Optional.ofNullable(request.getUsername())
+                .filter(username -> !username.equals(user.getUsername()))
+                .filter(userRepository::existsByUsername)
+                .ifPresent(username -> {
+                    throw new UserAlreadyExistsException("User", "username", username);
+                });
+
+        Optional.ofNullable(request.getEmail())
+                .filter(email -> !email.equals(user.getEmail()))
+                .filter(userRepository::existsByEmail)
+                .ifPresent(email -> {
+                    throw new UserAlreadyExistsException("User", "email", email);
+                });
+
+        Optional.ofNullable(request.getPhone())
+                .filter(phone -> !phone.equals(user.getPhone()))
+                .filter(userRepository::existsByPhone)
+                .ifPresent(phone -> {
+                    throw new UserAlreadyExistsException("User", "phone", phone);
+                });
+    }
+
+    private User findUserByIdOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User", "id", userId));
+    }
+
+    private User findUserByUsernameOrThrow(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User", "username", username));
+    }
+
+    private User findUserByEmailOrThrow(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User", "email", email));
     }
 }
