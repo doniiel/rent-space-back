@@ -1,5 +1,6 @@
 package com.rentspace.userservice.controller;
 
+import com.rentspace.userservice.dto.AuthResponseDto;
 import com.rentspace.userservice.dto.ConfirmRequest;
 import com.rentspace.userservice.dto.LoginRequest;
 import com.rentspace.userservice.dto.RegisterRequest;
@@ -46,8 +47,8 @@ public class AuthController {
             @ApiResponse(responseCode = "409", description = "Username or email already exists")
     })
     @PostMapping("/register")
-    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
-        Map<String, Object> response = authService.registerUserAndGenerateTokens(request);
+    public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponseDto response = authService.registerUserAndGenerateTokens(request);
         verificationService.sendVerificationEmail(authService.findUserByUsername(request.getUsername()));
         return ResponseEntity
                 .status(CREATED)
