@@ -7,16 +7,15 @@ import com.rentspace.userservice.exception.InvalidCredentialsException;
 import com.rentspace.userservice.repository.UserRepository;
 import com.rentspace.userservice.repository.VerificationTokenRepository;
 import com.rentspace.userservice.service.AccountVerificationService;
+import com.rentspace.userservice.util.EmailTemplateUtil;
+import com.rentspace.userservice.util.TokenGenerationUtil;
+import com.rentspace.userservice.util.VerificationTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.rentspace.userservice.util.EmailTemplateUtil.VERIFICATION_SUBJECT;
-import static com.rentspace.userservice.util.EmailTemplateUtil.getVerificationMessage;
-import static com.rentspace.userservice.util.VerificationTokenUtil.*;
 
 @Slf4j
 @Service
@@ -25,6 +24,9 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final TokenGenerationUtil tokenGenerationUtil;
+    private final EmailTemplateUtil emailTemplateUtil;
+    private final VerificationTokenUtil verificationTokenUtil;
 
     private static final String INVALID_TOKEN_MESSAGE = "Invalid verification token";
     private static final String EXPIRED_TOKEN_MESSAGE = "Verification token has expired";
@@ -33,18 +35,13 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
     @Value("${event.topic.verification}")
     private String topicName;
 
-    @Value("${verification.base-url}")
-    private String verificationBaseUrl;
-
     @Override
     @Transactional
     public void sendVerificationEmail(User user) {
         log.info("Starting verification email process for user: {}", user.getEmail());
-
         VerificationToken verificationToken = createOrUpdateVerificationToken(user);
-        String verificationLink = generateVerificationUrl(verificationToken.getToken());
+        String verificationLink = verificationTokenUtil.generateVerificationUrl(verificationToken.getToken());
         AccountVerificationEvent event = buildVerificationEvent(user.getEmail(), verificationLink);
-
         sendVerificationEventToKafka(event, user.getEmail());
         log.info("Verification email process completed for user: {}", user.getEmail());
     }
@@ -52,12 +49,10 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
     @Override
     @Transactional
     public void confirmAccount(String token) {
-        log.info("Attempting to confirm account with token {}", token);
-
+        log.info("Attempting to confirm account with token: {}", token);
         VerificationToken verificationToken = findValidVerificationTokenOrThrow(token);
         verifyUser(verificationToken.getUser());
         verificationTokenRepository.delete(verificationToken);
-
         log.info("Account successfully verified for user: {}", verificationToken.getUser().getEmail());
     }
 
@@ -69,9 +64,9 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
 
     private VerificationToken createNewVerificationToken(User user) {
         VerificationToken token = VerificationToken.builder()
-                .token(generateVerificationToken())
+                .token(tokenGenerationUtil.generateCode())
                 .user(user)
-                .expiryDate(getExpiryDate())
+                .expiryDate(tokenGenerationUtil.getVerificationExpiryDate())
                 .build();
         return verificationTokenRepository.save(token);
     }
@@ -81,20 +76,16 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
             log.debug("Reusing existing valid token for user: {}", token.getUser().getEmail());
             return token;
         }
-        token.setToken(generateVerificationToken());
-        token.setExpiryDate(getExpiryDate());
+        token.setToken(tokenGenerationUtil.generateCode());
+        token.setExpiryDate(tokenGenerationUtil.getVerificationExpiryDate());
         return verificationTokenRepository.save(token);
-    }
-
-    private String generateVerificationUrl(String token) {
-        return verificationBaseUrl + "/verify?token=" + token;
     }
 
     private AccountVerificationEvent buildVerificationEvent(String email, String verificationLink) {
         return AccountVerificationEvent.builder()
                 .email(email)
-                .subject(VERIFICATION_SUBJECT)
-                .message(getVerificationMessage(verificationLink))
+                .subject(emailTemplateUtil.getVerificationSubject())
+                .message(emailTemplateUtil.getVerificationMessage(verificationLink))
                 .build();
     }
 
@@ -104,8 +95,7 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
                     .whenComplete((result, ex) -> {
                         if (ex != null) {
                             log.error("Failed to send verification event to Kafka for email: {}. Error: {}", email, ex.getMessage());
-                        }
-                        else {
+                        } else {
                             log.debug("Verification event sent to Kafka: Topic={}, Offset={}",
                                     result.getRecordMetadata().topic(), result.getRecordMetadata().offset());
                         }

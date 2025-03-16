@@ -8,6 +8,8 @@ import com.rentspace.userservice.exception.UserNotFoundException;
 import com.rentspace.userservice.repository.PasswordResetTokenRepository;
 import com.rentspace.userservice.repository.UserRepository;
 import com.rentspace.userservice.service.PasswordResetService;
+import com.rentspace.userservice.util.EmailTemplateUtil;
+import com.rentspace.userservice.util.TokenGenerationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +17,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.rentspace.userservice.util.EmailTemplateUtil.PASSWORD_RESET_SUBJECT;
-import static com.rentspace.userservice.util.EmailTemplateUtil.getPasswordResetMessage;
-import static com.rentspace.userservice.util.PasswordResetTokenUtil.generateResetCode;
-import static com.rentspace.userservice.util.PasswordResetTokenUtil.getExpiryDate;
 
 @Slf4j
 @Service
@@ -29,6 +26,8 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private final PasswordResetTokenRepository tokenRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final TokenGenerationUtil tokenGenerationUtil;
+    private final EmailTemplateUtil emailTemplateUtil;
 
     private static final String INVALID_RESET_CODE_MESSAGE = "Invalid or expired reset code";
 
@@ -39,13 +38,10 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     @Transactional
     public void sendResetCode(String email) {
         log.info("Attempting to send password reset code for email: {}", email);
-
         User user = findUserByEmailOrThrow(email);
         PasswordResetToken token = createOrUpdateResetToken(user);
-
         PasswordResetEvent event = buildPasswordResetEvent(user, token.getToken());
         sendKafkaEvent(event);
-
         log.info("Password reset code sent successfully for email: {}", email);
     }
 
@@ -53,11 +49,9 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     @Transactional
     public void resetPassword(String email, String resetCode, String newPassword) {
         log.info("Attempting to reset password for email: {} with reset code: {}", email, resetCode);
-
         PasswordResetToken resetToken = findValidResetTokenOrThrow(email, resetCode);
         updateUserPassword(resetToken.getUser(), newPassword);
         tokenRepository.delete(resetToken);
-
         log.info("Password reset successfully for email: {}", email);
     }
 
@@ -74,9 +68,9 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
     private PasswordResetToken createNewResetToken(User user) {
         PasswordResetToken token = PasswordResetToken.builder()
-                .token(generateResetCode())
+                .token(tokenGenerationUtil.generateCode())
                 .user(user)
-                .expiryDate(getExpiryDate())
+                .expiryDate(tokenGenerationUtil.getPasswordResetExpiryDate())
                 .build();
         return tokenRepository.save(token);
     }
@@ -86,16 +80,16 @@ public class PasswordResetServiceImpl implements PasswordResetService {
             log.debug("Reusing existing valid token for user: {}", token.getUser().getEmail());
             return token;
         }
-        token.setToken(generateResetCode());
-        token.setExpiryDate(getExpiryDate());
+        token.setToken(tokenGenerationUtil.generateCode());
+        token.setExpiryDate(tokenGenerationUtil.getPasswordResetExpiryDate());
         return tokenRepository.save(token);
     }
 
     private PasswordResetEvent buildPasswordResetEvent(User user, String resetCode) {
         return PasswordResetEvent.builder()
                 .email(user.getEmail())
-                .subject(PASSWORD_RESET_SUBJECT)
-                .message(getPasswordResetMessage(resetCode))
+                .subject(emailTemplateUtil.getPasswordResetSubject())
+                .message(emailTemplateUtil.getPasswordResetMessage(resetCode))
                 .build();
     }
 
@@ -104,13 +98,14 @@ public class PasswordResetServiceImpl implements PasswordResetService {
             kafkaTemplate.send(topicName, event.getEmail(), event)
                     .whenComplete((result, ex) -> {
                         if (ex != null) {
-                            log.error("Failed to send password reset event for email: {}", event.getEmail(), ex);
+                            log.error("Failed to send password reset event for email: {}. Error: {}", event.getEmail(), ex.getMessage());
                         } else {
-                            log.debug("Kafka event sent successfully for email: {}", event.getEmail());
+                            log.debug("Kafka event sent successfully for email: {}, Topic={}, Offset={}",
+                                    event.getEmail(), result.getRecordMetadata().topic(), result.getRecordMetadata().offset());
                         }
                     });
         } catch (Exception e) {
-            log.error("Error sending Kafka event for email: {}", event.getEmail(), e);
+            log.error("Immediate failure sending Kafka event for email: {}", event.getEmail(), e);
             throw new RuntimeException("Failed to send password reset notification", e);
         }
     }

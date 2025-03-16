@@ -1,9 +1,6 @@
 package com.rentspace.userservice.controller;
 
-import com.rentspace.userservice.dto.AuthResponseDto;
-import com.rentspace.userservice.dto.ConfirmRequest;
-import com.rentspace.userservice.dto.LoginRequest;
-import com.rentspace.userservice.dto.RegisterRequest;
+import com.rentspace.userservice.dto.*;
 import com.rentspace.userservice.service.AccountVerificationService;
 import com.rentspace.userservice.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,8 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -34,7 +29,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Invalid username or password")
     })
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<TokenResponseDto> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity
                 .status(OK)
                 .body(authService.authenticateAndGenerateTokens(request.getUsername(), request.getPassword()));
@@ -48,11 +43,9 @@ public class AuthController {
     })
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponseDto response = authService.registerUserAndGenerateTokens(request);
-        verificationService.sendVerificationEmail(authService.findUserByUsername(request.getUsername()));
         return ResponseEntity
                 .status(CREATED)
-                .body(response);
+                .body(authService.registerUserAndGenerateTokens(request));
     }
 
     @Operation(summary = "Refresh access token", description = "Generate a new access token using a refresh token")
@@ -61,7 +54,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
     })
     @PostMapping("/refresh")
-    public ResponseEntity<Map<String, String>> refreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
+    public ResponseEntity<TokenResponseDto> refreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
         return ResponseEntity
                 .status(OK)
                 .body(authService.refreshAccessToken(refreshToken));

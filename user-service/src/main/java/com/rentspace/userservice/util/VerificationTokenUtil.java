@@ -1,33 +1,15 @@
 package com.rentspace.userservice.util;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.security.SecureRandom;
-import java.time.LocalDateTime;
-
+@Component
 public class VerificationTokenUtil {
-    private static final SecureRandom RANDOM = new SecureRandom();
-    private static final int EXPIRY_TIME_HOURS = 24;
-    private static String confirmAccountUrl;
 
-    @Value("${app.confirm-account-url}")
-    public void setConfirmAccountUrl(String url) {
-        confirmAccountUrl = url;
-    }
-    public static String generateVerificationToken() {
-        int code = 100000 + RANDOM.nextInt(900000);
-        return String.valueOf(code);
-    }
+    @Value("${verification.base-url}")
+    private String verificationBaseUrl;
 
-    public static LocalDateTime getExpiryDate() {
-        return LocalDateTime.now().plusHours(EXPIRY_TIME_HOURS);
-    }
-
-    public static boolean isTokenExpired(LocalDateTime expiryDate) {
-        return expiryDate.isBefore(LocalDateTime.now());
-    }
-
-    public static String generateConfirmAccountUrl(String token) {
-        return confirmAccountUrl + token;
+    public String generateVerificationUrl(String token) {
+        return verificationBaseUrl + "/verify?token=" + token;
     }
 }

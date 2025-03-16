@@ -22,7 +22,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
@@ -31,14 +30,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto createUser(UserCreateRequest request) {
         log.info("Attempting to create user with username: {}", request.getUsername());
-
         checkUserUniqueness(request.getUsername(), request.getEmail(), request.getPhone());
         User user = buildUserFromRequest(request);
         User savedUser = userRepository.save(user);
         log.info("User created successfully with ID: {}", savedUser.getId());
         return userMapper.toResponseDto(user);
     }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -65,11 +62,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto updateUser(Long userId, UpdateUserRequest request) {
         log.info("Updating user with ID: {}", userId);
-
         User user = findUserByIdOrThrow(userId);
         updateUserFields(user, request);
         User updatedUser = userRepository.save(user);
-
         log.info("User updated successfully with ID: {}", updatedUser.getId());
         return userMapper.toResponseDto(updatedUser);
     }

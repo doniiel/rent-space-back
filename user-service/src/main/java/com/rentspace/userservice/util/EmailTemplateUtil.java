@@ -1,15 +1,30 @@
 package com.rentspace.userservice.util;
 
-public class EmailTemplateUtil {
-    public static final String VERIFICATION_SUBJECT = "Account Verification";
-    public static final String VERIFICATION_MESSAGE = "Please click the link to verify your account: ";
-    public static final String PASSWORD_RESET_SUBJECT = "Password Reset Request";
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-    public static String getVerificationMessage(String link) {
-        return VERIFICATION_MESSAGE + link;
+@Component
+public class EmailTemplateUtil {
+    @Getter
+    @Value("${email.verification.subject}")
+    private String verificationSubject;
+
+    @Getter
+    @Value("${email.password-reset.subject}")
+    private String passwordResetSubject;
+
+    @Value("${email.verification.message}")
+    private String verificationMessage;
+
+    @Value("${email.password-reset.message}")
+    private String passwordResetMessage;
+
+    public String getVerificationMessage(String link) {
+        return String.format(verificationMessage, link);
     }
 
-    public static String getPasswordResetMessage(String resetCode) {
-        return "Your password reset code: " + resetCode;
+    public String getPasswordResetMessage(String resetCode) {
+        return String.format(passwordResetMessage, resetCode);
     }
 }

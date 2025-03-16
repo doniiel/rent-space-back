@@ -25,7 +25,6 @@ import static com.rentspace.userservice.util.TokenUtil.*;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter  extends OncePerRequestFilter {
-
     private final JwtService jwtTokenUtil;
     private final TokenRepository tokenRepository;
 
