@@ -2,6 +2,7 @@ package com.rentspace.listingservice.entity;
 
 import com.rentspace.listingservice.enums.AmenityType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -9,14 +10,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "listing_amenities")
+@Table(name = "listing_amenities", indexes = {
+        @Index(name = "idx_listing_id", columnList = "listing_id")
+})
 @Getter
 @Setter
 @Builder
@@ -24,7 +26,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class ListingAmenities implements Serializable {
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -37,12 +38,17 @@ public class ListingAmenities implements Serializable {
     @Enumerated(STRING)
     @CollectionTable(name = "listing_amenity_types", joinColumns = @JoinColumn(name = "listing_amenity_id"))
     @Column(name = "amenity_type")
+    @NotEmpty
     private Set<AmenityType> amenityTypes;
 
     @CreatedDate
-    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @Override
+    public String toString() {
+        return "ListingAmenities{id=" + id + ", amenityTypes=" + amenityTypes + "}";
+    }
 }

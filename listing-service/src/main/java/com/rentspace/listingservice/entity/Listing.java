@@ -1,8 +1,13 @@
 package com.rentspace.listingservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rentspace.listingservice.enums.ListingType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -14,10 +19,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static jakarta.persistence.EnumType.STRING;
-import static jakarta.persistence.GenerationType.*;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name="listing")
+@Table(name="listing", indexes = {
+    @Index(name = "idx_user_id", columnList = "user_id")
+})
 @Getter
 @Setter
 @AllArgsConstructor
@@ -25,18 +32,31 @@ import static jakarta.persistence.GenerationType.*;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 public class Listing {
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Column(nullable = false, length = 100)
+    @NotNull
     private String title;
+
+    @Column(length = 500)
+    @NotNull
     private String description;
+
+    @Column(nullable = false)
+    @NotNull
     private String address;
+
+    @Column(nullable = false, length = 100)
+    @NotNull
     private String city;
+
+    @Column(nullable = false, length = 100)
+    @NotNull
     private String country;
 
     private BigDecimal latitude;
@@ -46,27 +66,29 @@ public class Listing {
     @Column(nullable = false)
     private ListingType type;
 
+    @Column(name = "max_guests")
+    @Min(1)
     private Integer maxGuests;
 
-    @Column(nullable = false)
+    @Column(name = "price_per_night", nullable = false)
+    @NotNull
+    @DecimalMin("1.00")
     private Double pricePerNight;
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @CreatedBy
-    @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
 
     @LastModifiedDate
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @LastModifiedBy
-    @Column(name = "updated_by")
     private String updatedBy;
 
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 10)
+    @JsonIgnore
     private List<ListingPhoto> photos;
 }
