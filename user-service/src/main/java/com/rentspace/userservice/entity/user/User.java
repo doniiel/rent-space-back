@@ -22,7 +22,8 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "users", indexes = {
         @Index(name = "idx_username", columnList = "username"),
-        @Index(name = "idx_email", columnList = "email")
+        @Index(name = "idx_email", columnList = "email"),
+        @Index(name = "idx_phone", columnList = "phone")
 })
 @Getter @Setter
 @AllArgsConstructor
@@ -35,13 +36,13 @@ public class User implements UserDetails, Serializable {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(length = 70)
+    @Column(length = 100)
     private String firstname;
 
-    @Column(length = 70)
+    @Column(length = 100)
     private String lastname;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(unique = true, nullable = false, length = 100)
     private String username;
 
     @Column(unique = true, nullable = false, length = 100)
@@ -50,11 +51,11 @@ public class User implements UserDetails, Serializable {
     @Column(nullable = false)
     private String password;
 
-    @Column(length = 15)
+    @Column(unique = true, nullable = false, length = 15)
     private String phone;
 
     @Enumerated(STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 15)
     private Role role;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -65,7 +66,7 @@ public class User implements UserDetails, Serializable {
     private LocalDateTime createdAt;
 
     @CreatedBy
-    @Column(name = "created_by", updatable = false, length = 50)
+    @Column(name = "created_by", updatable = false, length = 100)
     private String createdBy;
 
     @LastModifiedDate
@@ -73,10 +74,10 @@ public class User implements UserDetails, Serializable {
     private LocalDateTime updatedAt;
 
     @LastModifiedBy
-    @Column(name = "updated_by", length = 50)
+    @Column(name = "updated_by", length = 100)
     private String updatedBy;
 
-    @Column(nullable = false)
+    @Column(name = "is_verified", nullable = false)
     private boolean isVerified;
 
     @Override

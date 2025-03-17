@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
 @Entity
 @Table(name = "tokens", indexes = {
         @Index(name = "idx_token", columnList = "token"),
@@ -21,12 +19,12 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Token  implements Serializable {
+public class Token implements Serializable {
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true)
     private String token;
 
     @Column(nullable = false)
@@ -35,15 +33,10 @@ public class Token  implements Serializable {
     @Column(nullable = false)
     private boolean expired;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
     @Column(name = "expiry_date", nullable = false)
     private LocalDateTime expiryDate;
 
-    @Transient
-    public boolean isValid() {
-        return !revoked && !expired && (expiryDate == null || LocalDateTime.now().isBefore(expiryDate));
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

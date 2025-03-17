@@ -36,11 +36,11 @@ public class UserProfiles implements Serializable {
     private String avatarUrl;
 
     @Enumerated(STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private Language language;
 
     @Enumerated(STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private Currency currency;
 
     @CreatedDate
