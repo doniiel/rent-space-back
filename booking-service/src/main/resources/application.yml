@@ -1,4 +1,8 @@
 spring:
+  application:
+    name: bookingservice
+  config:
+    import: "optional:configserver:http://localhost:8071/"
   datasource:
     url: jdbc:postgresql://localhost:5432/userservicedb
     driver-class-name: org.postgresql.Driver
@@ -9,7 +13,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
   kafka:
     bootstrap-servers: localhost:9092
     producer:
@@ -17,9 +20,15 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.trusted.packages: "*"
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: bookingservice
+      properties:
+        spring.json.trusted.packages: "*"
 
 server:
-  port: 9085
+  port: 8084
 
 event:
   topic:
@@ -29,7 +38,10 @@ event:
         response: "listing-availability-response"
         block: "listing-availability-block"
         unblock: "listing-availability-unblock"
-    payment: payment-topic
+    payment:
+      success: "payment-success"
+      failure: "payment-failure"
+      send: "payment-send"
 
 listing-service:
   url: http://localhost:8082/api/v1/listings

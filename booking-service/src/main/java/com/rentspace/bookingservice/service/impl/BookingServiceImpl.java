@@ -35,7 +35,7 @@ public class BookingServiceImpl implements BookingService {
     @Value("${event.topic.listing.availability.request}")
     private String listingAvailabilityRequestTopic;
 
-    @Value("${event.topic.listing-unblock}")
+    @Value("${event.topic.listing.availability.unblock}")
     private String listingUnblockTopic;
 
     @Override

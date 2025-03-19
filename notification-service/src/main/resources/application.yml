@@ -28,7 +28,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: 220107072@stu.sdu.edu.kz
-    password:
+    password: xtwt zrus ywzs baie
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true

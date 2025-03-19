@@ -24,18 +24,18 @@ public class BookingHandler {
     private final BookingService service;
     private final BookingPublisher publisher;
 
-    @Value("${event.topic.payment}")
+    @Value("${event.topic.payment.send}")
     private String paymentTopic;
 
     @Transactional
-    @KafkaListener(topics = "${event.topic.payment-success}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "${event.topic.payment.success}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlerSuccessPaymentEvent(@Payload PaymentSuccessEvent event) {
         log.info("Received payment success event for booking ID: {}", event.getBookingId());
         service.updateBookingStatus(event.getBookingId(), BookingStatus.CONFIRMED);
     }
 
     @Transactional
-    @KafkaListener(topics = "${event.topic.payment-failure}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "${event.topic.payment.failure}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlerFailurePaymentEvent(@Payload PaymentFailureEvent event) {
         log.info("Received payment failure event for booking ID: {}", event.getBookingId());
         service.updateBookingStatus(event.getBookingId(), BookingStatus.CANCELLED);
