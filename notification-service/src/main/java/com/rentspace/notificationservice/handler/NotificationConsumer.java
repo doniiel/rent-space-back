@@ -27,8 +27,8 @@ public class NotificationConsumer {
     @KafkaListener(topics = "${event.topic.verification}", groupId = "${spring.kafka.consumer.group-id}")
     public void handleVerificationEvent(@Payload AccountVerificationEvent event) {
         Map<String, Object> emailVariables = new HashMap<>();
-        emailVariables.put("name", event.getEmail().split("@")[0]); // Имя пользователя
-        emailVariables.put("verificationCode", extractVerificationCode(event.getMessage())); // Код подтверждения
+        emailVariables.put("name", event.getEmail().split("@")[0]);
+        emailVariables.put("verificationCode", extractVerificationCode(event.getMessage()));
 
         processNotification(event.getEmail(), event.getSubject(), "email-verification", emailVariables, NotificationType.ACCOUNT_VERIFICATION);
     }
@@ -36,8 +36,8 @@ public class NotificationConsumer {
     @KafkaListener(topics = "${event.topic.password-reset}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlePasswordResetEvent(@Payload PasswordResetEvent event) {
         Map<String, Object> emailVariables = new HashMap<>();
-        emailVariables.put("name", event.getEmail().split("@")[0]); // Имя пользователя
-        emailVariables.put("resetCode", extractVerificationCode(event.getMessage())); // Код сброса пароля
+        emailVariables.put("name", event.getEmail().split("@")[0]);
+        emailVariables.put("resetCode", extractVerificationCode(event.getMessage()));
 
         processNotification(event.getEmail(), event.getSubject(), "email-password-reset", emailVariables, NotificationType.PASSWORD_RESET);
     }

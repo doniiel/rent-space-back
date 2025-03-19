@@ -41,3 +41,13 @@ event:
   topic:
     verification: account-verification
     password-reset: password-reset
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+    enabled: true
+  api-docs:
+    path: /v3/api-docs

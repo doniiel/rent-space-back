@@ -5,6 +5,7 @@ import com.rentspace.core.exception.TokenExpiredException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.lang.NonNull;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -24,9 +25,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            @org.springframework.lang.NonNull MethodArgumentNotValidException ex,
-            @org.springframework.lang.NonNull HttpHeaders headers,
-            @org.springframework.lang.NonNull HttpStatusCode status,
+            @NonNull MethodArgumentNotValidException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         StringBuilder errorMessage = new StringBuilder("Validation failed for arguments: ");
 
