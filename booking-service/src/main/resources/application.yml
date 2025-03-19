@@ -33,3 +33,12 @@ event:
 
 listing-service:
   url: http://localhost:8082/api/v1/listings
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs
