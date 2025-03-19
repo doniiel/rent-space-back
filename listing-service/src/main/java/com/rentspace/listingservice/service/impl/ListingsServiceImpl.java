@@ -5,7 +5,6 @@ import com.rentspace.listingservice.dto.ListingDto;
 import com.rentspace.listingservice.dto.ListingUpdateRequest;
 import com.rentspace.listingservice.entity.Listing;
 import com.rentspace.listingservice.exception.InvalidListingDataException;
-import com.rentspace.listingservice.exception.ListingNotFoundException;
 import com.rentspace.listingservice.mapper.ListingMapper;
 import com.rentspace.listingservice.repository.ListingsRepository;
 import com.rentspace.listingservice.service.ListingPhotoService;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,64 +24,91 @@ public class ListingsServiceImpl implements ListingsService {
     private final ListingsRepository listingsRepository;
     private final ListingMapper listingMapper;
     private final ListingPhotoService listingPhotoService;
+    private final ListingBaseService listingBaseService;
 
     @Override
     @Transactional
     public ListingDto createListing(ListingCreateRequest request) {
-//        if (!isValidListingData(request)) {
-//            throw  new InvalidListingDataException("Invalid listing data");
-//        }
-        Listing listing = listingMapper.toEntity(request);
-        listingsRepository.save(listing);
-
-        log.info("Создано объявление с ID: {}", listing.getId());
+        log.debug("Creating listing from request: {}", request);
+        validateCreateRequest(request);
+        Listing listing = createAndSaveListing(request);
+        log.info("Listing created with ID: {}", listing.getId());
         return listingMapper.toDto(listing);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ListingDto getListingById(Long id) {
-        Listing listing = listingsRepository.findById(id)
-                .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", id));
-
+        log.debug("Fetching listing by ID: {}", id);
+        Listing listing = listingBaseService.getListingById(id);
         return listingMapper.toDto(listing);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ListingDto> getAllListings() {
+        log.debug("Fetching all listings");
         return listingsRepository.findAll().stream()
                 .map(listingMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ListingDto> getAllUserListings(Long userId) {
+        log.debug("Fetching listings for user ID: {}", userId);
+        validateUserId(userId);
         return listingsRepository.findByUserId(userId).stream()
                 .map(listingMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     @Transactional
     public ListingDto updateListing(Long listingId, ListingUpdateRequest request) {
-        Listing listing = listingsRepository.findById(listingId)
-                .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId));
-
-        listingMapper.updateListingFromRequest(request, listing);
-        listingsRepository.save(listing);
-
+        log.debug("Updating listing ID: {} with request: {}", listingId, request);
+        Listing listing = listingBaseService.getListingById(listingId);
+        validateUpdateRequest(request);
+        updateAndSaveListing(listing, request);
+        log.info("Listing ID: {} updated", listingId);
         return listingMapper.toDto(listing);
     }
 
     @Override
     @Transactional
     public void deleteListing(Long listingId) {
-        Listing listing = listingsRepository.findById(listingId)
-                .orElseThrow(() -> new ListingNotFoundException("Listing", "listingId", listingId));
+        log.debug("Deleting listing ID: {}", listingId);
+        Listing listing = listingBaseService.getListingById(listingId);
         listingPhotoService.deletePhotos(listing.getPhotos());
         listingsRepository.delete(listing);
-        log.info("Удалено объявление с ID: {}", listingId);
+        log.info("Listing ID: {} deleted", listingId);
+    }
+
+    private void validateCreateRequest(ListingCreateRequest request) {
+        if (request == null) {
+            throw new InvalidListingDataException("Listing create request cannot be null");
+        }
+    }
+
+    private void validateUpdateRequest(ListingUpdateRequest request) {
+        if (request == null) {
+            throw new InvalidListingDataException("Listing update request cannot be null");
+        }
+    }
+
+    private void validateUserId(Long userId) {
+        if (userId == null || userId <= 0) {
+            throw new InvalidListingDataException("User ID must be a positive number");
+        }
+    }
+
+    private Listing createAndSaveListing(ListingCreateRequest request) {
+        Listing listing = listingMapper.toEntity(request);
+        return listingsRepository.save(listing);
+    }
+
+    private void updateAndSaveListing(Listing listing, ListingUpdateRequest request) {
+        listingMapper.updateListingFromRequest(request, listing);
+        listingsRepository.save(listing);
     }
 }

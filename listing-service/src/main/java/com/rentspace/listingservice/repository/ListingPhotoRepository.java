@@ -11,6 +11,5 @@ import java.util.List;
 public interface ListingPhotoRepository extends JpaRepository<ListingPhoto, Long> {
     List<ListingPhoto> findByListing(Listing listing);
     List<ListingPhoto> findByListingId(Long listingId);
-
     void deleteByListing(Listing listing);
 }

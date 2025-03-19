@@ -1,8 +1,21 @@
 package com.rentspace.listingservice.util;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class TokenUtil {
+
     public static final String HEADER = "Authorization";
     public static final String PREFIX = "Bearer ";
-    public static final int PREFIX_LENGTH = 7;
-    private TokenUtil() {}
+
+    public static String extractToken(String header) {
+        if (header == null || !header.startsWith(PREFIX)) {
+            return null;
+        }
+        return header.substring(PREFIX.length());
+    }
+
+    public static boolean isValidBearerHeader(String header) {
+        return header != null && header.startsWith(PREFIX);
+    }
 }

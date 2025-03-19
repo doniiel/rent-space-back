@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 
-import static com.rentspace.userservice.util.TokenUtil.*;
+import static com.rentspace.core.util.TokenUtil.*;
 
 @Slf4j
 @Component
