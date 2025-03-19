@@ -5,6 +5,7 @@ import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,13 +15,14 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class MinioBucketConfig {
     private final MinioClient minioClient;
-    private final MinioProperties minioProperties;
+
+    @Value("${minio.bucket}")
+    private String bucket;
 
     @Bean
     public CommandLineRunner createBucketIfNotExists() {
         return args -> {
             try {
-                String bucket = minioProperties.getBucket();
                 boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
                 if (!exists) {
                     minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());

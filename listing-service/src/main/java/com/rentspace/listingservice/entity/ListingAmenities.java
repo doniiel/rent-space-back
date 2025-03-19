@@ -17,7 +17,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "listing_amenities", indexes = {
-        @Index(name = "idx_listing_id", columnList = "listing_id")
+        @Index(name = "idx_listing_availability_listing_id", columnList = "listing_id")
 })
 @Getter
 @Setter

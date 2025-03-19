@@ -16,7 +16,17 @@ spring:
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: listing-service
 
+jwt:
+  secret-key: ${JWT_SECRET_KEY:ZGlnNF4lXiYqKCo0MjRnZXdnZXdma2Vmfmg4gr25fbg15}
+  signature-algorithm: HS256
+
+minio:
+  bucket: "images"
+  url: "http://localhost:9000/"
+  accessKey: "minioadmin"
+  secretKey: "minioadmin"
 
 management:
   endpoints:

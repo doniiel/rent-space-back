@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -17,11 +16,12 @@ import java.util.List;
 @Slf4j
 @Service
 public class JwtTokenUtil {
-    private final byte[] secretKey;
+    private final String secretKey;
 
     public JwtTokenUtil(@Value("${jwt.secret-key}") String secretKey) {
-        this.secretKey = secretKey.getBytes(StandardCharsets.UTF_8);
+        this.secretKey = secretKey;
     }
+
     public String extractUsername(String token) {
         return parseClaims(token).getSubject();
     }
@@ -62,9 +62,8 @@ public class JwtTokenUtil {
 
     private Claims parseClaims(String token) {
         try {
-            return Jwts.parserBuilder()
+            return Jwts.parser()
                     .setSigningKey(secretKey)
-                    .build()
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
