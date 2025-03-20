@@ -77,6 +77,18 @@ services:
         networks:
             - rentspace
 
+    elasticsearch:
+        container_name: elasticsearch
+        image: elasticsearch:8.14.2
+        environment:
+            - discovery.type=single-node
+            - xpack.security.enabled=false
+        ports:
+            - "9200:9200"
+        volumes:
+            - esdata:/usr/share/elasticsearch/data
+
+
     configservice:
         container_name: configservice
         image: d0niiel/configservice:v1
@@ -214,9 +226,26 @@ services:
         networks:
             - rentspace
 
+#    searchservice:
+#        image: d0niiel/searchservice:v1
+#        container_name: searchservice
+#        restart: always
+#        ports:
+#            - "8085:8085"
+#        depends_on:
+#            discoveryservice:
+#                condition: service_healthy
+#        environment:
+#            SPRING_PROFILES_ACTIVE: default
+#            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+#            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+#        networks:
+#            - rentspace
+
 volumes:
     minio_data:
     kafka-data:
+    esdata:
 
 networks:
     rentspace:
