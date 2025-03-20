@@ -19,6 +19,7 @@
         <module>review-service</module>
         <module>payment-service</module>
         <module>notification-service</module>
+        <module>search-service</module>
         <module>gateway-service</module>
     </modules>
 
@@ -46,6 +47,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <postgresql.version>42.7.3</postgresql.version>
         <h2database.version>2.2.224</h2database.version>
+        <elasticsearch.version>3.4.3</elasticsearch.version>
         <minio.version>8.5.11</minio.version>
         <kafka.version>3.3.2</kafka.version>
         <mail.version>3.4.2</mail.version>
@@ -203,6 +205,13 @@
                 <version>${flyway.version}</version>
             </dependency>
 
+            <!-- Elasticsearch Dependency -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+
             <!--MINIO DEPENDENCY -->
             <dependency>
                 <groupId>io.minio</groupId>
@@ -229,7 +238,6 @@
                 <artifactId>jakarta.mail-api</artifactId>
                 <version>${jakarta.mail.version}</version>
             </dependency>
-
 
             <!-- TESTING DEPENDENCY -->
             <dependency>

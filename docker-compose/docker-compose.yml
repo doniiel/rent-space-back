@@ -83,11 +83,15 @@ services:
         environment:
             - discovery.type=single-node
             - xpack.security.enabled=false
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m  # Ограничение JVM до 512 МБ
         ports:
             - "9200:9200"
         volumes:
             - esdata:/usr/share/elasticsearch/data
-
+        mem_limit: 1g  # Ограничение контейнера до 1 ГБ
+        mem_reservation: 512m
+        networks:
+            - rentspace
 
     configservice:
         container_name: configservice
@@ -226,21 +230,26 @@ services:
         networks:
             - rentspace
 
-#    searchservice:
-#        image: d0niiel/searchservice:v1
-#        container_name: searchservice
-#        restart: always
-#        ports:
-#            - "8085:8085"
-#        depends_on:
-#            discoveryservice:
-#                condition: service_healthy
-#        environment:
-#            SPRING_PROFILES_ACTIVE: default
-#            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
-#            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
-#        networks:
-#            - rentspace
+    searchservice:
+        image: d0niiel/searchservice:v1
+        container_name: searchservice
+        restart: always
+        ports:
+            - "8085:8085"
+        depends_on:
+            - elasticsearch
+            - kafka-1
+            - configservice
+            - discoveryservice
+        environment:
+            SPRING_APPLICATION_NAME: searchservice
+            SPRING_PROFILES_ACTIVE: default
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9092"
+            SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+        networks:
+            - rentspace
 
 volumes:
     minio_data:

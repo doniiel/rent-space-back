@@ -46,6 +46,8 @@ management:
 event:
   topic:
     listing:
+      created: "listing-created"
+      updated: "listing-updated"
       availability:
         request: "listing-availability-request"
         response: "listing-availability-response"

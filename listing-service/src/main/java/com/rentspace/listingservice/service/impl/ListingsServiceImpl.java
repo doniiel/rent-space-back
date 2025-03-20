@@ -11,6 +11,8 @@ import com.rentspace.listingservice.service.ListingPhotoService;
 import com.rentspace.listingservice.service.ListingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +22,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ListingsServiceImpl implements ListingsService {
-
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ListingsRepository listingsRepository;
     private final ListingMapper listingMapper;
     private final ListingPhotoService listingPhotoService;
     private final ListingBaseService listingBaseService;
+
+    @Value("${event.topic.listing.created}")
+    private String listingCreatedTopic;
+
+    @Value("${event.topic.listing.updated}")
+    private String listingUpdatedTopic;
 
     @Override
     @Transactional
@@ -32,6 +40,7 @@ public class ListingsServiceImpl implements ListingsService {
         log.debug("Creating listing from request: {}", request);
         validateCreateRequest(request);
         Listing listing = createAndSaveListing(request);
+        kafkaTemplate.send(listingCreatedTopic, listing.getId().toString(), listing);
         log.info("Listing created with ID: {}", listing.getId());
         return listingMapper.toDto(listing);
     }
@@ -70,6 +79,7 @@ public class ListingsServiceImpl implements ListingsService {
         Listing listing = listingBaseService.getListingById(listingId);
         validateUpdateRequest(request);
         updateAndSaveListing(listing, request);
+        kafkaTemplate.send(listingUpdatedTopic, listing.getId().toString(), listing);
         log.info("Listing ID: {} updated", listingId);
         return listingMapper.toDto(listing);
     }

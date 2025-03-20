@@ -1,13 +1,21 @@
 spring:
   application:
-    name: search-service
-  config: "optional:configserver:http://localhost:8071/"
+    name: searchservice
+  config:
+    import: "optional:configserver:http://localhost:8071/"
   kafka:
     bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: search-service
   elasticsearch:
     uris: http://localhost:9200
 server:
-  port:8085
+  port: 8085
 management:
   endpoints:
     web:
