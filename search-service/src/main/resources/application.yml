@@ -12,10 +12,24 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       group-id: search-service
+      auto-offset-reset: earliest
   elasticsearch:
     uris: http://localhost:9200
+
 server:
   port: 8085
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY:ZGlnNF4lXiYqKCo0MjRnZXdnZXdma2Vmfmg4gr25fbg15}
+  signature-algorithm: HS256
+
+event:
+  topic:
+    listing:
+      created: listing-created
+      updated: listing-updated
+      deleted: listing-deleted
+
 management:
   endpoints:
     web:

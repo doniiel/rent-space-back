@@ -18,6 +18,6 @@ public class SearchController {
 
     @GetMapping
     public List<Listing> search(@RequestParam String query) {
-        return searchService.search(query);
+        return searchService.searchListings(query);
     }
 }
