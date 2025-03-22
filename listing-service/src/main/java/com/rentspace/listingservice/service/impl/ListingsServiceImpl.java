@@ -1,5 +1,6 @@
 package com.rentspace.listingservice.service.impl;
 
+import com.rentspace.core.event.ListingEvent;
 import com.rentspace.listingservice.dto.ListingCreateRequest;
 import com.rentspace.listingservice.dto.ListingDto;
 import com.rentspace.listingservice.dto.ListingUpdateRequest;
@@ -34,14 +35,18 @@ public class ListingsServiceImpl implements ListingsService {
     @Value("${event.topic.listing.updated}")
     private String listingUpdatedTopic;
 
+    @Value("${event.topic.listing.deleted}")
+    private String listingDeletedTopic;
+
     @Override
     @Transactional
     public ListingDto createListing(ListingCreateRequest request) {
         log.debug("Creating listing from request: {}", request);
         validateCreateRequest(request);
         Listing listing = createAndSaveListing(request);
-        kafkaTemplate.send(listingCreatedTopic, listing.getId().toString(), listing);
-        log.info("Listing created with ID: {}", listing.getId());
+        ListingEvent event = createListingEvent(listing, "CREATED");
+        kafkaTemplate.send(listingCreatedTopic, listing.getId().toString(), event);
+        log.info("Listing created with ID: {} and event sent to topic Kafka: {}", listing.getId(), listingCreatedTopic);
         return listingMapper.toDto(listing);
     }
 
@@ -79,8 +84,9 @@ public class ListingsServiceImpl implements ListingsService {
         Listing listing = listingBaseService.getListingById(listingId);
         validateUpdateRequest(request);
         updateAndSaveListing(listing, request);
-        kafkaTemplate.send(listingUpdatedTopic, listing.getId().toString(), listing);
-        log.info("Listing ID: {} updated", listingId);
+        ListingEvent event = createListingEvent(listing, "UPDATED");
+        kafkaTemplate.send(listingUpdatedTopic, listing.getId().toString(), event);
+        log.info("Listing ID: {} updated and event sent to topic Kafka: {}", listingId, listing);
         return listingMapper.toDto(listing);
     }
 
@@ -91,7 +97,9 @@ public class ListingsServiceImpl implements ListingsService {
         Listing listing = listingBaseService.getListingById(listingId);
         listingPhotoService.deletePhotos(listing.getPhotos());
         listingsRepository.delete(listing);
-        log.info("Listing ID: {} deleted", listingId);
+        ListingEvent event = createListingEvent(listing, "DELETED");
+        kafkaTemplate.send(listingDeletedTopic, listingId.toString(), event);
+        log.info("Listing ID: {} deleted and event sent to topic Kafka: {}", listingId, listingDeletedTopic);
     }
 
     private void validateCreateRequest(ListingCreateRequest request) {
@@ -120,5 +128,23 @@ public class ListingsServiceImpl implements ListingsService {
     private void updateAndSaveListing(Listing listing, ListingUpdateRequest request) {
         listingMapper.updateListingFromRequest(request, listing);
         listingsRepository.save(listing);
+    }
+
+    private ListingEvent createListingEvent(Listing listing, String eventType) {
+        return ListingEvent.builder()
+                .id(listing.getId())
+                .userId(listing.getUserId())
+                .title(listing.getTitle())
+                .description(listing.getDescription())
+                .address(listing.getAddress())
+                .city(listing.getCity())
+                .country(listing.getCountry())
+                .latitude(listing.getLatitude())
+                .longitude(listing.getLongitude())
+                .type(listing.getType().name())
+                .maxGuests(listing.getMaxGuests())
+                .pricePerNight(listing.getPricePerNight())
+                .eventType(eventType)
+                .build();
     }
 }

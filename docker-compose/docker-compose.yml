@@ -168,6 +168,7 @@ services:
                 condition: service_healthy
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9092"
             SPRING_DATASOURCE_USERNAME: postgres
             SPRING_DATASOURCE_PASSWORD: postgres
             SPRING_PROFILES_ACTIVE: default

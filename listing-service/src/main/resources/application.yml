@@ -18,6 +18,20 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       group-id: listing-service
 
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/userservicedb}
+    driver-class-name: ${DB_DRIVER_CLASS_NAME:org.postgresql.Driver}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
 jwt:
   secret-key: ${JWT_SECRET_KEY:ZGlnNF4lXiYqKCo0MjRnZXdnZXdma2Vmfmg4gr25fbg15}
   signature-algorithm: HS256
@@ -48,6 +62,7 @@ event:
     listing:
       created: "listing-created"
       updated: "listing-updated"
+      deleted: "listing-deleted"
       availability:
         request: "listing-availability-request"
         response: "listing-availability-response"
