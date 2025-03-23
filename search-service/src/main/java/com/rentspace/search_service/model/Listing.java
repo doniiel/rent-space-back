@@ -7,6 +7,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @Document(indexName = "listings")
@@ -46,4 +47,7 @@ public class Listing {
 
     @Field(type = FieldType.Double)
     private Double pricePerNight;
+
+    @Field(type = FieldType.Keyword)
+    private List<String> amenities;
 }

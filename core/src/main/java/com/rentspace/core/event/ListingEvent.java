@@ -3,6 +3,7 @@ package com.rentspace.core.event;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -21,5 +22,6 @@ public class ListingEvent {
     private String type;
     private Integer maxGuests;
     private Double pricePerNight;
+    private List<String> amenities;
     private String eventType;
 }
