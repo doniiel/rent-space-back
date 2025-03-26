@@ -18,6 +18,11 @@
 	<description>Review Service For RentSpace Backend</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.rentspace</groupId>
+			<artifactId>core</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 		<!-- Spring Boot Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -85,12 +90,6 @@
 			<artifactId>jjwt-jackson</artifactId>
 		</dependency>
 
-		<!-- Swagger Documentation -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-		</dependency>
-
 		<!-- Database Dependency -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -108,6 +107,18 @@
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct-processor</artifactId>
 			<scope>provided</scope>
+		</dependency>
+
+		<!-- Swagger Documentation -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		</dependency>
+
+		<!-- Kafka Dependency-->
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
 		</dependency>
 
 		<!-- Test Dependencies -->

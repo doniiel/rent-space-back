@@ -47,7 +47,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <postgresql.version>42.7.3</postgresql.version>
         <h2database.version>2.2.224</h2database.version>
-        <elasticsearch.version>3.4.3</elasticsearch.version>
+        <elasticsearch.version>3.4.2</elasticsearch.version>
         <minio.version>8.5.11</minio.version>
         <kafka.version>3.3.2</kafka.version>
         <mail.version>3.4.2</mail.version>

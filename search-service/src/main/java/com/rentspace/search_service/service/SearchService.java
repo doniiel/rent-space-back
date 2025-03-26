@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface SearchService {
     List<Listing> searchListings(String query);
-    Page<Listing> searchListings(String city, String type, Double minPrice, Double maxPrice, Integer minGuests, String amenities, Pageable pageable);
+    Page<Listing> searchListings(String city, String type, Double minPrice, Double maxPrice, Integer minGuests, List<String> amenitiesList, Pageable pageable);
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -20,8 +21,8 @@ import java.util.List;
 public class SearchController {
     private final SearchService searchService;
 
-    @GetMapping
-    public List<Listing> search(@RequestParam String query) {
+    @GetMapping("/quick")
+    public List<Listing> quickSearch(@RequestParam String query) {
         return searchService.searchListings(query);
     }
 
@@ -31,9 +32,14 @@ public class SearchController {
                                         @RequestParam(required = false) Double minPrice,
                                         @RequestParam(required = false) Double maxPrice,
                                         @RequestParam(required = false) Integer minGuests,
-                                        @RequestParam(required = false) String amenities, @RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(required = false) String amenities,
+                                        @RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return searchService.searchListings(city, type, minPrice, maxPrice, minGuests, amenities, pageable);
+        List<String> amenitiesList = (amenities != null && !amenities.isBlank())
+                ? Arrays.stream(amenities.split(",")).map(String::trim).filter(s -> !s.isBlank()).toList()
+                : null;
+
+        return searchService.searchListings(city, type, minPrice, maxPrice, minGuests, amenitiesList, pageable);
     }
 }

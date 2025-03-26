@@ -50,4 +50,7 @@ public class Listing {
 
     @Field(type = FieldType.Keyword)
     private List<String> amenities;
+
+    @Field(type = FieldType.Double)
+    private Double averageRating;
 }

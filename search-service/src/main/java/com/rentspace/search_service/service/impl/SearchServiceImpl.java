@@ -6,6 +6,7 @@ import com.rentspace.search_service.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,17 +15,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchServiceImpl implements SearchService {
     private final ListingRepository listingRepository;
+    private final ElasticsearchOperations elasticsearchOperations;
 
+    @Override
     public List<Listing> searchListings(String query) {
         return listingRepository.findByTitleContainingOrDescriptionContainingOrCityContaining(query, query, query);
     }
 
-    public Page<Listing> searchListings(String city, String type, Double minPrice, Double maxPrice, Integer minGuests, String amenities, Pageable pageable) {
-        List<String> amenitiesList = amenities != null ? List.of(amenities.split(",")) : null;
-
-        return listingRepository.findByFilters(city, type, minPrice != null ? minPrice : 0.0,
-                maxPrice != null ? maxPrice : Double.MAX_VALUE,
-                minGuests, amenitiesList, pageable);
+    @Override
+    public Page<Listing> searchListings(
+            String city, String type, Double minPrice, Double maxPrice,
+            Integer minGuests, List<String> amenities, Pageable pageable) {
+        return null;
     }
-
 }
