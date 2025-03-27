@@ -47,6 +47,9 @@ public class ListingDto {
     @Schema(description = "Price per night for the listing", example = "100.50")
     private Double pricePerNight;
 
+    @Schema(description = "Average rating of the listing", example = "4.5")
+    private Double averageRating;
+
     @Schema(description = "List of URLs for the listing's photos", example = "[\"http://example.com/photo1.jpg\"]")
     private List<String> photoUrls;
 }

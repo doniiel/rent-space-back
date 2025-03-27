@@ -102,6 +102,14 @@ public class ListingsServiceImpl implements ListingsService {
         log.info("Listing ID: {} deleted and event sent to topic Kafka: {}", listingId, listingDeletedTopic);
     }
 
+    @Override
+    @Transactional
+    public void updateListingRating(Long listingId, Double averageRating) {
+        Listing listing = listingBaseService.getListingById(listingId);
+        listing.setAverageRating(averageRating);
+        listingsRepository.save(listing);
+    }
+
     private void validateCreateRequest(ListingCreateRequest request) {
         if (request == null) {
             throw new InvalidListingDataException("Listing create request cannot be null");

@@ -12,4 +12,5 @@ public class ReviewEvent {
     private Integer rating;
     private String comment;
     private String eventType;
+    private Double averageRating;
 }

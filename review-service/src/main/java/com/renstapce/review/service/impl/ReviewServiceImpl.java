@@ -27,7 +27,8 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewDto createReview(ReviewCreateRequest request) {
         Review review = mapper.toEntity(request);
         Review savedReview = repository.save(review);
-        reviewHandler.publishReviewEvent(savedReview, "CREATED");
+        double averageRating = calculateAverageRating(savedReview.getListingId());
+        reviewHandler.publishReviewEvent(savedReview, "CREATED", averageRating);
         return mapper.toDto(savedReview);
     }
 
@@ -52,7 +53,8 @@ public class ReviewServiceImpl implements ReviewService {
         review.setRating(request.getRating());
         review.setComment(request.getComment());
         Review updatedReview = repository.save(review);
-        reviewHandler.publishReviewEvent(updatedReview, "UPDATED");
+        double averageRating = calculateAverageRating(updatedReview.getListingId());
+        reviewHandler.publishReviewEvent(updatedReview, "UPDATED", averageRating);
         return mapper.toDto(updatedReview);
     }
 
@@ -61,6 +63,16 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = repository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException("Review with id " + id + " not found"));
         repository.delete(review);
-        reviewHandler.publishReviewEvent(review, "DELETED");
+        double averageRating = calculateAverageRating(review.getListingId());
+        reviewHandler.publishReviewEvent(review, "DELETED", averageRating);
+    }
+
+    private double calculateAverageRating(Long listingId) {
+        List<Review> reviews = repository.findByListingId(listingId);
+        if (reviews.isEmpty()) {
+            return 0.0;
+        }
+        double sum = reviews.stream().mapToInt(Review::getRating).sum();
+        return Math.round(sum / reviews.size() * 10.0) / 10.0;
     }
 }

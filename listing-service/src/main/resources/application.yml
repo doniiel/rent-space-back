@@ -63,6 +63,8 @@ event:
       created: "listing-created"
       updated: "listing-updated"
       deleted: "listing-deleted"
+      rating:
+        updated: "listing-rating-updated"
       availability:
         request: "listing-availability-request"
         response: "listing-availability-response"

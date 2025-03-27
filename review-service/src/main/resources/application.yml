@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: review-service
+
+event:
+  topic:
+    review:
+      updated: "review-updated"
+    listing:
+      updated: "listing-rating-updated"

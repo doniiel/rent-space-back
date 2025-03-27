@@ -4,7 +4,9 @@ import com.rentspace.core.enums.ListingStatus;
 import com.rentspace.core.event.ListingAvailabilityEvent;
 import com.rentspace.core.event.ListingAvailableResponse;
 import com.rentspace.core.event.ListingUnblockEvent;
+import com.rentspace.core.event.ReviewEvent;
 import com.rentspace.listingservice.service.ListingAvailabilityService;
+import com.rentspace.listingservice.service.ListingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +22,8 @@ import java.time.format.DateTimeParseException;
 @Service
 @RequiredArgsConstructor
 public class ListingHandler {
-    private final ListingAvailabilityService service;
+    private final ListingAvailabilityService listingAvailabilityService;
+    private final ListingsService listingsService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     @Value("${event.topic.listing.availability.response}")
     private String responseTopic;
@@ -29,11 +32,11 @@ public class ListingHandler {
     public void handleListingAvailabilityEvent(@Payload ListingAvailabilityEvent event) {
         log.info("Received listing availability event for booking ID: {}", event.getBookingId());
 
-        boolean isAvailable = service.isAvailable(event.getListingId(), event.getStartDate(), event.getEndDate());
+        boolean isAvailable = listingAvailabilityService.isAvailable(event.getListingId(), event.getStartDate(), event.getEndDate());
 
         ListingAvailableResponse response;
         if (isAvailable) {
-            service.blockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
+            listingAvailabilityService.blockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
 
             response = ListingAvailableResponse.builder()
                     .bookingId(event.getBookingId())
@@ -59,12 +62,19 @@ public class ListingHandler {
     public void handlerListingUnblock(@Payload ListingUnblockEvent event) {
         log.info("Received listing unblock event for booking ID: {}", event.getBookingId());
         try {
-            service.unblockAvailability(event.getListingId(), LocalDateTime.parse(event.getStartDate()), LocalDateTime.parse(event.getEndDate()));
+            listingAvailabilityService.unblockAvailability(event.getListingId(), LocalDateTime.parse(event.getStartDate()), LocalDateTime.parse(event.getEndDate()));
             log.info("Successfully unblocked availability for listingId={} from {} to {}", event.getListingId(), event.getStartDate(), event.getEndDate());
         } catch (DateTimeParseException e) {
             log.error("Failed to parse dates for unblock event: bookingId: {}, startDate: {}, endDate: {}",
                     event.getBookingId(), event.getStartDate(), event.getEndDate());
             throw new IllegalArgumentException("Invalid date format in unblock event", e);
         }
+    }
+
+    @KafkaListener(topics = "${event.topic.listing.rating.updated}", groupId = "${spring.kafka.consumer.group-id}")
+    public void handleReviewUpdated(ReviewEvent event) {
+        log.info("Received review event for rating update: {}", event);
+        listingsService.updateListingRating(event.getListingId(), event.getAverageRating());
+        log.info("Updated listing rating for listing ID: {}", event.getListingId());
     }
 }

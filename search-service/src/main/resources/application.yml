@@ -29,6 +29,8 @@ event:
       created: listing-created
       updated: listing-updated
       deleted: listing-deleted
+    review:
+      updated: review-updated
 
 management:
   endpoints:

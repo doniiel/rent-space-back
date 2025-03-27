@@ -20,6 +20,7 @@ public class SearchHandler {
     public void handleListingCreated(ListingEvent event) {
         log.info("Received listing created event: {}", event);
         Listing listing = mapper.toEntity(event);
+        listing.setAverageRating(0.0);
         listingRepository.save(listing);
         log.info("Indexed listing with ID: {}", listing.getId());
     }
