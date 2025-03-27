@@ -7,6 +7,18 @@ spring:
   config:
     import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8071/}"
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: ${KAFKA_PRODUCER_KEY_SERIALIZER:org.apache.kafka.common.serialization.StringSerializer}
+      value-serializer: ${KAFKA_PRODUCER_VALUE_SERIALIZER:org.springframework.kafka.support.serializer.JsonSerializer}
+      acks: ${KAFKA_PRODUCER_ACKS:1}
+      retries: ${KAFKA_PRODUCER_RETRIES:3}
+      retry:
+        backoff: ${KAFKA_PRODUCER_RETRY_BACKOFF:1000}
+      properties:
+        spring.json.trusted.packages: ${KAFKA_PRODUCER_TRUSTED_PACKAGES:*}
+
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/userservicedb}
     driver-class-name: ${DB_DRIVER_CLASS_NAME:org.postgresql.Driver}
@@ -25,18 +37,6 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     out-of-order: false
-
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    producer:
-      key-serializer: ${KAFKA_PRODUCER_KEY_SERIALIZER:org.apache.kafka.common.serialization.StringSerializer}
-      value-serializer: ${KAFKA_PRODUCER_VALUE_SERIALIZER:org.springframework.kafka.support.serializer.JsonSerializer}
-      acks: ${KAFKA_PRODUCER_ACKS:1}
-      retries: ${KAFKA_PRODUCER_RETRIES:3}
-      retry:
-        backoff: ${KAFKA_PRODUCER_RETRY_BACKOFF:1000}
-      properties:
-        spring.json.trusted.packages: ${KAFKA_PRODUCER_TRUSTED_PACKAGES:*}
 
 springdoc:
   swagger-ui:

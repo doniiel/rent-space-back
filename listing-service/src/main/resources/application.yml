@@ -6,6 +6,7 @@ spring:
     name: "listingservice"
   config:
     import: "optional:configserver:http://localhost:8071/"
+
   kafka:
     bootstrap-servers: localhost:9092
     producer:

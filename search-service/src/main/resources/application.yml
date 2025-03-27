@@ -1,8 +1,12 @@
+server:
+  port: 8085
+
 spring:
   application:
     name: searchservice
   config:
     import: "optional:configserver:http://localhost:8071/"
+
   kafka:
     bootstrap-servers: localhost:9092
     producer:
@@ -13,24 +17,13 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       group-id: search-service
       auto-offset-reset: earliest
+
   elasticsearch:
     uris: http://localhost:9200
-
-server:
-  port: 8085
 
 jwt:
   secret-key: ${JWT_SECRET_KEY:ZGlnNF4lXiYqKCo0MjRnZXdnZXdma2Vmfmg4gr25fbg15}
   signature-algorithm: HS256
-
-event:
-  topic:
-    listing:
-      created: listing-created
-      updated: listing-updated
-      deleted: listing-deleted
-    review:
-      updated: review-updated
 
 management:
   endpoints:
@@ -42,3 +35,16 @@ management:
       enabled: true
     readiness-state:
       enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+event:
+  topic:
+    listing:
+      created: "listing-created"
+      updated: "listing-updated"
+      deleted: "listing-deleted"
+    review:
+      updated: "review-updated"
