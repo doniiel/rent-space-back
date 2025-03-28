@@ -1,4 +1,4 @@
-package com.rentspace.search_service.jwt;
+package com.rentspace.listingservice.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,10 +15,10 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class JwtTokenUtil {
+public class JwtTokenProvider {
     private final String secretKey;
 
-    public JwtTokenUtil(@Value("${jwt.secret-key}") String secretKey) {
+    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey) {
         this.secretKey = secretKey;
     }
 

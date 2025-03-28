@@ -1,7 +1,7 @@
-package com.rentspace.listingservice.jwt;
+package com.rentspace.paymentservice.jwt;
 
 import com.rentspace.core.exception.TokenExpiredException;
-import com.rentspace.listingservice.util.TokenUtil;
+import com.rentspace.paymentservice.utils.TokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -18,10 +18,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter  extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override

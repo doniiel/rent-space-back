@@ -1,4 +1,5 @@
-package com.rentspace.listingservice.jwt;
+package com.rentspace.bookingservice.jwt;
+
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -7,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -15,10 +17,10 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class JwtTokenUtil {
+public class JwtTokenProvider {
     private final String secretKey;
 
-    public JwtTokenUtil(@Value("${jwt.secret-key}") String secretKey) {
+    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey) {
         this.secretKey = secretKey;
     }
 

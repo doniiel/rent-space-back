@@ -1,7 +1,8 @@
-package com.rentspace.listingservice.jwt;
+package com.rentspace.notificationservice.jwt;
+
 
 import com.rentspace.core.exception.TokenExpiredException;
-import com.rentspace.listingservice.util.TokenUtil;
+import com.rentspace.notificationservice.util.TokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

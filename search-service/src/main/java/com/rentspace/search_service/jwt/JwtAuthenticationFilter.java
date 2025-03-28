@@ -22,7 +22,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -46,11 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void processToken(String token) {
-        String username = jwtTokenUtil.extractUsername(token);
+        String username = jwtTokenProvider.extractUsername(token);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtTokenUtil.validateToken(token, username)) {
+            if (jwtTokenProvider.validateToken(token, username)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        username, null, jwtTokenUtil.extractAuthorities(token)
+                        username, null, jwtTokenProvider.extractAuthorities(token)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
                 log.debug("Authentication set for user: {}", username);

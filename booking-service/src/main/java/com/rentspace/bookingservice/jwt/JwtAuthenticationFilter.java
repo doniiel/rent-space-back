@@ -1,42 +1,66 @@
 package com.rentspace.bookingservice.jwt;
 
-import com.rentspace.bookingservice.exception.TokenExpiredException;
-import com.rentspace.bookingservice.util.JwtTokenUtil;
+import com.rentspace.bookingservice.util.TokenUtil;
+import com.rentspace.core.exception.TokenExpiredException;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtTokenUtil jwtTokenUtil;
 
-    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil) {
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class JwtAuthenticationFilter  extends OncePerRequestFilter {
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = request.getHeader("Authorization");
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String header = request.getHeader(TokenUtil.HEADER);
+        String token = TokenUtil.extractToken(header);
 
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
+        if (token != null) {
             try {
-                String username = jwtTokenUtil.extractUsername(token);
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>()));
+                processToken(token);
+            } catch (JwtException e) {
+                log.error("JWT processing failed: {}", e.getMessage());
+                if (e instanceof ExpiredJwtException) {
+                    throw new TokenExpiredException("Token has expired");
                 }
-            } catch (ExpiredJwtException e) {
-                throw new TokenExpiredException("Token has expired");
             }
+        } else {
+            log.debug("No valid Bearer token found in request");
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void processToken(String token) {
+        String username = jwtTokenProvider.extractUsername(token);
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (jwtTokenProvider.validateToken(token, username)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        username, null, jwtTokenProvider.extractAuthorities(token)
+                );
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+                log.debug("Authentication set for user: {}", username);
+            } else {
+                log.warn("Invalid token for user: {}", username);
+            }
+        }
     }
 }
