@@ -126,7 +126,14 @@
 			<artifactId>spring-kafka</artifactId>
 		</dependency>
 
-<!--		Stripe SDK -->
+		<!-- PROMETHEUS DEPENDENCY -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+
+
+		<!--		Stripe SDK -->
 <!--		<dependency>-->
 <!--			<groupId>com.stripe</groupId>-->
 <!--			<artifactId>stripe-java</artifactId>-->

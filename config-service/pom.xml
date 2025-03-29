@@ -31,6 +31,13 @@
 			<artifactId>spring-cloud-config-server</artifactId>
 		</dependency>
 
+		<!-- PROMETHEUS DEPENDENCY -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+
+
 		<!-- Test Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

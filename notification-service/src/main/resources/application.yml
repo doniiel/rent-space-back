@@ -46,6 +46,10 @@ management:
     web:
       exposure:
         include: "*"
+  prometheus:
+    metrics:
+      export:
+        enabled: true
   health:
     liveness-state:
       enabled: true
@@ -55,6 +59,8 @@ management:
     health:
       probes:
         enabled: true
+    shutdown:
+      enabled: true
 
 event:
   topic:

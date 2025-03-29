@@ -93,6 +93,16 @@ services:
         networks:
             - rentspace
 
+    promethous:
+        container_name: prometheus
+        image: prom/prometheus:v2.45.0
+        ports:
+            - "9090:9090"
+        volumes:
+            - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+        networks:
+            - rentspace
+
     configservice:
         container_name: configservice
         image: d0niiel/configservice:v1
@@ -107,25 +117,25 @@ services:
         networks:
             - rentspace
 
-    discoveryservice:
-        container_name: discoveryservice
-        image: d0niiel/discoveryservice:v1
-        ports:
-            - "8761:8761"
-        restart: always
-        environment:
-            SPRING_PROFILES_ACTIVE: default
-            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
-        healthcheck:
-            test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health/readiness || exit 1"]
-            interval: 10s
-            timeout: 5s
-            retries: 10
-        depends_on:
-            configservice:
-                condition: service_healthy
-        networks:
-            - rentspace
+#    discoveryservice:
+#        container_name: discoveryservice
+#        image: d0niiel/discoveryservice:v1
+#        ports:
+#            - "8761:8761"
+#        restart: always
+#        environment:
+#            SPRING_PROFILES_ACTIVE: default
+#            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+#        healthcheck:
+#            test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health/readiness || exit 1"]
+#            interval: 10s
+#            timeout: 5s
+#            retries: 10
+#        depends_on:
+#            configservice:
+#                condition: service_healthy
+#        networks:
+#            - rentspace
 
 #    userservice:
 #        image: d0niiel/userservice:v1
