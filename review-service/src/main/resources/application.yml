@@ -57,4 +57,5 @@ event:
     review:
       updated: "review-updated"
     listing:
-      updated: "listing-rating-updated"
+      rating:
+        updated: "listing-rating-updated"

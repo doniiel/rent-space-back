@@ -14,28 +14,12 @@ public interface ListingRepository extends ElasticsearchRepository<Listing, Long
     List<Listing> findByTitleContainingOrDescriptionContainingOrCityContaining(
             String title, String description, String city);
 
-//
-//    @Query("""
-//            {
-//                "bool": {
-//                    "must": [
-//                        { "match": { "city": ?0 } },
-//                        { "match": { "type": ?1 } },
-//                        { "range": { "pricePerNight": { "gte": ?2, "lte": ?3 } } },
-//                        { "range": { "maxGuests": { "gte": ?4 } } }
-//                    ],
-//                    "filter": [
-//                        { "terms": { "amenities.keyword": ?5 } }
-//                    ]
-//                }
-//            }
-//    """)
-    Page<Listing> findByFilters(
-            String city,
-            String type,
-            Double minPrice,
-            Double maxPrice,
-            int minGuests,
-            String amenities,
-            Pageable pageable);
+    @Query("{\"bool\": {" +
+            "\"filter\": [" +
+            "  {\"match\": {\"city\": \"?0\"}}," +
+            "  {\"match\": {\"type\": \"?1\"}}," +
+            "  {\"range\": {\"pricePerNight\": {\"gte\": \"?2\", \"lte\": \"?3\"}}}," +
+            "  {\"match\": {\"maxGuests\": \"?4\"}}" +
+            "]}}")
+    Page<Listing> findByFilters(String city, String type, Double priceMin, Double priceMax, Integer maxGuests, Pageable pageable);
 }

@@ -14,7 +14,7 @@
 	<artifactId>review-service</artifactId>
 	<version>1.0.0</version>
 
-	<name>review</name>
+	<name>Review Service</name>
 	<description>Review Service For RentSpace Backend</description>
 
 	<dependencies>

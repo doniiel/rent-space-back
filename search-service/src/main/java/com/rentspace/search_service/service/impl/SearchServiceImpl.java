@@ -23,9 +23,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Page<Listing> searchListings(
-            String city, String type, Double minPrice, Double maxPrice,
-            Integer minGuests, List<String> amenities, Pageable pageable) {
-        return null;
+    public Page<Listing> searchListings(String city, String type, Double priceMin, Double priceMax, Integer maxGuests, Pageable pageable) {
+        return listingRepository.findByFilters(city, type, priceMin, priceMax, maxGuests, pageable);
     }
 }
