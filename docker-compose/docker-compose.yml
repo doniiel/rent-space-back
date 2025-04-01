@@ -56,26 +56,26 @@ services:
         networks:
             - rentspace
 
-#    kafka-1:
-#        container_name: kafka-1
-#        image: bitnami/kafka:latest
-#        environment:
-#            - KAFKA_CFG_NODE_ID=1
-#            - KAFKA_CFG_PROCESS_ROLES=broker,controller
-#            - KAFKA_KRAFT_CLUSTER_ID=nky7lYvIRimbvRyKeHU8-g
-#
-#            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9094
-#            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9092,CONTROLLER://kafka-1:9094
-#            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-#            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-#            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-#            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094
-#        ports:
-#            - "9092:9092"
-#        volumes:
-#            - kafka-data:/bitnami/kafka
-#        networks:
-#            - rentspace
+    kafka-1:
+        container_name: kafka-1
+        image: bitnami/kafka:latest
+        environment:
+            - KAFKA_CFG_NODE_ID=1
+            - KAFKA_CFG_PROCESS_ROLES=broker,controller
+            - KAFKA_KRAFT_CLUSTER_ID=nky7lYvIRimbvRyKeHU8-g
+
+            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9094
+            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9092,CONTROLLER://kafka-1:9094
+            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094
+        ports:
+            - "9092:9092"
+        volumes:
+            - kafka-data:/bitnami/kafka
+        networks:
+            - rentspace
 
     elasticsearch:
         container_name: elasticsearch
@@ -117,25 +117,25 @@ services:
         networks:
             - rentspace
 
-#    discoveryservice:
-#        container_name: discoveryservice
-#        image: d0niiel/discoveryservice:v1
-#        ports:
-#            - "8761:8761"
-#        restart: always
-#        environment:
-#            SPRING_PROFILES_ACTIVE: default
-#            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
-#        healthcheck:
-#            test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health/readiness || exit 1"]
-#            interval: 10s
-#            timeout: 5s
-#            retries: 10
-#        depends_on:
-#            configservice:
-#                condition: service_healthy
-#        networks:
-#            - rentspace
+    discoveryservice:
+        container_name: discoveryservice
+        image: d0niiel/discoveryservice:v1
+        ports:
+            - "8761:8761"
+        restart: always
+        environment:
+            SPRING_PROFILES_ACTIVE: default
+            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health/readiness || exit 1"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+        depends_on:
+            configservice:
+                condition: service_healthy
+        networks:
+            - rentspace
 
 #    userservice:
 #        image: d0niiel/userservice:v1
@@ -190,7 +190,7 @@ services:
 #            MINIO_SECRETKEY: minioadmin
 #        networks:
 #            - rentspace
-#
+
 #    notificationservice:
 #        image: d0niiel/notificationservice:v1
 #        container_name: notificationservice
@@ -215,7 +215,7 @@ services:
 #            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
 #        networks:
 #            - rentspace
-#
+
 #    bookingservice:
 #        image: d0niiel/bookingservice:v1
 #        container_name: bookingservice
@@ -240,23 +240,51 @@ services:
 #            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
 #        networks:
 #            - rentspace
+
+    searchservice:
+        image: d0niiel/searchservice:v1
+        container_name: searchservice
+        restart: always
+        ports:
+            - "8085:8085"
+        depends_on:
+            - elasticsearch
+            - kafka-1
+            - configservice
+            - discoveryservice
+        environment:
+            SPRING_APPLICATION_NAME: searchservice
+            SPRING_PROFILES_ACTIVE: default
+            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9092"
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: postgres
+            SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+        networks:
+            - rentspace
 #
-#    searchservice:
-#        image: d0niiel/searchservice:v1
-#        container_name: searchservice
+#    reviewservice:
+#        image: d0niiel/reviewservice:v1
+#        container_name: reviewservice
 #        restart: always
 #        ports:
-#            - "8085:8085"
+#            - "8081:8081"
 #        depends_on:
-#            - elasticsearch
-#            - kafka-1
-#            - configservice
-#            - discoveryservice
+#            discoveryservice:
+#                condition: service_healthy
+#            userservicedb:
+#                condition: service_healthy
+#            kafka-1:
+#                condition: service_started
 #        environment:
-#            SPRING_APPLICATION_NAME: searchservice
+#            SPRING_APPLICATION_NAME: reviewservice
 #            SPRING_PROFILES_ACTIVE: default
 #            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9092"
-#            SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+#            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+#            SPRING_DATASOURCE_USERNAME: postgres
+#            SPRING_DATASOURCE_PASSWORD: postgres
 #            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
 #            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
 #        networks:

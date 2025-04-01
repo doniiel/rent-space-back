@@ -6,40 +6,40 @@ scrape_configs:
   - job_name: 'config-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['config-service:8071']
-  - job_name: 'eureka-service'
+      - targets: ['configservice:8071']
+  - job_name: 'discovery-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['eureka-service:8761']
+      - targets: ['discoveryservice:8761']
   - job_name: 'gateway-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['gateway-service:8072']
+      - targets: ['gatewayservice:8072']
   - job_name: 'user-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['user-service:8080']
+      - targets: ['userservice:8080']
   - job_name: 'review-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['review-service:8081']
+      - targets: ['reviewservice:8081']
   - job_name: 'listing-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['listing-service:8082']
+      - targets: ['listingservice:8082']
   - job_name: 'notification-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['notification-service:8083']
+      - targets: ['notificationservice:8083']
   - job_name: 'booking-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['booking-service:8084']
+      - targets: ['bookingservice:8084']
   - job_name: 'search-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['search-service:8085']
+      - targets: ['searchservice:8085']
   - job_name: 'payment-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['payment-service:8086']
+      - targets: ['paymentservice:8086']
