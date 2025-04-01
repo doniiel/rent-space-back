@@ -1,4 +1,4 @@
-package com.rentspace.payment_service;
+package com.rentspace.paymentservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

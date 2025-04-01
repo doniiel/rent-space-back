@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: payment-service
+    name: paymentservice
   config:
     import: "optional:configserver:http://localhost:8071/"
 
@@ -54,3 +54,10 @@ management:
         enabled: true
     shutdown:
       enabled: true
+
+event:
+  topic:
+    payment:
+      success: "payment-success"
+      failure: "payment-failure"
+      create: "payment-created"

@@ -240,31 +240,31 @@ services:
 #            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
 #        networks:
 #            - rentspace
-
-    searchservice:
-        image: d0niiel/searchservice:v1
-        container_name: searchservice
-        restart: always
-        ports:
-            - "8085:8085"
-        depends_on:
-            - elasticsearch
-            - kafka-1
-            - configservice
-            - discoveryservice
-        environment:
-            SPRING_APPLICATION_NAME: searchservice
-            SPRING_PROFILES_ACTIVE: default
-            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
-            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9092"
-            SPRING_DATASOURCE_USERNAME: postgres
-            SPRING_DATASOURCE_PASSWORD: postgres
-            SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
-            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
-            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
-        networks:
-            - rentspace
 #
+#    searchservice:
+#        image: d0niiel/searchservice:v1
+#        container_name: searchservice
+#        restart: always
+#        ports:
+#            - "8085:8085"
+#        depends_on:
+#            - elasticsearch
+#            - kafka-1
+#            - configservice
+#            - discoveryservice
+#        environment:
+#            SPRING_APPLICATION_NAME: searchservice
+#            SPRING_PROFILES_ACTIVE: default
+#            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+#            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9092"
+#            SPRING_DATASOURCE_USERNAME: postgres
+#            SPRING_DATASOURCE_PASSWORD: postgres
+#            SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+#            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+#            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+#        networks:
+#            - rentspace
+
 #    reviewservice:
 #        image: d0niiel/reviewservice:v1
 #        container_name: reviewservice
@@ -290,6 +290,28 @@ services:
 #        networks:
 #            - rentspace
 
+    paymentservice:
+        image: d0niiel/paymentservice:v1
+        container_name: paymentservice
+        restart: always
+        ports:
+            - "8086:8086"
+        depends_on:
+            discoveryservice:
+                condition: service_healthy
+            kafka-1:
+                condition: service_started
+        environment:
+            SPRING_APPLICATION_NAME: paymentservice
+            SPRING_PROFILES_ACTIVE: default
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9092"
+            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: postgres
+            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+        networks:
+            - rentspace
 volumes:
     minio_data:
     kafka-data:
