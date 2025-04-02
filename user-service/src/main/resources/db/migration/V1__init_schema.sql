@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS users (
     updated_by VARCHAR(100)
     );
 
-CREATE INDEX IF NOT EXISTS idx_username ON users (username);
-CREATE INDEX IF NOT EXISTS idx_email ON users (email);
-CREATE INDEX IF NOT EXISTS idx_phone ON users (phone);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users (username);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
+CREATE INDEX IF NOT EXISTS idx_users_phone ON users (phone);
 
 CREATE TABLE IF NOT EXISTS user_profiles (
                                              id BIGSERIAL PRIMARY KEY,
@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     CONSTRAINT fk_user_profiles_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
 
+CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON user_profiles (user_id);
+
 CREATE TABLE IF NOT EXISTS tokens (
                                       id BIGSERIAL PRIMARY KEY,
                                       token VARCHAR(255) UNIQUE NOT NULL,
@@ -40,8 +42,8 @@ CREATE TABLE IF NOT EXISTS tokens (
     CONSTRAINT fk_tokens_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
 
-CREATE INDEX IF NOT EXISTS idx_token ON tokens (token);
-CREATE INDEX IF NOT EXISTS idx_user_id ON tokens (user_id);
+CREATE INDEX IF NOT EXISTS idx_tokens_token ON tokens (token);
+CREATE INDEX IF NOT EXISTS idx_tokens_user_id ON tokens (user_id);
 
 CREATE TABLE IF NOT EXISTS verification_tokens (
                                                    id BIGSERIAL PRIMARY KEY,
@@ -52,8 +54,8 @@ CREATE TABLE IF NOT EXISTS verification_tokens (
     CONSTRAINT fk_verification_tokens_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
 
-CREATE INDEX IF NOT EXISTS idx_verification_token ON verification_tokens (token);
-CREATE INDEX IF NOT EXISTS idx_verification_user_id ON verification_tokens (user_id);
+CREATE INDEX IF NOT EXISTS idx_verification_tokens_token ON verification_tokens (token);
+CREATE INDEX IF NOT EXISTS idx_verification_tokens_user_id ON verification_tokens (user_id);
 
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
                                                      id BIGSERIAL PRIMARY KEY,
@@ -64,4 +66,4 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
     CONSTRAINT fk_password_reset_tokens_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
 
-CREATE INDEX IF NOT EXISTS idx_password_reset_user_id ON password_reset_tokens (user_id);
+CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user_id ON password_reset_tokens (user_id);

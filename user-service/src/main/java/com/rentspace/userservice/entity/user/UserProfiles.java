@@ -14,7 +14,7 @@ import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "user_profiles", indexes = @Index(name = "idx_user_id", columnList = "user_id"))
+@Table(name = "user_profiles")
 @Data
 @Builder
 @AllArgsConstructor

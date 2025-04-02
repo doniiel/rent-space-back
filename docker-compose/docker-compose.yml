@@ -56,26 +56,26 @@ services:
         networks:
             - rentspace
 
-    kafka-1:
-        container_name: kafka-1
-        image: bitnami/kafka:latest
-        environment:
-            - KAFKA_CFG_NODE_ID=1
-            - KAFKA_CFG_PROCESS_ROLES=broker,controller
-            - KAFKA_KRAFT_CLUSTER_ID=nky7lYvIRimbvRyKeHU8-g
-
-            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9094
-            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9092,CONTROLLER://kafka-1:9094
-            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094
-        ports:
-            - "9092:9092"
-        volumes:
-            - kafka-data:/bitnami/kafka
-        networks:
-            - rentspace
+#    kafka-1:
+#        container_name: kafka-1
+#        image: bitnami/kafka:latest
+#        environment:
+#            - KAFKA_CFG_NODE_ID=1
+#            - KAFKA_CFG_PROCESS_ROLES=broker,controller
+#            - KAFKA_KRAFT_CLUSTER_ID=nky7lYvIRimbvRyKeHU8-g
+#
+#            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9094
+#            - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9092,CONTROLLER://kafka-1:9094
+#            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+#            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+#            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+#            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094
+#        ports:
+#            - "9092:9092"
+#        volumes:
+#            - kafka-data:/bitnami/kafka
+#        networks:
+#            - rentspace
 
     elasticsearch:
         container_name: elasticsearch
@@ -136,7 +136,7 @@ services:
                 condition: service_healthy
         networks:
             - rentspace
-
+#
 #    userservice:
 #        image: d0niiel/userservice:v1
 #        container_name: userservice
@@ -190,7 +190,7 @@ services:
 #            MINIO_SECRETKEY: minioadmin
 #        networks:
 #            - rentspace
-
+#
 #    notificationservice:
 #        image: d0niiel/notificationservice:v1
 #        container_name: notificationservice
@@ -215,7 +215,7 @@ services:
 #            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
 #        networks:
 #            - rentspace
-
+#
 #    bookingservice:
 #        image: d0niiel/bookingservice:v1
 #        container_name: bookingservice
@@ -289,29 +289,29 @@ services:
 #            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
 #        networks:
 #            - rentspace
-
-    paymentservice:
-        image: d0niiel/paymentservice:v1
-        container_name: paymentservice
-        restart: always
-        ports:
-            - "8086:8086"
-        depends_on:
-            discoveryservice:
-                condition: service_healthy
-            kafka-1:
-                condition: service_started
-        environment:
-            SPRING_APPLICATION_NAME: paymentservice
-            SPRING_PROFILES_ACTIVE: default
-            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9092"
-            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
-            SPRING_DATASOURCE_USERNAME: postgres
-            SPRING_DATASOURCE_PASSWORD: postgres
-            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
-            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
-        networks:
-            - rentspace
+#
+#    paymentservice:
+#        image: d0niiel/paymentservice:v1
+#        container_name: paymentservice
+#        restart: always
+#        ports:
+#            - "8086:8086"
+#        depends_on:
+#            discoveryservice:
+#                condition: service_healthy
+#            kafka-1:
+#                condition: service_started
+#        environment:
+#            SPRING_APPLICATION_NAME: paymentservice
+#            SPRING_PROFILES_ACTIVE: default
+#            SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-1:9092"
+#            SPRING_DATASOURCE_URL: jdbc:postgresql://userservicedb:5432/userservicedb
+#            SPRING_DATASOURCE_USERNAME: postgres
+#            SPRING_DATASOURCE_PASSWORD: postgres
+#            SPRING_CONFIG_IMPORT: "configserver:http://configservice:8071/"
+#            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discoveryservice:8761/eureka/"
+#        networks:
+#            - rentspace
 volumes:
     minio_data:
     kafka-data:

@@ -15,10 +15,7 @@ import java.time.LocalDateTime;
 import static jakarta.persistence.GenerationType.*;
 
 @Entity
-@Table(name = "verification_tokens", indexes = {
-        @Index(name = "idx_verification_token", columnList = "token"),
-        @Index(name = "idx_verification_user_id", columnList = "user_id")
-})
+@Table(name = "verification_tokens")
 @Data
 @Builder
 @AllArgsConstructor

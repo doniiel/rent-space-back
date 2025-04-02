@@ -20,11 +20,7 @@ import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "users", indexes = {
-        @Index(name = "idx_username", columnList = "username"),
-        @Index(name = "idx_email", columnList = "email"),
-        @Index(name = "idx_phone", columnList = "phone")
-})
+@Table(name = "users")
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor

@@ -66,6 +66,8 @@ management:
     kafka:
       enabled: true
   endpoint:
+    prometheus:
+      enabled: true
     health:
       probes:
         enabled: true
