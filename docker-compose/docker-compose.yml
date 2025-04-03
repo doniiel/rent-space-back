@@ -97,6 +97,7 @@ services:
             - "9090:9090"
         volumes:
             - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+            - ./observability/prometheus/rules/alerts.yml:/etc/prometheus/rules/alerts.yml
         networks:
             - rentspace
 
@@ -115,7 +116,9 @@ services:
             - GF_SECURITY_ADMIN_USER=admin
             - GF_SECURITY_ADMIN_PASSWORD=admin
         volumes:
-            - ./observability/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+            - ./observability/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+            - ./observability/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+            - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
             - grafana-storage:/var/lib/grafana
         depends_on:
             -   prometheus

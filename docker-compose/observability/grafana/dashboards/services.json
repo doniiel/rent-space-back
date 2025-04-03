@@ -1,0 +1,105 @@
+{
+  "id": null,
+  "title": "Spring Boot Microservices Monitoring",
+  "tags": ["spring-boot", "microservices", "monitoring"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "title": "🟢 Service Uptime",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "refId": "A", "expr": "up{job=~\"$job\"}", "format": "time_series" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "📈 HTTP Request Rate",
+      "type": "timeseries",
+      "gridPos": { "x": 6, "y": 0, "w": 12, "h": 8 },
+      "targets": [{
+        "refId": "A",
+        "expr": "rate(http_server_requests_seconds_count{job=~\"$job\"}[5m])",
+        "legendFormat": "{{job}} {{status}}"
+      }]
+    },
+    {
+      "title": "⏱️ HTTP Response Time (avg)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [{
+        "refId": "A",
+        "expr": "rate(http_server_requests_seconds_sum{job=~\"$job\"}[5m]) / rate(http_server_requests_seconds_count{job=~\"$job\"}[5m])",
+        "legendFormat": "{{job}}"
+      }]
+    },
+    {
+      "title": "🔥 JVM Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [{
+        "refId": "A",
+        "expr": "jvm_memory_used_bytes{area=\"heap\", job=~\"$job\"} / jvm_memory_max_bytes{area=\"heap\", job=~\"$job\"}",
+        "legendFormat": "{{job}} Heap Usage"
+      }],
+      "fieldConfig": { "defaults": { "unit": "percent" } }
+    },
+    {
+      "title": "🧠 CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "targets": [{
+        "refId": "A",
+        "expr": "process_cpu_usage{job=~\"$job\"}",
+        "legendFormat": "{{job}}"
+      }],
+      "fieldConfig": { "defaults": { "unit": "percent" } }
+    },
+    {
+      "title": "📦 DB Connection Count",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [{
+        "refId": "A",
+        "expr": "hikaricp_active_connections{job=~\"$job\"}",
+        "legendFormat": "{{job}}"
+      }]
+    },
+    {
+      "title": "📨 Kafka Messages In",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 8 },
+      "targets": [{
+        "refId": "A",
+        "expr": "rate(kafka_server_brokertopicmetrics_messagesin_total{job=~\"$job\"}[5m])",
+        "legendFormat": "{{topic}}"
+      }]
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "job",
+        "type": "query",
+        "datasource": "Prometheus",
+        "refresh": 1,
+        "query": "label_values(up, job)",
+        "multi": true,
+        "includeAll": true,
+        "current": { "selected": true, "text": "All", "value": "$__all" }
+      }
+    ]
+  }
+}

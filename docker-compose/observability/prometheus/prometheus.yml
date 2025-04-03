@@ -7,39 +7,82 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['configservice:8071']
+        labels:
+          group: 'infrastructure'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - source_labels: [__meta_docker_name]
+        target_label: container
+
   - job_name: 'discovery-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['discoveryservice:8761']
+        labels:
+          group: 'infrastructure'
+
   - job_name: 'gateway-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['gatewayservice:8072']
+        labels:
+          group: 'infrastructure'
+
   - job_name: 'user-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['userservice:8080']
+        labels:
+          group: 'application'
+
   - job_name: 'review-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['reviewservice:8081']
+        labels:
+          group: 'application'
+
   - job_name: 'listing-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['listingservice:8082']
+        labels:
+          group: 'application'
+
   - job_name: 'notification-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['notificationservice:8083']
+        labels:
+          group: 'application'
+
   - job_name: 'booking-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['bookingservice:8084']
+        labels:
+          group: 'application'
+
   - job_name: 'search-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['searchservice:8085']
+        labels:
+          group: 'application'
+
   - job_name: 'payment-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['paymentservice:8086']
+        labels:
+          group: 'application'
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+        labels:
+          group: 'monitoring'
+
+rule_files:
+  - '/etc/prometheus/rules/alerts.yml'
