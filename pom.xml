@@ -111,6 +111,7 @@
                 <version>${lombok.version}</version>
                 <scope>provided</scope>
             </dependency>
+
             <!-- SPRING CLOUD DEPENDENCY-->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -204,6 +205,12 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-database-postgresql</artifactId>
                 <version>${flyway.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${spring.boot.version}</version>
             </dependency>
 
             <!-- Elasticsearch Dependency -->

@@ -13,6 +13,7 @@ import com.rentspace.listingservice.service.ListingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,7 @@ public class ListingsServiceImpl implements ListingsService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "listing", key = "#id")
     public ListingDto getListingById(Long id) {
         log.debug("Fetching listing by ID: {}", id);
         Listing listing = listingBaseService.getListingById(id);
