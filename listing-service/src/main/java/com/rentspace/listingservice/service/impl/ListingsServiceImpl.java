@@ -13,7 +13,10 @@ import com.rentspace.listingservice.service.ListingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +44,12 @@ public class ListingsServiceImpl implements ListingsService {
 
     @Override
     @Transactional
+    @Caching(put = {@CachePut(value = "listing", key = "#result.id")},
+            evict = {
+                    @CacheEvict(value = "listings", key = "'allListings'"),
+                    @CacheEvict(value = "userListings", key = "#request.userId")
+            }
+    )
     public ListingDto createListing(ListingCreateRequest request) {
         log.debug("Creating listing from request: {}", request);
         validateCreateRequest(request);
@@ -62,6 +71,7 @@ public class ListingsServiceImpl implements ListingsService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "listings", key = "'allListings'")
     public List<ListingDto> getAllListings() {
         log.debug("Fetching all listings");
         return listingsRepository.findAll().stream()
@@ -71,6 +81,7 @@ public class ListingsServiceImpl implements ListingsService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "userListings", key = "#userId")
     public List<ListingDto> getAllUserListings(Long userId) {
         log.debug("Fetching listings for user ID: {}", userId);
         validateUserId(userId);
@@ -81,6 +92,10 @@ public class ListingsServiceImpl implements ListingsService {
 
     @Override
     @Transactional
+    @Caching(put = { @CachePut(value = "listing", key = "#result.id")},
+            evict = {@CacheEvict(value = "listings", key = "'allListings'"),
+                    @CacheEvict(value = "userListings", key = "#result.userId")}
+    )
     public ListingDto updateListing(Long listingId, ListingUpdateRequest request) {
         log.debug("Updating listing ID: {} with request: {}", listingId, request);
         Listing listing = listingBaseService.getListingById(listingId);
@@ -94,6 +109,10 @@ public class ListingsServiceImpl implements ListingsService {
 
     @Override
     @Transactional
+    @Caching(evict = { @CacheEvict(value = "listing", key = "#listingId"),
+            @CacheEvict(value = "listings", key = "'allListings'"),
+            @CacheEvict(value = "userListings", key = "#listing.userId"),
+            @CacheEvict(value = "listingAmenities", key = "#listingId") })
     public void deleteListing(Long listingId) {
         log.debug("Deleting listing ID: {}", listingId);
         Listing listing = listingBaseService.getListingById(listingId);
@@ -105,11 +124,15 @@ public class ListingsServiceImpl implements ListingsService {
     }
 
     @Override
-    @Transactional
-    public void updateListingRating(Long listingId, Double averageRating) {
+    @Caching(put = { @CachePut(value = "listing", key = "#result.id") },
+            evict = { @CacheEvict(value = "listings", key = "'allListings'"),
+                    @CacheEvict(value = "userListings", key = "#listing.userId"),
+                    @CacheEvict(value = "listing", key = "#listingId") })
+    public ListingDto updateListingRating(Long listingId, Double averageRating) {
         Listing listing = listingBaseService.getListingById(listingId);
         listing.setAverageRating(averageRating);
-        listingsRepository.save(listing);
+        Listing savedListing = listingsRepository.save(listing);
+        return listingMapper.toDto(savedListing);
     }
 
     private void validateCreateRequest(ListingCreateRequest request) {

@@ -75,7 +75,7 @@ public class Listing {
     @DecimalMin("1.00")
     private Double pricePerNight;
 
-    @Column(name = "average_rating", nullable = false, columnDefinition = "FLOAT default 0")
+    @Column(name = "average_rating", columnDefinition = "FLOAT default 0")
     private Double averageRating;
 
     @CreatedDate

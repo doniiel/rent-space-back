@@ -10,6 +10,8 @@ import com.rentspace.listingservice.repository.ListingAmenitiesRepository;
 import com.rentspace.listingservice.service.ListingAmenitiesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -30,6 +32,7 @@ public class ListingAmenitiesServiceImpl implements ListingAmenitiesService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "listingAmenities", key = "#listingId", unless = "#result == null")
     public ListingAmenitiesDto getAmenitiesByListing(Long listingId) {
         log.debug("Fetching amenities for listing ID: {}", listingId);
         ListingAmenities amenities = repository.findByListingId(listingId)
@@ -39,6 +42,7 @@ public class ListingAmenitiesServiceImpl implements ListingAmenitiesService {
 
     @Override
     @Transactional
+    @CachePut(value = "listingAmenities", key = "#listingId")
     public ListingAmenitiesDto addAmenitiesToListing(Long listingId, Set<AmenityType> amenityTypes) {
         log.debug("Adding amenities to listing ID: {}", listingId);
         ListingAmenities amenities = getOrCreateAmenities(listingId);
@@ -50,6 +54,7 @@ public class ListingAmenitiesServiceImpl implements ListingAmenitiesService {
 
     @Override
     @Transactional
+    @CachePut(value = "listingAmenities", key = "#listingId")
     public ListingAmenitiesDto updateAmenitiesForListing(Long listingId, Set<AmenityType> amenityTypes) {
         log.debug("Updating amenities for listing ID: {}", listingId);
         ListingAmenities amenities = repository.findByListingId(listingId)
@@ -62,6 +67,7 @@ public class ListingAmenitiesServiceImpl implements ListingAmenitiesService {
 
     @Override
     @Transactional
+    @CachePut(value = "listingAmenities", key = "#listingId")
     public ListingAmenitiesDto removeAmenityFromListing(Long listingId, AmenityType amenityType) {
         log.debug("Removing amenity {} from listing ID: {}", amenityType, listingId);
         ListingAmenities amenities = repository.findByListingId(listingId)
@@ -74,6 +80,7 @@ public class ListingAmenitiesServiceImpl implements ListingAmenitiesService {
 
     @Override
     @Transactional
+    @CachePut(value = "listingAmenities", key = "#listingId")
     public void removeAllAmenitiesFromListing(Long listingId) {
         log.debug("Removing all amenities from listing ID: {}", listingId);
         ListingAmenities amenities = repository.findByListingId(listingId)
