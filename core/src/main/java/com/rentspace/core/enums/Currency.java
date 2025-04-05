@@ -1,4 +1,4 @@
-package com.rentspace.userservice.enums;
+package com.rentspace.core.enums;
 
 public enum Currency {
     KZT,  // Казахстанский тенге

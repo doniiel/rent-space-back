@@ -1,7 +1,7 @@
 package com.rentspace.userservice.entity.user;
 
-import com.rentspace.userservice.enums.Currency;
-import com.rentspace.userservice.enums.Language;
+import com.rentspace.core.enums.Currency;
+import com.rentspace.core.enums.Language;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

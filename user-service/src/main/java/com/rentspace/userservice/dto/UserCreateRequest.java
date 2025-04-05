@@ -26,7 +26,7 @@ public class UserCreateRequest {
     private String email;
 
     @NotBlank(message = "Phone cannot be empty")
-    @Pattern(regexp = "(^$|[0-9]{11})", message = "Account number must be 10 digits")
+    @Pattern(regexp = "[0-9]{11}", message = "Phone number must be 11 digits")
     @Schema(description = "User`s phone number", example = "12345678910")
     private String phone;
 }

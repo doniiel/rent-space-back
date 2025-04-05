@@ -1,9 +1,13 @@
 package com.rentspace.userservice.service.impl;
 
 import com.rentspace.core.dto.UserDto;
+import com.rentspace.core.enums.Currency;
+import com.rentspace.core.enums.Language;
+import com.rentspace.userservice.dto.UpdateUserProfilesRequest;
 import com.rentspace.userservice.dto.UpdateUserRequest;
 import com.rentspace.userservice.dto.UserCreateRequest;
 import com.rentspace.userservice.entity.user.User;
+import com.rentspace.userservice.entity.user.UserProfiles;
 import com.rentspace.userservice.enums.Role;
 import com.rentspace.userservice.exception.UserAlreadyExistsException;
 import com.rentspace.userservice.exception.UserNotFoundException;
@@ -42,9 +46,11 @@ public class UserServiceImpl implements UserService {
         log.info("Attempting to create user with username: {}", request.getUsername());
         checkUserUniqueness(request.getUsername(), request.getEmail(), request.getPhone());
         User user = buildUserFromRequest(request);
+        UserProfiles defaultProfiles = buildDefaultUserProfiles(user);
+        user.setProfile(defaultProfiles);
         User savedUser = userRepository.save(user);
         log.info("User created successfully with ID: {}", savedUser.getId());
-        return userMapper.toResponseDto(user);
+        return userMapper.toResponseDto(savedUser);
     }
 
     @Override
@@ -108,6 +114,27 @@ public class UserServiceImpl implements UserService {
         log.info("User deleted successfully with ID: {}", userId);
     }
 
+    @Override
+    @Transactional
+    @Caching(put = {
+            @CachePut(value = "user", key = "#userId"),
+            @CachePut(value = "user", key = "#result.email"),
+            @CachePut(value = "user", key = "#result.username")
+    })
+    public UserDto updateUserProfile(Long userId, UpdateUserProfilesRequest request) {
+        log.info("Updating user profile with ID: {}", userId);
+        User user = findUserByIdOrThrow(userId);
+        UserProfiles userProfiles = user.getProfile();
+        if (userProfiles == null) {
+            userProfiles = buildDefaultUserProfiles(user);
+            user.setProfile(userProfiles);
+        }
+        updateUserProfileFields(userProfiles, request);
+        User updatedUser = userRepository.save(user);
+        log.info("User profile updated successfully with ID: {}", updatedUser.getId());
+        return userMapper.toResponseDto(updatedUser);
+    }
+
     private User buildUserFromRequest(UserCreateRequest request) {
         return User.builder()
                 .username(request.getUsername())
@@ -115,6 +142,14 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
                 .role(Role.USER)
+                .build();
+    }
+
+    private UserProfiles buildDefaultUserProfiles(User user) {
+        return UserProfiles.builder()
+                .user(user)
+                .language(Language.ENGLISH)
+                .currency(Currency.USD)
                 .build();
     }
 
@@ -168,6 +203,13 @@ public class UserServiceImpl implements UserService {
                 .ifPresent(phone -> {
                     throw new UserAlreadyExistsException("User", "phone", phone);
                 });
+    }
+
+    private void updateUserProfileFields(UserProfiles userProfiles, UpdateUserProfilesRequest request) {
+        Optional.ofNullable(request.getBio()).ifPresent(userProfiles::setBio);
+        Optional.ofNullable(request.getAvatarUrl()).ifPresent(userProfiles::setAvatarUrl);
+        Optional.ofNullable(request.getLanguage()).ifPresent(userProfiles::setLanguage);
+        Optional.ofNullable(request.getCurrency()).ifPresent(userProfiles::setCurrency);
     }
 
     private User findUserByIdOrThrow(Long userId) {
