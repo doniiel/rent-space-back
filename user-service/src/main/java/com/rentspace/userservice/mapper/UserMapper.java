@@ -13,5 +13,6 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     User toEntity(UserCreateRequest request);
+    User toEntity(UserDto dto);
     UserDto toResponseDto(User user);
 }

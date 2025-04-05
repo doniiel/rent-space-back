@@ -12,6 +12,10 @@ import com.rentspace.userservice.repository.UserRepository;
 import com.rentspace.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +32,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @Caching(put = {
+            @CachePut(value = "user", key = "#result.id"),
+            @CachePut(value = "user", key = "#result.username"),
+            @CachePut(value = "user", key = "#result.email")
+            }
+    )
     public UserDto createUser(UserCreateRequest request) {
         log.info("Attempting to create user with username: {}", request.getUsername());
         checkUserUniqueness(request.getUsername(), request.getEmail(), request.getPhone());
@@ -39,6 +49,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "user", key = "#email", unless = "#result == null")
     public UserDto getUserByEmail(String email) {
         log.info("Fetching user with email: {}", email);
         return userMapper.toResponseDto(findUserByEmailOrThrow(email));
@@ -46,13 +57,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public User getUserByUsername(String username) {
+    @Cacheable(value = "user", key = "#username", unless = "#result == null")
+    public UserDto getUserByUsername(String username) {
         log.info("Fetching user with username: {}", username);
-        return findUserByUsernameOrThrow(username);
+        User user = findUserByUsernameOrThrow(username);
+        return userMapper.toResponseDto(user);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "user", key = "#userId", unless = "#result == null")
     public UserDto getUserById(Long userId) {
         log.info("Fetching user with ID: {}", userId);
         return userMapper.toResponseDto(findUserByIdOrThrow(userId));
@@ -60,6 +74,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @Caching(
+            put = { @CachePut(value = "user", key = "#userId"),
+                    @CachePut(value = "user", key = "#result.email"),
+                    @CachePut(value = "user", key = "#result.username")
+            },
+            evict = {
+                    @CacheEvict(value = "user", key = "#user.email"),
+                    @CacheEvict(value = "user", key = "#user.username")
+            }
+    )
     public UserDto updateUser(Long userId, UpdateUserRequest request) {
         log.info("Updating user with ID: {}", userId);
         User user = findUserByIdOrThrow(userId);
@@ -71,6 +95,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "user", key = "#userId"),
+            @CacheEvict(value = "user", key = "#user.email"),
+            @CacheEvict(value = "user", key = "#user.username")
+        }
+    )
     public void deleteUser(Long userId) {
         log.info("Deleting user with ID: {}", userId);
         User user = findUserByIdOrThrow(userId);

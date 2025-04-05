@@ -9,6 +9,7 @@ import com.rentspace.userservice.entity.token.Token;
 import com.rentspace.userservice.entity.user.User;
 import com.rentspace.userservice.exception.InvalidCredentialsException;
 import com.rentspace.userservice.jwt.JwtService;
+import com.rentspace.userservice.mapper.UserMapper;
 import com.rentspace.userservice.repository.TokenRepository;
 import com.rentspace.userservice.service.AccountVerificationService;
 import com.rentspace.userservice.service.AuthService;
@@ -36,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
+    private final UserMapper mapper;
 
     @Value("${jwt.access-expiration-time}")
     private long accessTokenExpirationTimeMs;
@@ -76,7 +78,8 @@ public class AuthServiceImpl implements AuthService {
 
         validateRefreshToken(refreshToken);
         String username = jwtService.extractUsername(refreshToken);
-        User user = userService.getUserByUsername(username);
+        UserDto userDto = userService.getUserByUsername(username);
+        User user = mapper.toEntity(userDto);
         TokenResponseDto tokens = generateTokens(user);
 
         log.info("Access token refreshed successfully for user: {}", username);
@@ -87,7 +90,8 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(readOnly = true)
     public User findUserByUsername(String username) {
         log.info("Fetching user by username: {}", username);
-        return userService.getUserByUsername(username);
+        UserDto userDto = userService.getUserByUsername(username);
+        return mapper.toEntity(userDto);
     }
 
     private User authenticateUser(String username, String password) {
