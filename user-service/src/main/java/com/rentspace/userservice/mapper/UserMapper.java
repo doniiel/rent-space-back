@@ -4,27 +4,29 @@ import com.rentspace.core.dto.UserDto;
 import com.rentspace.userservice.dto.UpdateUserRequest;
 import com.rentspace.userservice.dto.UserCreateRequest;
 import com.rentspace.userservice.entity.user.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = CurrencyMapper.class)
 public interface UserMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "role", source = "role", defaultValue = "USER")
-    User toEntity(UserCreateRequest request);
+    User toEntity(UserDto userDto);
 
-    @Mapping(target = "role", source = "role.name")
+    @Mapping(target = "role", source = "role")
     @Mapping(target = "bio", source = "profile.bio")
     @Mapping(target = "avatarUrl", source = "profile.avatarUrl")
     @Mapping(target = "language", source = "profile.language")
-    @Mapping(target = "currency", source = "profile.currency")
-    @Mapping(target = "profileCreatedAt", source = "profile.createdAt")
-    @Mapping(target = "profileUpdatedAt", source = "profile.updatedAt")
+    @Mapping(target = "currency", source = "profile.currency", qualifiedByName = "mapCurrency")
     UserDto toResponseDto(User user);
 
-    void updateUserFromRequest(UpdateUserRequest request, @MappingTarget User user);
+    // Остальные методы
+}
+
+@Named("CurrencyMapper")
+class CurrencyMapper {
+    @Named("mapCurrency")
+    public static String mapCurrency(com.rentspace.core.enums.Currency currency) {
+        return currency.name();
+    }
 }

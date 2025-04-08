@@ -1,5 +1,6 @@
 package com.rentspace.core.dto;
 
+import com.rentspace.core.enums.Currency;
 import com.rentspace.core.enums.Language;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -7,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Currency;
+
 
 @Data
 @Schema(name = "UserResponse", description = "Shema to hold user information")
@@ -35,6 +36,4 @@ public class UserDto {
     private String avatarUrl;
     private Language language;
     private Currency currency;
-    private LocalDateTime profileCreatedAt;
-    private LocalDateTime profileUpdatedAt;
 }
