@@ -1,14 +1,19 @@
 package com.rentspace.listingservice.service.impl;
 
+import com.rentspace.listingservice.dto.ListingDto;
 import com.rentspace.listingservice.entity.Listing;
 import com.rentspace.listingservice.entity.ListingPhoto;
 import com.rentspace.listingservice.exception.PhotosUploadException;
+import com.rentspace.listingservice.mapper.ListingMapper;
 import com.rentspace.listingservice.repository.ListingPhotoRepository;
 import com.rentspace.listingservice.service.ListingPhotoService;
 import com.rentspace.listingservice.storage.StorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,37 +27,34 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
     private final StorageService storageService;
     private final ListingBaseService listingBaseService;
     private final ListingPhotoRepository photoRepository;
+    private final ListingMapper listingMapper;
     private static final int MAX_PHOTOS_COUNT = 10;
 
     @Override
     @Transactional
-    public void savePhotos(Long listingId, List<MultipartFile> photos) {
+    @Caching(put = { @CachePut(value = "listing", key = "#listingId") },
+            evict = { @CacheEvict(value = "listings", key = "'allListings'"),
+                      @CacheEvict(value = "userListings", key = "#listing.userId") })
+    public ListingDto savePhotos(Long listingId, List<MultipartFile> photos) {
         log.debug("Saving photos for listing ID: {}", listingId);
         Listing listing = listingBaseService.getListingById(listingId);
         List<MultipartFile> validPhotos = validatePhotos(photos);
         if (!validPhotos.isEmpty()) {
             savePhotosForListing(listing, validPhotos);
         }
+        return listingMapper.toDto(listing);
     }
 
     @Override
     @Transactional
-    public void deletePhotos(List<ListingPhoto> listingPhotos) {
-        log.debug("Deleting {} photos", listingPhotos != null ? listingPhotos.size() : 0);
-        if (CollectionUtils.isEmpty(listingPhotos)) {
-            return;
-        }
-        deletePhotosFromStorage(listingPhotos);
-        photoRepository.deleteAll(listingPhotos);
-        log.info("Deleted {} photos", listingPhotos.size());
-    }
-
-    @Override
-    @Transactional
-    public void deletePhotos(Long listingId, List<String> deleteUrls) {
+    @Caching(put = { @CachePut(value = "listing", key = "#listingId") },
+            evict = { @CacheEvict(value = "listings", key = "'allListings'"),
+                      @CacheEvict(value = "userListings", key = "#listing.userId") })
+    public ListingDto deletePhotos(Long listingId, List<String> deleteUrls) {
         log.debug("Deleting photos for listing ID: {} with deleteUrls: {}", listingId, deleteUrls);
         if (CollectionUtils.isEmpty(deleteUrls)) {
-            return;
+            Listing listing = listingBaseService.getListingById(listingId);
+            return listingMapper.toDto(listing);
         }
         Listing listing = listingBaseService.getListingById(listingId);
         List<ListingPhoto> photosToDelete =  findPhotosToDelete(listing, deleteUrls);
@@ -60,6 +62,7 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
         listing.getPhotos().removeAll(photosToDelete);
         photoRepository.deleteAll(photosToDelete);
         log.info("Deleted {} photos for listing ID: {}", photosToDelete.size(), listingId);
+        return listingMapper.toDto(listing);
     }
 
     private List<MultipartFile> validatePhotos(List<MultipartFile> photos) {

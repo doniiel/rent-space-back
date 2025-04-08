@@ -5,6 +5,7 @@ import com.rentspace.listingservice.dto.ListingCreateRequest;
 import com.rentspace.listingservice.dto.ListingDto;
 import com.rentspace.listingservice.dto.ListingUpdateRequest;
 import com.rentspace.listingservice.entity.Listing;
+import com.rentspace.listingservice.entity.ListingPhoto;
 import com.rentspace.listingservice.exception.InvalidListingDataException;
 import com.rentspace.listingservice.mapper.ListingMapper;
 import com.rentspace.listingservice.repository.ListingsRepository;
@@ -116,7 +117,10 @@ public class ListingsServiceImpl implements ListingsService {
     public void deleteListing(Long listingId) {
         log.debug("Deleting listing ID: {}", listingId);
         Listing listing = listingBaseService.getListingById(listingId);
-        listingPhotoService.deletePhotos(listing.getPhotos());
+        List<String> deleteUrls = listing.getPhotos().stream()
+                .map(ListingPhoto::getPhotoUrl)
+                .toList();
+        listingPhotoService.deletePhotos(listingId, deleteUrls);
         listingsRepository.delete(listing);
         ListingEvent event = createListingEvent(listing, "DELETED");
         kafkaTemplate.send(listingDeletedTopic, listingId.toString(), event);
@@ -126,8 +130,7 @@ public class ListingsServiceImpl implements ListingsService {
     @Override
     @Caching(put = { @CachePut(value = "listing", key = "#result.id") },
             evict = { @CacheEvict(value = "listings", key = "'allListings'"),
-                    @CacheEvict(value = "userListings", key = "#listing.userId"),
-                    @CacheEvict(value = "listing", key = "#listingId") })
+                      @CacheEvict(value = "userListings", key = "#listing.userId")})
     public ListingDto updateListingRating(Long listingId, Double averageRating) {
         Listing listing = listingBaseService.getListingById(listingId);
         listing.setAverageRating(averageRating);
