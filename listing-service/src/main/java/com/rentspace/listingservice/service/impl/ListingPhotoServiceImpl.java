@@ -8,13 +8,14 @@ import com.rentspace.listingservice.mapper.ListingMapper;
 import com.rentspace.listingservice.repository.ListingPhotoRepository;
 import com.rentspace.listingservice.service.ListingPhotoService;
 import com.rentspace.listingservice.storage.StorageService;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,17 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
     private final ListingPhotoRepository photoRepository;
     private final ListingMapper listingMapper;
     private static final int MAX_PHOTOS_COUNT = 10;
+
+    @Override
+    @Transactional(readOnly = true)
+    public ListingDto getListingPhotos(Long listingId) {
+        log.debug("Getting photos for listing ID: {}", listingId);
+        Listing listing = listingBaseService.getListingById(listingId);
+        log.debug("Retrieved listing: {}", listing);
+        ListingDto listingDto = listingMapper.toDto(listing);
+        log.debug("Converted into DTO: {}", listingDto);
+        return listingDto;
+    }
 
     @Override
     @Transactional

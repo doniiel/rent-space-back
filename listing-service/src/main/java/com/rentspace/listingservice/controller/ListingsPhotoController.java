@@ -1,5 +1,6 @@
 package com.rentspace.listingservice.controller;
 
+import com.rentspace.listingservice.dto.ListingDto;
 import com.rentspace.listingservice.service.ListingPhotoService;
 import com.rentspace.listingservice.storage.StorageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -29,6 +31,19 @@ import static org.springframework.http.HttpStatus.CREATED;
 public class ListingsPhotoController {
     private final StorageService storageService;
     private final ListingPhotoService listingPhotoService;
+
+    @Operation(summary = "Get all photos for a listing", description = "Retrieves a list of all photos URL for a listing")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Photos retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Listing not found")
+    })
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'MANAGER')")
+    @GetMapping
+    public ResponseEntity<List<String>> getAllPhotos(@PathVariable @NotNull Long listingId) {
+        ListingDto listingDto = listingPhotoService.getListingPhotos(listingId);
+        List<String> photoUrls = listingDto.getPhotoUrls() != null ? listingDto.getPhotoUrls() : Collections.emptyList();
+        return ResponseEntity.ok(photoUrls);
+    }
 
     @Operation(summary = "Upload photos for a listing", description = "Uploads multiple photos for a listing")
     @ApiResponses({

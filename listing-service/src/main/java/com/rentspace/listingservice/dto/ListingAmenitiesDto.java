@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Set;
 
 @Data
@@ -25,4 +26,8 @@ public class ListingAmenitiesDto {
 
     @Schema(description = "Timestamp when the amenities were last updated", example = "2025-03-17T12:00:00")
     private LocalDateTime updatedAt;
+
+    public Set<AmenityType> getAmenityTypes() {
+        return amenityTypes != null ? amenityTypes : Collections.emptySet();
+    }
 }

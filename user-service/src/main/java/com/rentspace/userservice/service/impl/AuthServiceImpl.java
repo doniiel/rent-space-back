@@ -43,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
     private long accessTokenExpirationTimeMs;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public TokenResponseDto authenticateAndGenerateTokens(String username, String password) {
         log.info("Attempting to authenticate user: {}", username);
         User user = authenticateUser(username, password);

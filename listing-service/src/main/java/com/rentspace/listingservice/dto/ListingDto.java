@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -52,4 +53,8 @@ public class ListingDto {
 
     @Schema(description = "List of URLs for the listing's photos", example = "[\"http://example.com/photo1.jpg\"]")
     private List<String> photoUrls;
+
+    public List<String> getPhotoUrls() {
+        return photoUrls != null ? photoUrls : Collections.emptyList();
+    }
 }

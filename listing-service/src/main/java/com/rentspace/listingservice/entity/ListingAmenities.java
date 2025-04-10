@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -39,7 +40,7 @@ public class ListingAmenities implements Serializable {
     @CollectionTable(name = "listing_amenity_types", joinColumns = @JoinColumn(name = "listing_amenity_id"))
     @Column(name = "amenity_type")
     @NotEmpty
-    private Set<AmenityType> amenityTypes;
+    private Set<AmenityType> amenityTypes = new HashSet<>();
 
     @CreatedDate
     private LocalDateTime createdAt;
