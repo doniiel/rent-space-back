@@ -11,9 +11,11 @@ import com.rentspace.listingservice.storage.StorageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -29,6 +31,7 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
     private final ListingBaseService listingBaseService;
     private final ListingPhotoRepository photoRepository;
     private final ListingMapper listingMapper;
+    private final RedisCacheManager cacheManager;
     private static final int MAX_PHOTOS_COUNT = 10;
 
     @Override
@@ -45,8 +48,7 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
     @Override
     @Transactional
     @Caching(put = { @CachePut(value = "listing", key = "#listingId") },
-            evict = { @CacheEvict(value = "listings", key = "'allListings'"),
-                      @CacheEvict(value = "userListings", key = "#listing.userId") })
+            evict = { @CacheEvict(value = "listings", key = "'allListings'")})
     public ListingDto savePhotos(Long listingId, List<MultipartFile> photos) {
         log.debug("Saving photos for listing ID: {}", listingId);
         Listing listing = listingBaseService.getListingById(listingId);
@@ -54,14 +56,14 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
         if (!validPhotos.isEmpty()) {
             savePhotosForListing(listing, validPhotos);
         }
+        cacheManager.getCache("userListings").evict(listing.getUserId());
         return listingMapper.toDto(listing);
     }
 
     @Override
     @Transactional
     @Caching(put = { @CachePut(value = "listing", key = "#listingId") },
-            evict = { @CacheEvict(value = "listings", key = "'allListings'"),
-                      @CacheEvict(value = "userListings", key = "#listing.userId") })
+            evict = { @CacheEvict(value = "listings", key = "'allListings'")})
     public ListingDto deletePhotos(Long listingId, List<String> deleteUrls) {
         log.debug("Deleting photos for listing ID: {} with deleteUrls: {}", listingId, deleteUrls);
         if (CollectionUtils.isEmpty(deleteUrls)) {
@@ -93,6 +95,7 @@ public class ListingPhotoServiceImpl implements ListingPhotoService {
                 .map(photo -> uploadAndBuildPhoto(listing, photo))
                 .toList();
         photoRepository.saveAll(savedPhotos);
+        listing.getPhotos().addAll(savedPhotos);
         log.info("Saved {} photos for listing ID: {}", savedPhotos.size(), listing.getId());
     }
 

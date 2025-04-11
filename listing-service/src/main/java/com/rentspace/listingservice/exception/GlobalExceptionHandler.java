@@ -140,11 +140,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleException(WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleAllExceptions(Exception ex, WebRequest request) {
+        ex.printStackTrace();
+
         ErrorResponseDto errorResponse = new ErrorResponseDto(
                 request.getDescription(false).replace("uri=", ""),
                 INTERNAL_SERVER_ERROR.value(),
-                "An unexpected error occurred.",
+                "Unexpected error: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponse, INTERNAL_SERVER_ERROR);

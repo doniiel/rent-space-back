@@ -19,8 +19,10 @@ public interface ListingMapper {
     void updateListingFromRequest(ListingUpdateRequest request, @MappingTarget Listing listing);
     @Named("mapPhotos")
     default List<String> mapPhotos(List<ListingPhoto> photos) {
-        return photos != null ? photos.stream()
+        if (photos == null) return List.of();
+        return photos.stream()
+                .filter(p -> p != null && p.getPhotoUrl() != null)
                 .map(ListingPhoto::getPhotoUrl)
-                .toList() : null;
+                .toList();
     }
 }

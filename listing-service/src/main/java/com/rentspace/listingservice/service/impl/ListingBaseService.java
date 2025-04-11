@@ -12,7 +12,7 @@ public class ListingBaseService {
     private final ListingsRepository listingsRepository;
 
     public Listing getListingById(Long id) {
-        return listingsRepository.findById(id).orElseThrow(
+        return listingsRepository.findByIdWithPhotos(id).orElseThrow(
                 () -> new ListingNotFoundException("Listing", "listingId", id));
     }
 }

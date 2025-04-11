@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class ListingsServiceImpl implements ListingsService {
     private final ListingMapper listingMapper;
     private final ListingPhotoService listingPhotoService;
     private final ListingBaseService listingBaseService;
+    private final RedisCacheManager cacheManager;
 
     @Value("${event.topic.listing.created}")
     private String listingCreatedTopic;
@@ -112,7 +114,6 @@ public class ListingsServiceImpl implements ListingsService {
     @Transactional
     @Caching(evict = { @CacheEvict(value = "listing", key = "#listingId"),
             @CacheEvict(value = "listings", key = "'allListings'"),
-            @CacheEvict(value = "userListings", key = "#listing.userId"),
             @CacheEvict(value = "listingAmenities", key = "#listingId") })
     public void deleteListing(Long listingId) {
         log.debug("Deleting listing ID: {}", listingId);
@@ -124,13 +125,14 @@ public class ListingsServiceImpl implements ListingsService {
         listingsRepository.delete(listing);
         ListingEvent event = createListingEvent(listing, "DELETED");
         kafkaTemplate.send(listingDeletedTopic, listingId.toString(), event);
+        cacheManager.getCache("userListings").evict(listing.getUserId());
         log.info("Listing ID: {} deleted and event sent to topic Kafka: {}", listingId, listingDeletedTopic);
     }
 
     @Override
     @Caching(put = { @CachePut(value = "listing", key = "#result.id") },
             evict = { @CacheEvict(value = "listings", key = "'allListings'"),
-                      @CacheEvict(value = "userListings", key = "#listing.userId")})
+                      @CacheEvict(value = "userListings", key = "#result.userId")})
     public ListingDto updateListingRating(Long listingId, Double averageRating) {
         Listing listing = listingBaseService.getListingById(listingId);
         listing.setAverageRating(averageRating);
