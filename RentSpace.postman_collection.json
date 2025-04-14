@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"John5\",\n  \"email\": \"5Xl55g@example.com\",\n  \"password\": \"ldfn5454,.5\",\n  \"phone\": \"12345678912\"\n}\n",
+							"raw": "{\n  \"username\": \"daniyal\",\n  \"email\": \"orynbekdanial8@gmail.com\",\n  \"password\": \"Ldfn5454A\",\n  \"phone\": \"12345678910\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -47,7 +47,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"John2\",\n    \"password\": \"ldfn5454,.\"\n}",
+							"raw": "{\n    \"username\": \"daniyal\",\n    \"password\": \"Ldfn5454A\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -72,34 +72,6 @@
 					"response": []
 				},
 				{
-					"name": "refresh",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Refresh-Token",
-								"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTI2NjUxOCwiZXhwIjoxNzM5ODcxMzE4fQ.IV_IGZuo2nf9fCK1yJKrq1NUHuryAG8eQXJC0dJRfAQ",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/api/v1/auth/refresh",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"refresh"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "logout",
 					"request": {
 						"auth": {
@@ -107,7 +79,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTI2NjYzNywiZXhwIjoxNzM5MjcwMjM3fQ.QnnJuueWjqVJHJZAAFrYR-xsofCx33-ONlO3PlG34qE",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0MTIwMDI5LCJleHAiOjE3NDQxMjM2MjksInJvbGUiOiJVU0VSIn0.JNbDnJt9W98ICJALYr5J3cV9B3JKOPtUirxI7F_6t9w",
 									"type": "string"
 								}
 							]
@@ -130,6 +102,159 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "refresh token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Refresh-Token",
+								"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQyMTk0NTQwLCJleHAiOjE3NDI3OTkzNDB9.yh2xEuhqm-ypegiC2qmEZ-7Fq9GHw0XIVssx-LpGXoA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "confirm account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQyMTk0NTg2LCJleHAiOjE3NDIxOTgxODYsInJvbGUiOiJVU0VSIn0.o8FCVA3M8YXizEMU8Mni5mXWTHePqUCvTgAPfF-GEm0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"confirmCode\" : \"194280\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/confirm",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"confirm"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forgot password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQyMTk0NTg2LCJleHAiOjE3NDIxOTgxODYsInJvbGUiOiJVU0VSIn0.o8FCVA3M8YXizEMU8Mni5mXWTHePqUCvTgAPfF-GEm0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"5Xl7hgg@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/password/forgot",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"password",
+								"forgot"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reset password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQwMzg5Mzc5LCJleHAiOjE3NDAzOTI5NzksInJvbGUiOiJVU0VSIn0.LT68oIkGHmTtDzSEMKRlsb90lDzybq-_aXjdRb676CU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\" : \"5Xl7hgg@example.com\",\n    \"resetCode\" : \"465431\",\n    \"newPassword\" : \"555Dinjnfd86\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/password/reset",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"password",
+								"reset"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -144,7 +269,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huNSIsImlhdCI6MTczODY2OTcxMywiZXhwIjoxNzM4NjczMzEzLCJyb2xlIjoiVVNFUiJ9.k2vXzpBP1DBvkJnP2Vpry2Obym6VPFsd0CyvemIy_7U",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQzODM2MTk1LCJleHAiOjE3NDM4Mzk3OTUsInJvbGUiOiJVU0VSIn0.pk9l5JLjim-a8j-g1AP4UKqz-DcIHkCdEmEKTG0dcUg",
 									"type": "string"
 								}
 							]
@@ -152,7 +277,44 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/v1/users/by-email/5Xl55g@example.com",
+							"raw": "http://localhost:8080/api/v1/users?email=orynbekdanial8@gmail.com",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "orynbekdanial8@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0MTE1NDc2LCJleHAiOjE3NDQxMTkwNzYsInJvbGUiOiJVU0VSIn0.eFXkcnwruwUlwWNy8XmtTZC4ppljYpFZg1ELzkoCPIk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/3",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -162,18 +324,9 @@
 								"api",
 								"v1",
 								"users",
-								"by-email",
-								"5Xl55g@example.com"
+								"3"
 							]
 						}
-					},
-					"response": []
-				},
-				{
-					"name": "get by id",
-					"request": {
-						"method": "GET",
-						"header": []
 					},
 					"response": []
 				},
@@ -184,7 +337,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"john_doe\",\n  \"password\": \"SecurePass123\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"1234567890\"\n}",
+							"raw": "{\n  \"username\": \"john_doe\",\n  \"password\": \"SecurePass123\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"12345678911\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -210,16 +363,115 @@
 				{
 					"name": "update user",
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQyMTk0NTg2LCJleHAiOjE3NDIxOTgxODYsInJvbGUiOiJVU0VSIn0.o8FCVA3M8YXizEMU8Mni5mXWTHePqUCvTgAPfF-GEm0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"Jhh\",\n  \"firstname\": \"John\",\n  \"lastname\": \"Doe\",\n  \"password\": \"ldfn5454\",\n  \"email\": \"5Xl7hgg@example.com\",\n  \"phone\": \"12345676512\",\n  \"role\": \"ADMIN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0MTE1NDc2LCJleHAiOjE3NDQxMTkwNzYsInJvbGUiOiJVU0VSIn0.eFXkcnwruwUlwWNy8XmtTZC4ppljYpFZg1ELzkoCPIk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bio\": \"Люблю путешествия и аренду уникальных пространств!\",\n  \"avatarUrl\": \"https://example.com/avatars/user123.jpg\",\n  \"language\": \"CHINESE\",\n  \"currency\": \"USD\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/3/profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"3",
+								"profile"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "delete user",
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQyMTk0NTg2LCJleHAiOjE3NDIxOTgxODYsInJvbGUiOiJVU0VSIn0.o8FCVA3M8YXizEMU8Mni5mXWTHePqUCvTgAPfF-GEm0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"2"
+							]
+						}
 					},
 					"response": []
 				}
@@ -274,6 +526,620 @@
 			"name": "Listing",
 			"item": [
 				{
+					"name": "Photos",
+					"item": [
+						{
+							"name": "get listing photo",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjI0NTgyLCJleHAiOjE3NDQ2MjgxODIsInJvbGUiOiJVU0VSIn0.JGQzETD_JZ4BUeJuKMa0VxImoIfYVlnDImlkouNO29c",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/photos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"photos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get listing photos",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0Mzg5MTY5LCJleHAiOjE3NDQzOTI3NjksInJvbGUiOiJVU0VSIn0.QXK5NNWq6c0O32AXTWYJxdWMkn3r7LnMdR5ebUEWnSU",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/photos/a614fd74-6b04-4268-8b7e-2aba36b0ca5d_image2.jpg",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"photos",
+										"a614fd74-6b04-4268-8b7e-2aba36b0ca5d_image2.jpg"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "add listing photo",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczODkzMTYxNSwiZXhwIjoxNzM4OTM1MjE1LCJyb2xlIjoiVVNFUiJ9.9aGPV8ZdcC9PRbHYBFJKyvdJq13fc_SsGTgHB50OnmA",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "photos",
+											"type": "file",
+											"src": [
+												"/home/daniyal/Documents/projects/startup/quramDetect/image1.jpg",
+												"/home/daniyal/Documents/projects/startup/quramDetect/image2.jpg",
+												"/home/daniyal/Documents/projects/startup/quramDetect/image3.jpg"
+											]
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:7777/api/v1/listings/1/photos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "7777",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"photos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete listing photo",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0MjcxODg3LCJleHAiOjE3NDQyNzU0ODcsInJvbGUiOiJVU0VSIn0.WUtvFVY0TCOFSFO-Te8YOqHDS616Udg81pXzVAcephU",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/photos?deleteUrls=http://localhost:9000//images/listings/1/e2b237e3-82aa-4c7c-a107-c4eed0d00fd4_image1.jpg&deleteUrls=http://localhost:9000//images/listings/1/bdad961e-7dc7-4959-8d99-54bb4855d31a_image2.jpg",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"photos"
+									],
+									"query": [
+										{
+											"key": "deleteUrls",
+											"value": "http://localhost:9000//images/listings/1/e2b237e3-82aa-4c7c-a107-c4eed0d00fd4_image1.jpg"
+										},
+										{
+											"key": "deleteUrls",
+											"value": "http://localhost:9000//images/listings/1/bdad961e-7dc7-4959-8d99-54bb4855d31a_image2.jpg"
+										},
+										{
+											"key": "",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Availability",
+					"item": [
+						{
+							"name": "get listing availability",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMwMTYwLCJleHAiOjE3NDQ2MzM3NjAsInJvbGUiOiJVU0VSIn0.uXreShAJgP6utdbNq3GFMlquAf804i5GmuQcu7mpY8U",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/availability",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"availability"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create listing availability",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMyNjgxLCJleHAiOjE3NDQ2MzYyODEsInJvbGUiOiJVU0VSIn0.UAIdgFOM1F3vRu3HGoGqsdmH3svhjYno13NLV0CJQts",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"listingId\": 1,\n  \"startDate\": \"2025-10-01T00:00:00\",\n  \"endDate\": \"2025-10-31T23:59:59\",\n  \"available\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/availability",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"availability"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update listing availability",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMyNjgxLCJleHAiOjE3NDQ2MzYyODEsInJvbGUiOiJVU0VSIn0.UAIdgFOM1F3vRu3HGoGqsdmH3svhjYno13NLV0CJQts",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"listingId\": 1,\n  \"startDate\": \"2025-09-15T00:00:00\",\n  \"endDate\": \"2025-10-30T23:59:59\",\n  \"available\": false\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/availability",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"availability"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "check availability",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMwMTYwLCJleHAiOjE3NDQ2MzM3NjAsInJvbGUiOiJVU0VSIn0.uXreShAJgP6utdbNq3GFMlquAf804i5GmuQcu7mpY8U",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"startDate\": \"2025-12-01T00:00:00\", \n    \"endDate\": \"2025-12-31T23:59:59\"\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/availability/check",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"availability",
+										"check"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "block availability",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMwMTYwLCJleHAiOjE3NDQ2MzM3NjAsInJvbGUiOiJVU0VSIn0.uXreShAJgP6utdbNq3GFMlquAf804i5GmuQcu7mpY8U",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"startDate\": \"2025-12-01T00:00:00\", \n    \"endDate\": \"2025-12-31T23:59:59\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/availability/block",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"availability",
+										"block"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "unblock availability",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMwMTYwLCJleHAiOjE3NDQ2MzM3NjAsInJvbGUiOiJVU0VSIn0.uXreShAJgP6utdbNq3GFMlquAf804i5GmuQcu7mpY8U",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"startDate\": \"2025-12-01T00:00:00\", \n    \"endDate\": \"2025-12-31T23:59:59\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/availability/unblock",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"availability",
+										"unblock"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Amenities",
+					"item": [
+						{
+							"name": "get listing amenities",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjIzNDcyLCJleHAiOjE3NDQ2MjcwNzIsInJvbGUiOiJVU0VSIn0.LBF39JBjUVPx1s74EAxhfX4x7HpT3FH9GsDNQVqURX4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/amenities",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"amenities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "add listing amenities",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjIzNDcyLCJleHAiOjE3NDQ2MjcwNzIsInJvbGUiOiJVU0VSIn0.LBF39JBjUVPx1s74EAxhfX4x7HpT3FH9GsDNQVqURX4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\"KITCHEN\"",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/amenities",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"amenities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update listing amenities",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjIzNDcyLCJleHAiOjE3NDQ2MjcwNzIsInJvbGUiOiJVU0VSIn0.LBF39JBjUVPx1s74EAxhfX4x7HpT3FH9GsDNQVqURX4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\"POOL\", \"WIFI\", \"PARKING\"]\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/amenities",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"amenities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete all listing amenities",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjIxMjQwLCJleHAiOjE3NDQ2MjQ4NDAsInJvbGUiOiJVU0VSIn0.xICyaORPLL91CRFDDMaWEmybL4e8KBx0iSPnoJKeaQY",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/amenities",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"amenities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete listing amenities",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjI0NTgyLCJleHAiOjE3NDQ2MjgxODIsInJvbGUiOiJVU0VSIn0.JGQzETD_JZ4BUeJuKMa0VxImoIfYVlnDImlkouNO29c",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/amenities/POOL",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"amenities",
+										"POOL"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "get listing",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -284,7 +1150,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTUzNTQ3NCwiZXhwIjoxNzM5NTM5MDc0fQ.GuBLcTxSEpprqKjTEGvIXnw74IKXrpA4bSXxsyDluZw",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjIzNDcyLCJleHAiOjE3NDQ2MjcwNzIsInJvbGUiOiJVU0VSIn0.LBF39JBjUVPx1s74EAxhfX4x7HpT3FH9GsDNQVqURX4",
 									"type": "string"
 								}
 							]
@@ -320,7 +1186,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTU0NTc3NywiZXhwIjoxNzM5NTQ5Mzc3LCJyb2xlIjoiVVNFUiJ9.Awk8MpmBUqpZaEvAxGmUd5WM1fQ92HKHKZzN68WTDX4",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0MzkxNzQ5LCJleHAiOjE3NDQzOTUzNDksInJvbGUiOiJVU0VSIn0.TZpWpNOMwQz-l3Vae6VnTFLyw2hCBgGciM_UYEs78RQ",
 									"type": "string"
 								}
 							]
@@ -351,7 +1217,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczODkzNTEwMywiZXhwIjoxNzM4OTM4NzAzLCJyb2xlIjoiVVNFUiJ9.4V-XkODdmnqugEacvBQJXbRXiUhfKtTcj18Z533FgmE",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjIxMjQwLCJleHAiOjE3NDQ2MjQ4NDAsInJvbGUiOiJVU0VSIn0.xICyaORPLL91CRFDDMaWEmybL4e8KBx0iSPnoJKeaQY",
 									"type": "string"
 								}
 							]
@@ -465,7 +1331,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTQ0NjMwNiwiZXhwIjoxNzM5NDQ5OTA2LCJyb2xlIjoiVVNFUiJ9.q0lxRLSWCbNCeN-jtQJbqg7JTV7Eyb90AL99Mqk-wrI",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjIzNDcyLCJleHAiOjE3NDQ2MjcwNzIsInJvbGUiOiJVU0VSIn0.LBF39JBjUVPx1s74EAxhfX4x7HpT3FH9GsDNQVqURX4",
 									"type": "string"
 								}
 							]
@@ -473,7 +1339,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/3",
+							"raw": "http://localhost:8082/api/v1/listings/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -483,440 +1349,38 @@
 								"api",
 								"v1",
 								"listings",
-								"3"
+								"1"
 							]
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "Search",
+			"item": [
 				{
-					"name": "add listing photo",
+					"name": "New Request",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczODkzMTYxNSwiZXhwIjoxNzM4OTM1MjE1LCJyb2xlIjoiVVNFUiJ9.9aGPV8ZdcC9PRbHYBFJKyvdJq13fc_SsGTgHB50OnmA",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "photos",
-									"type": "file",
-									"src": [
-										"/home/daniyal/Documents/projects/startup/quramDetect/image1.jpg",
-										"/home/daniyal/Documents/projects/startup/quramDetect/image2.jpg",
-										"/home/daniyal/Documents/projects/startup/quramDetect/image3.jpg"
-									]
-								}
-							]
-						},
-						"url": {
-							"raw": "http://localhost:7777/api/v1/listings/1/photos",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "7777",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"1",
-								"photos"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get listing photo",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTUzNTQ3NCwiZXhwIjoxNzM5NTM5MDc0fQ.GuBLcTxSEpprqKjTEGvIXnw74IKXrpA4bSXxsyDluZw",
-									"type": "string"
-								}
-							]
-						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/1/photos/2d4bb890-47cf-4214-93a9-4ddbb0adce96_image2.jpg",
+							"raw": "http://localhost:9200/listings/_search?pretty",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8082",
+							"port": "9200",
 							"path": [
-								"api",
-								"v1",
 								"listings",
-								"1",
-								"photos",
-								"2d4bb890-47cf-4214-93a9-4ddbb0adce96_image2.jpg"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete listing photo",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTQ0NjMwNiwiZXhwIjoxNzM5NDQ5OTA2LCJyb2xlIjoiVVNFUiJ9.q0lxRLSWCbNCeN-jtQJbqg7JTV7Eyb90AL99Mqk-wrI",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
-						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/2/photos?deleteUrls=http://localhost:9000//images/listings/2/5970f3d4-2eb5-4829-bbef-0bfc171561bd_image1.jpg&deleteUrls=http://localhost:9000//images/listings/2/133b5897-9b39-4568-bca8-8eba0a190229_image2.jpg&deleteUrls=http://localhost:9000//images/listings/2/ac131d18-4376-401d-a28e-737aa77f1608_image3.jpg",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8082",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"2",
-								"photos"
+								"_search"
 							],
 							"query": [
 								{
-									"key": "deleteUrls",
-									"value": "http://localhost:9000//images/listings/2/5970f3d4-2eb5-4829-bbef-0bfc171561bd_image1.jpg"
-								},
-								{
-									"key": "deleteUrls",
-									"value": "http://localhost:9000//images/listings/2/133b5897-9b39-4568-bca8-8eba0a190229_image2.jpg"
-								},
-								{
-									"key": "deleteUrls",
-									"value": "http://localhost:9000//images/listings/2/ac131d18-4376-401d-a28e-737aa77f1608_image3.jpg"
+									"key": "pretty",
+									"value": null
 								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get listing availability",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTUzNTQ3NCwiZXhwIjoxNzM5NTM5MDc0fQ.GuBLcTxSEpprqKjTEGvIXnw74IKXrpA4bSXxsyDluZw",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/1/availability",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8082",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"1",
-								"availability"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create listing availability",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTUzNTQ3NCwiZXhwIjoxNzM5NTM5MDc0fQ.GuBLcTxSEpprqKjTEGvIXnw74IKXrpA4bSXxsyDluZw",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"listingId\": 4,\n  \"startDate\": \"2023-09-01\",\n  \"endDate\": \"2023-09-30\",\n  \"available\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/1/availability",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8082",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"1",
-								"availability"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "set listing availability",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTUzNTQ3NCwiZXhwIjoxNzM5NTM5MDc0fQ.GuBLcTxSEpprqKjTEGvIXnw74IKXrpA4bSXxsyDluZw",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"listingId\": 4,\n  \"startDate\": \"2023-10-01\",\n  \"endDate\": \"2023-10-31\",\n  \"available\": false\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/1/availability",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8082",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"1",
-								"availability"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get listing amenities",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTUzNTQ3NCwiZXhwIjoxNzM5NTM5MDc0fQ.GuBLcTxSEpprqKjTEGvIXnw74IKXrpA4bSXxsyDluZw",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/1/amenities",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8082",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"1",
-								"amenities"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "add listing amenities",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTU0MTMxNiwiZXhwIjoxNzM5NTQ0OTE2LCJyb2xlIjoiVVNFUiJ9.Qq3n9iwT5vnH9HYCVZi91vzrS4AMXMsdVrq369wiLZk",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "\"POOL\"",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/1/amenities",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8082",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"1",
-								"amenities"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update listing amenities",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTU0MTMxNiwiZXhwIjoxNzM5NTQ0OTE2LCJyb2xlIjoiVVNFUiJ9.Qq3n9iwT5vnH9HYCVZi91vzrS4AMXMsdVrq369wiLZk",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "[\"POOL\", \"WIFI\", \"PARKING\"]\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/1/amenities",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8082",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"1",
-								"amenities"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete listing amenities",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTU0MTMxNiwiZXhwIjoxNzM5NTQ0OTE2LCJyb2xlIjoiVVNFUiJ9.Qq3n9iwT5vnH9HYCVZi91vzrS4AMXMsdVrq369wiLZk",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/1/amenities/POOL",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8082",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"1",
-								"amenities",
-								"POOL"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete all listing amenities",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huMiIsImlhdCI6MTczOTU0MTMxNiwiZXhwIjoxNzM5NTQ0OTE2LCJyb2xlIjoiVVNFUiJ9.Qq3n9iwT5vnH9HYCVZi91vzrS4AMXMsdVrq369wiLZk",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8082/api/v1/listings/1/amenities",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8082",
-							"path": [
-								"api",
-								"v1",
-								"listings",
-								"1",
-								"amenities"
 							]
 						}
 					},

@@ -8,7 +8,6 @@ import com.rentspace.listingservice.entity.ListingAvailability;
 import com.rentspace.listingservice.exception.InvalidDateRangeException;
 import com.rentspace.listingservice.mapper.ListingAvailabilityMapper;
 import com.rentspace.listingservice.repository.ListingAvailabilityRepository;
-import com.rentspace.listingservice.repository.ListingsRepository;
 import com.rentspace.listingservice.service.ListingAvailabilityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ListingAvailabilityServiceImpl implements ListingAvailabilityService {
     private final ListingAvailabilityRepository availabilityRepository;
-    private final ListingsRepository listingsRepository;
     private final ListingAvailabilityMapper mapper;
     private final ListingBaseService listingBaseService;
 
@@ -44,14 +43,50 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
         log.debug("Setting availability for listingId: {} with request: {}", listingId, request);
         Listing listing = listingBaseService.getListingById(listingId);
         validateAvailabilityRequest(request);
+        if (!isAvailable(listingId, request.getStartDate(), request.getEndDate())) {
+            log.warn("Cannot set availability for listingId: {} - the period from {} to {} overlaps with an existing record",
+                    listingId, request.getStartDate(), request.getEndDate());
+            throw new ListingNotAvailableException(listingId, request.getStartDate().toString(), request.getEndDate().toString());
+        }
         ListingAvailability availability = createAndSaveAvailability(listing, request);
         log.info("Availability set for listingId: {}", listingId);
         return mapper.toDto(availability);
     }
 
     @Override
+    @Transactional
+    public ListingAvailabilityDto updateAvailability(Long listingId, ListingAvailabilityRequest request) {
+        log.debug("Updating availability for listingId: {} with request: {}", listingId, request);
+        Listing listing = listingBaseService.getListingById(listingId);
+        validateAvailabilityRequest(request);
+
+        Optional<ListingAvailability> existingAvailability = availabilityRepository
+                .findByListingIdAndStartDateAndEndDate(listingId, request.getStartDate(), request.getEndDate());
+
+        if (existingAvailability.isEmpty()) {
+            if (!isAvailable(listingId, request.getStartDate(), request.getEndDate())) {
+                log.warn("Cannot set availability for listingId: {} - the period from {} to {} overlaps with an existing record",
+                        listingId, request.getStartDate(), request.getEndDate());
+                throw new ListingNotAvailableException(listingId, request.getStartDate().toString(), request.getEndDate().toString());
+            }
+        }
+
+        ListingAvailability availability;
+        if (existingAvailability.isPresent()) {
+            availability = existingAvailability.get();
+            availability.setAvailable(request.isAvailable());
+            log.info("Updated existing availability record with ID: {} for listing", availability.getId(),listingId);
+        }
+        else {
+            availability = createAndSaveAvailability(listing, request);
+            log.info("Created new availability record with ID: {} for listing", availability.getId(),listingId);
+        }
+        return mapper.toDto(availability);
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public boolean isAvailable(Long listingId, LocalDateTime startDate , LocalDateTime endDate) {
+    public boolean isAvailable(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Checking availability for listingId={} from {} to {}", listingId, startDate, endDate);
         validateDateRange(startDate, endDate);
         return !availabilityRepository.existsByListingIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
