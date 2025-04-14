@@ -95,4 +95,9 @@ public class Listing {
     @BatchSize(size = 10)
     @JsonIgnore
     private List<ListingPhoto> photos = new ArrayList<>();
+
+    @OneToOne(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private ListingAmenities amenities;
+
 }

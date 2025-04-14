@@ -10,6 +10,7 @@ import com.rentspace.listingservice.repository.ListingAmenitiesRepository;
 import com.rentspace.listingservice.service.ListingAmenitiesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -80,7 +81,7 @@ public class ListingAmenitiesServiceImpl implements ListingAmenitiesService {
 
     @Override
     @Transactional
-    @CachePut(value = "listingAmenities", key = "#listingId")
+    @CacheEvict(value = "listingAmenities", key = "#listingId")
     public void removeAllAmenitiesFromListing(Long listingId) {
         log.debug("Removing all amenities from listing ID: {}", listingId);
         ListingAmenities amenities = repository.findByListingId(listingId)

@@ -31,7 +31,7 @@ public class ListingAmenities implements Serializable {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "listing_id", nullable = false)
     private Listing listing;
 
@@ -39,7 +39,6 @@ public class ListingAmenities implements Serializable {
     @Enumerated(STRING)
     @CollectionTable(name = "listing_amenity_types", joinColumns = @JoinColumn(name = "listing_amenity_id"))
     @Column(name = "amenity_type")
-    @NotEmpty
     private Set<AmenityType> amenityTypes = new HashSet<>();
 
     @CreatedDate

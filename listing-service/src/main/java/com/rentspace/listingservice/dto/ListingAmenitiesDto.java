@@ -21,11 +21,11 @@ public class ListingAmenitiesDto {
     @Schema(description = "Set of amenity types", example = "[\"WIFI\", \"PARKING\"]")
     private Set<AmenityType> amenityTypes;
 
-    @Schema(description = "Timestamp when the amenities were created", example = "2025-03-17T10:00:00")
-    private LocalDateTime createdAt;
-
-    @Schema(description = "Timestamp when the amenities were last updated", example = "2025-03-17T12:00:00")
-    private LocalDateTime updatedAt;
+//    @Schema(description = "Timestamp when the amenities were created", example = "2025-03-17T10:00:00")
+//    private LocalDateTime createdAt;
+//
+//    @Schema(description = "Timestamp when the amenities were last updated", example = "2025-03-17T12:00:00")
+//    private LocalDateTime updatedAt;
 
     public Set<AmenityType> getAmenityTypes() {
         return amenityTypes != null ? amenityTypes : Collections.emptySet();
