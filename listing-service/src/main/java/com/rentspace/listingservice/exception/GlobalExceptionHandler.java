@@ -1,8 +1,11 @@
 package com.rentspace.listingservice.exception;
 
 import com.rentspace.core.dto.ErrorResponseDto;
+import com.rentspace.core.exception.ListingNotAvailableException;
 import com.rentspace.core.exception.TokenExpiredException;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
@@ -72,6 +75,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponse, NOT_FOUND);
+    }
+
+    @ExceptionHandler(ListingNotAvailableException.class)
+    public ResponseEntity<ErrorResponseDto> handleListingNotAvailableException(ListingNotAvailableException ex, WebRequest request) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ListingOperationException.class)

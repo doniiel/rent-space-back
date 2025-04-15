@@ -9,7 +9,7 @@ import java.util.List;
 public interface ListingAvailabilityService {
     List<ListingAvailabilityDto> getAvailabilityByListing(Long listingId);
     ListingAvailabilityDto setAvailability(Long listingId, ListingAvailabilityRequest request);
-    ListingAvailabilityDto updateAvailability(Long listingId, ListingAvailabilityRequest request);
+    ListingAvailabilityDto updateAvailability(Long listingId, Long availabilityId, ListingAvailabilityRequest request);
     boolean isAvailable(Long listingId, LocalDateTime startDate, LocalDateTime endDate);
     void blockAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate);
     void unblockAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate);

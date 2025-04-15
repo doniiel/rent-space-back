@@ -59,11 +59,12 @@ public class AvailabilityController {
             @ApiResponse(responseCode = "404", description = "Listing not found")
     })
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER')")
-    @PutMapping
+    @PutMapping("/{availabilityId}")
     public ResponseEntity<ListingAvailabilityDto> updateAvailability(
             @PathVariable @NotNull Long listingId,
+            @PathVariable @NotNull Long availabilityId,
             @Valid @RequestBody ListingAvailabilityRequest request) {
-        return ResponseEntity.ok(service.updateAvailability(listingId, request));
+        return ResponseEntity.ok(service.updateAvailability(listingId, availabilityId, request));
     }
 
     @Operation(summary = "Check availability", description = "Checks if the listing is available for the specified date range. Dates must be in 'yyyy-MM-dd'T'HH:mm:ss' format (e.g., '2025-04-01T00:00:00').")

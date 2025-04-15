@@ -50,10 +50,13 @@ public class ListingAvailability implements Serializable {
     private LocalDateTime updatedAt;
 
     @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
     @PreUpdate
-    public void validateDate() {
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("Start date must be before end date");
-        }
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

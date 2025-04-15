@@ -31,7 +31,6 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
     public List<ListingAvailabilityDto> getAvailabilityByListing(Long listingId) {
         log.debug("Fetching availabilities for listingId: {}", listingId);
         List<ListingAvailability> availabilities = availabilityRepository.findByListingId(listingId);
-        validateAvailabilityExists(availabilities, listingId);
         return availabilities.stream()
                 .map(mapper::toDto)
                 .toList();
@@ -43,44 +42,59 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
         log.debug("Setting availability for listingId: {} with request: {}", listingId, request);
         Listing listing = listingBaseService.getListingById(listingId);
         validateAvailabilityRequest(request);
-        if (!isAvailable(listingId, request.getStartDate(), request.getEndDate())) {
+
+        if (hasOverlappingRecords(listingId, request.getStartDate(), request.getEndDate(), null)) {
             log.warn("Cannot set availability for listingId: {} - the period from {} to {} overlaps with an existing record",
                     listingId, request.getStartDate(), request.getEndDate());
             throw new ListingNotAvailableException(listingId, request.getStartDate().toString(), request.getEndDate().toString());
         }
-        ListingAvailability availability = createAndSaveAvailability(listing, request);
+
+        ListingAvailability availability = ListingAvailability.builder()
+                .listing(listing)
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .available(request.isAvailable())
+                .build();
+        availability = availabilityRepository.save(availability);
         log.info("Availability set for listingId: {}", listingId);
         return mapper.toDto(availability);
     }
 
     @Override
     @Transactional
-    public ListingAvailabilityDto updateAvailability(Long listingId, ListingAvailabilityRequest request) {
+    public ListingAvailabilityDto updateAvailability(Long listingId, Long availabilityId, ListingAvailabilityRequest request) {
         log.debug("Updating availability for listingId: {} with request: {}", listingId, request);
         Listing listing = listingBaseService.getListingById(listingId);
         validateAvailabilityRequest(request);
 
-        Optional<ListingAvailability> existingAvailability = availabilityRepository
-                .findByListingIdAndStartDateAndEndDate(listingId, request.getStartDate(), request.getEndDate());
+        if (!listingId.equals(request.getListingId())) {
+            log.warn("Listing ID mismatch: path variable listingId={} does not match request listingId={}", listingId, request.getListingId());
+            throw new IllegalArgumentException("Listing ID in path must match the listing ID in the request");
+        }
 
+        Optional<ListingAvailability> existingAvailability = availabilityRepository.findById(availabilityId);
         if (existingAvailability.isEmpty()) {
-            if (!isAvailable(listingId, request.getStartDate(), request.getEndDate())) {
-                log.warn("Cannot set availability for listingId: {} - the period from {} to {} overlaps with an existing record",
-                        listingId, request.getStartDate(), request.getEndDate());
-                throw new ListingNotAvailableException(listingId, request.getStartDate().toString(), request.getEndDate().toString());
-            }
+            log.warn("Availability record with ID: {} not found for listingId: {}", availabilityId, listingId);
+            throw new ListingNotAvailableException(listingId, "Availability record with ID " + availabilityId + " not found", "");
         }
 
-        ListingAvailability availability;
-        if (existingAvailability.isPresent()) {
-            availability = existingAvailability.get();
-            availability.setAvailable(request.isAvailable());
-            log.info("Updated existing availability record with ID: {} for listing", availability.getId(),listingId);
+        ListingAvailability availability = existingAvailability.get();
+        if (!availability.getListing().getId().equals(listingId)) {
+            log.warn("Availability record with ID: {} does not belong to listingId: {}", availabilityId, listingId);
+            throw new IllegalArgumentException("Availability record does not belong to the specified listing");
         }
-        else {
-            availability = createAndSaveAvailability(listing, request);
-            log.info("Created new availability record with ID: {} for listing", availability.getId(),listingId);
+
+        if (hasOverlappingRecords(listingId, request.getStartDate(), request.getEndDate(), availability.getId())) {
+            log.warn("Cannot update availability for listingId: {} - the period from {} to {} overlaps with another existing record",
+                    listingId, request.getStartDate(), request.getEndDate());
+            throw new ListingNotAvailableException(listingId, request.getStartDate().toString(), request.getEndDate().toString());
         }
+
+        availability.setStartDate(request.getStartDate());
+        availability.setEndDate(request.getEndDate());
+        availability.setAvailable(request.isAvailable());
+        availability = availabilityRepository.save(availability);
+        log.info("Updated availability record with ID: {} for listingId: {}", availability.getId(), listingId);
         return mapper.toDto(availability);
     }
 
@@ -99,7 +113,20 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
         log.debug("Blocking availability for listingId={} from {} to {}", listingId, startDate, endDate);
         Listing listing = listingBaseService.getListingById(listingId);
         validateBlockRequest(listingId, startDate, endDate);
-        saveBlockedAvailability(listing, startDate, endDate);
+
+        if (hasOverlappingRecords(listingId, startDate, endDate, null)) {
+            log.warn("Cannot block availability for listingId: {} - the period from {} to {} overlaps with an existing record",
+                    listingId, startDate, endDate);
+            throw new ListingNotAvailableException(listingId, startDate.toString(), endDate.toString());
+        }
+
+        ListingAvailability availability = ListingAvailability.builder()
+                .listing(listing)
+                .startDate(startDate)
+                .endDate(endDate)
+                .available(false)
+                .build();
+        availabilityRepository.save(availability);
         log.info("Availability blocked for listingId={} from {} to {}", listingId, startDate, endDate);
     }
 
@@ -142,31 +169,26 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
         }
     }
 
-    private ListingAvailability createAndSaveAvailability(Listing listing, ListingAvailabilityRequest request) {
-        ListingAvailability availability = ListingAvailability.builder()
-                .listing(listing)
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .available(request.isAvailable())
-                .build();
-        return availabilityRepository.save(availability);
-    }
-
-    private void saveBlockedAvailability(Listing listing, LocalDateTime startDate, LocalDateTime endDate) {
-        ListingAvailability availability = ListingAvailability.builder()
-                .listing(listing)
-                .startDate(startDate)
-                .endDate(endDate)
-                .available(false)
-                .build();
-        availabilityRepository.save(availability);
-    }
-
     private void logAvailabilityUnblocked(int deletedCount, Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         if (deletedCount == 0) {
             log.warn("No availability unblocked for listing ID: {} from {} to {}", listingId, startDate, endDate);
         } else {
             log.info("Unblocked {} availability records for listing ID: {} from {} to {}", deletedCount, listingId, startDate, endDate);
         }
+    }
+
+    private boolean hasOverlappingRecords(Long listingId, LocalDateTime startDate, LocalDateTime endDate, Long excludeId) {
+        log.debug("Checking for overlapping records for listingId: {} from {} to {}, excluding id={}",
+                listingId, startDate, endDate, excludeId);
+        boolean hasOverlap;
+        if (excludeId != null) {
+            hasOverlap = availabilityRepository.existsByListingIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndIdNot(
+                    listingId, startDate, endDate, excludeId);
+        } else {
+            hasOverlap = availabilityRepository.existsByListingIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                    listingId, startDate, endDate);
+        }
+        log.debug("Overlap check result for listingId: {} from {} to {}: {}", listingId, startDate, endDate, hasOverlap);
+        return hasOverlap;
     }
 }

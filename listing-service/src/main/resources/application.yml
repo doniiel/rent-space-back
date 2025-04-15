@@ -32,6 +32,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          timezone: UTC
   redis:
     host: localhost
     port: 6379
