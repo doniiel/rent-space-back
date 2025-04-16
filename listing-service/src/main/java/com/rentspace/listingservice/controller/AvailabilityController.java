@@ -67,6 +67,21 @@ public class AvailabilityController {
         return ResponseEntity.ok(service.updateAvailability(listingId, availabilityId, request));
     }
 
+    @Operation(summary = "Delete availability", description = "Deletes an availability period for the specified listing by its availability ID.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Availability deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Listing or availability record not found")
+    })
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER')")
+    @DeleteMapping("/{availabilityId}")
+    public ResponseEntity<Void> deleteAvailability(
+            @PathVariable @NotNull Long listingId,
+            @PathVariable @NotNull Long availabilityId) {
+        service.deleteAvailability(listingId, availabilityId);
+        return ResponseEntity.noContent().build();
+    }
+
+
     @Operation(summary = "Check availability", description = "Checks if the listing is available for the specified date range. Dates must be in 'yyyy-MM-dd'T'HH:mm:ss' format (e.g., '2025-04-01T00:00:00').")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Availability status returned"),

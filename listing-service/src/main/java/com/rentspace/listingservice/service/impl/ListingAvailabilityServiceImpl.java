@@ -99,6 +99,25 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
     }
 
     @Override
+    @Transactional
+    public void deleteAvailability(Long listingId, Long availabilityId) {
+        Listing listing = listingBaseService.getListingById(listingId);
+        Optional<ListingAvailability> existingAvailability = availabilityRepository.findById(availabilityId);
+        if (existingAvailability.isEmpty()) {
+            log.warn("Availability record with ID: {} not found for listingId: {}", availabilityId, listingId);
+            throw new ListingNotAvailableException(listingId, "Availability record with ID " + availabilityId + " not found", "");
+        }
+
+        ListingAvailability listingAvailability = existingAvailability.get();
+        if (!listingAvailability.getListing().getId().equals(listingId)) {
+            log.warn("Availability record with ID: {} does not belong to listingId: {}", availabilityId, listingId);
+            throw new IllegalArgumentException("Availability record does not belong to the specified listing");
+        }
+        availabilityRepository.delete(listingAvailability);
+        log.info("Deleted availability record with ID: {} for listingId: {}", availabilityId, listingId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public boolean isAvailable(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Checking availability for listingId={} from {} to {}", listingId, startDate, endDate);
