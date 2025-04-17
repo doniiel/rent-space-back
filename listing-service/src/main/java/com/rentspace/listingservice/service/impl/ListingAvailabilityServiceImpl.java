@@ -11,6 +11,8 @@ import com.rentspace.listingservice.repository.ListingAvailabilityRepository;
 import com.rentspace.listingservice.service.ListingAvailabilityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "listingAvailability", key = "#listingId")
     public List<ListingAvailabilityDto> getAvailabilityByListing(Long listingId) {
         log.debug("Fetching availabilities for listingId: {}", listingId);
         List<ListingAvailability> availabilities = availabilityRepository.findByListingId(listingId);
@@ -38,6 +41,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
 
     @Override
     @Transactional
+    @CacheEvict(value = {"listingAvailability", "availabilityCheck"}, key = "#listingId")
     public ListingAvailabilityDto setAvailability(Long listingId, ListingAvailabilityRequest request) {
         log.debug("Setting availability for listingId: {} with request: {}", listingId, request);
         Listing listing = fetchListing(listingId);
@@ -53,6 +57,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
 
     @Override
     @Transactional
+    @CacheEvict(value = {"listingAvailability", "availabilityCheck"}, key = "#listingId")
     public ListingAvailabilityDto updateAvailability(Long listingId, Long availabilityId, ListingAvailabilityRequest request) {
         log.debug("Updating availability for listingId: {} with request: {}", listingId, request);
         Listing listing = fetchListing(listingId);
@@ -72,6 +77,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
 
     @Override
     @Transactional
+    @CacheEvict(value = {"listingAvailability", "availabilityCheck"}, key = "#listingId")
     public void deleteAvailability(Long listingId, Long availabilityId) {
         Listing listing = fetchListing(listingId);
 
@@ -84,6 +90,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "availabilityCheck", key = "{#listingId, #startDate, #endDate}")
     public boolean isAvailable(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Checking availability for listingId={} from {} to {}", listingId, startDate, endDate);
         validateDateRange(startDate, endDate);
@@ -92,6 +99,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
 
     @Override
     @Transactional
+    @CacheEvict(value = {"listingAvailability", "availabilityCheck"}, key = "#listingId")
     public void blockAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.debug("Blocking availability for listingId={} from {} to {}", listingId, startDate, endDate);
         Listing listing = fetchListing(listingId);
@@ -106,6 +114,7 @@ public class ListingAvailabilityServiceImpl implements ListingAvailabilityServic
 
     @Override
     @Transactional
+    @CacheEvict(value = {"listingAvailability", "availabilityCheck"}, key = "#listingId")
     public void unblockAvailability(Long listingId, LocalDateTime startDate, LocalDateTime endDate) {
         log.debug("Unblocking availability for listingId={} from {} to {}", listingId, startDate, endDate);
         validateDateRange(startDate, endDate);

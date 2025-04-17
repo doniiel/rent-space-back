@@ -4,6 +4,7 @@ import com.rentspace.listingservice.entity.Listing;
 import com.rentspace.listingservice.exception.ListingNotFoundException;
 import com.rentspace.listingservice.repository.ListingsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service

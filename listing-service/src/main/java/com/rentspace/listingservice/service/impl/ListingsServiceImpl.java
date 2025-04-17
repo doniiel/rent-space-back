@@ -112,7 +112,8 @@ public class ListingsServiceImpl implements ListingsService {
 
     @Override
     @Transactional
-    @Caching(evict = { @CacheEvict(value = "listing", key = "#listingId"),
+    @Caching(evict = {
+            @CacheEvict(value = "listing", key = "#listingId"),
             @CacheEvict(value = "listings", key = "'allListings'"),
             @CacheEvict(value = "listingAmenities", key = "#listingId") })
     public void deleteListing(Long listingId) {
@@ -131,7 +132,7 @@ public class ListingsServiceImpl implements ListingsService {
 
     @Override
     @Caching(put = { @CachePut(value = "listing", key = "#result.id") },
-            evict = { @CacheEvict(value = "listings", key = "'allListings'"),
+            evict = {@CacheEvict(value = "listings", key = "'allListings'"),
                       @CacheEvict(value = "userListings", key = "#result.userId")})
     public ListingDto updateListingRating(Long listingId, Double averageRating) {
         Listing listing = listingBaseService.getListingById(listingId);
