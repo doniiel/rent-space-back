@@ -1,10 +1,7 @@
 package com.rentspace.listingservice.handler;
 
 import com.rentspace.core.enums.ListingStatus;
-import com.rentspace.core.event.ListingAvailabilityEvent;
-import com.rentspace.core.event.ListingAvailableResponse;
-import com.rentspace.core.event.ListingUnblockEvent;
-import com.rentspace.core.event.ReviewEvent;
+import com.rentspace.core.event.*;
 import com.rentspace.listingservice.service.ListingAvailabilityService;
 import com.rentspace.listingservice.service.ListingsService;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +11,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
 @Slf4j
 @Service
@@ -34,41 +28,29 @@ public class ListingHandler {
 
         boolean isAvailable = listingAvailabilityService.isAvailable(event.getListingId(), event.getStartDate(), event.getEndDate());
 
-        ListingAvailableResponse response;
-        if (isAvailable) {
-            listingAvailabilityService.blockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
-
-            response = ListingAvailableResponse.builder()
-                    .bookingId(event.getBookingId())
-                    .listingId(event.getListingId())
-                    .status(ListingStatus.AVAILABLE.name())
-                    .build();
-
-            kafkaTemplate.send(responseTopic, response);
+        ListingAvailableResponse response = ListingAvailableResponse.builder()
+                .bookingId(event.getBookingId())
+                .listingId(event.getListingId())
+                .status(isAvailable ? ListingStatus.AVAILABLE.name() : ListingStatus.UNAVAILABLE.name())
+                .build();;
             log.info("Sent listing available response for booking ID: {}", event.getBookingId());
-        } else {
-            response = ListingAvailableResponse.builder()
-                    .bookingId(event.getBookingId())
-                    .listingId(event.getListingId())
-                    .status(ListingStatus.UNAVAILABLE.name())
-                    .build();
-
-            kafkaTemplate.send(responseTopic, event.getListingId().toString(), response);
-            log.info("Sent listing unavailable response for booking ID: {}", event.getBookingId());
         }
+
+    @KafkaListener(topics = "${event.topic.listing.availability.block}", groupId = "${spring.kafka.consumer.group-id}")
+    public void handleListingBlockEvent(@Payload ListingBlockEvent event) {
+        log.info("Received listing block event for booking ID: {}", event.getBookingId());
+        listingAvailabilityService.blockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
+        log.info("Successfully blocked availability for listingId={} from {} to {}",
+                event.getListingId(), event.getStartDate(), event.getEndDate());
     }
 
     @KafkaListener(topics = "${event.topic.listing.availability.unblock}", groupId = "${spring.kafka.consumer.group-id}")
-    public void handlerListingUnblock(@Payload ListingUnblockEvent event) {
+    public void handlerListingUnblockEvent(@Payload ListingUnblockEvent event) {
         log.info("Received listing unblock event for booking ID: {}", event.getBookingId());
-        try {
-            listingAvailabilityService.unblockAvailability(event.getListingId(), LocalDateTime.parse(event.getStartDate()), LocalDateTime.parse(event.getEndDate()));
-            log.info("Successfully unblocked availability for listingId={} from {} to {}", event.getListingId(), event.getStartDate(), event.getEndDate());
-        } catch (DateTimeParseException e) {
-            log.error("Failed to parse dates for unblock event: bookingId: {}, startDate: {}, endDate: {}",
-                    event.getBookingId(), event.getStartDate(), event.getEndDate());
-            throw new IllegalArgumentException("Invalid date format in unblock event", e);
-        }
+
+        listingAvailabilityService.unblockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
+        log.info("Successfully unblocked availability for listingId={} from {} to {}",
+                event.getListingId(), event.getStartDate(), event.getEndDate());
     }
 
     @KafkaListener(topics = "${event.topic.listing.rating.updated}", groupId = "${spring.kafka.consumer.group-id}")

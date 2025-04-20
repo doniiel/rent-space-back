@@ -18,6 +18,8 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       group-id: listing-service
+      properties:
+        spring.json.trusted.packages: "*"
 
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/userservicedb}

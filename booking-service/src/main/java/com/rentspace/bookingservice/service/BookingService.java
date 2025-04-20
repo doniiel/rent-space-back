@@ -10,6 +10,7 @@ public interface BookingService {
     BookingDto createBooking(CreateBookingRequest request);
     BookingDto getBookingById(Long bookingId);
     Page<BookingDto> getAllBookingsByUserId(Long userId, Pageable pageable);
+    Page<BookingDto> getAllBookingsByListingId(Long listingId, Pageable pageable);
     Page<BookingDto> getAllBookings(Pageable pageable);
     void cancelBooking(Long bookingId);
     void updateBookingStatus(Long bookingId, BookingStatus status);

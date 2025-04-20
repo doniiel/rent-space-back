@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -57,7 +58,7 @@ public class BookingController {
     @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
     @GetMapping("/{bookingId}")
     public ResponseEntity<BookingDto> getBookingById(
-            @PathVariable @Min(1) Long bookingId) {
+            @PathVariable @NotNull Long bookingId) {
         return ResponseEntity.ok(bookingService.getBookingById(bookingId));
     }
 
@@ -69,11 +70,26 @@ public class BookingController {
     @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<BookingDto>> getBookingsByUserId(
-            @PathVariable @Min(1) @Parameter(description = "User ID", example = "1") Long userId,
+            @PathVariable @NotNull @Parameter(description = "User ID", example = "1") Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(bookingService.getAllBookingsByUserId(userId, pageable));
+    }
+
+    @Operation(summary = "Get booking by listing ID", description = "Retrieves a paginated list of bookings for specific user")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Bookings retrieved successfully", content = @Content(schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid listing ID")
+    })
+    @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
+    @GetMapping("/listing/{listingId}")
+    public ResponseEntity<Page<BookingDto>> getBookingsByListingId(
+            @PathVariable @NotNull Long listingId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(bookingService.getAllBookingsByListingId(listingId,pageable));
     }
 
     @Operation(summary = "Get all bookings", description = "Retrieves a paginated list of all bookings (admin only)")
@@ -95,10 +111,10 @@ public class BookingController {
             @ApiResponse(responseCode = "204", description = "Booking cancelled successfully"),
             @ApiResponse(responseCode = "404", description = "Booking not found")
     })
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
     @DeleteMapping("/{bookingId}")
     public ResponseEntity<Void> cancelBooking(
-            @PathVariable @Min(1) Long bookingId) {
+            @PathVariable @NotNull Long bookingId) {
         bookingService.cancelBooking(bookingId);
         return ResponseEntity.noContent().build();
     }

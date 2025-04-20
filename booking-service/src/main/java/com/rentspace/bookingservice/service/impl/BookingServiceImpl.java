@@ -67,11 +67,18 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BookingDto> getAllBookings(Pageable pageable) {
+    public Page<BookingDto> getAllBookingsByListingId(Long listingId, Pageable pageable) {
+        Objects.requireNonNull(listingId, "Listing ID cannot be null");
         Objects.requireNonNull(pageable, "Pageable cannot be null");
         return repository.findAll(pageable).map(mapper::toDto);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BookingDto> getAllBookings(Pageable pageable) {
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+        return repository.findAll(pageable).map(mapper::toDto);
+    }
 
     @Override
     @Transactional
@@ -105,7 +112,6 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 
-
     private Booking findBookingById(Long bookingId) {
         return repository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking", "ID", bookingId));
@@ -125,8 +131,8 @@ public class BookingServiceImpl implements BookingService {
         ListingUnblockEvent event = ListingUnblockEvent.builder()
                 .bookingId(booking.getId())
                 .listingId(booking.getListingId())
-                .startDate(booking.getStartDate().toString())
-                .endDate(booking.getEndDate().toString())
+                .startDate(booking.getStartDate())
+                .endDate(booking.getEndDate())
                 .build();
         publisher.publish(listingUnblockTopic, booking.getId(), event, "unblock request");
     }

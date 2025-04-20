@@ -5,10 +5,7 @@ import com.rentspace.bookingservice.enums.BookingStatus;
 import com.rentspace.bookingservice.exception.BookingNotFoundException;
 import com.rentspace.bookingservice.service.BookingService;
 import com.rentspace.core.enums.ListingStatus;
-import com.rentspace.core.event.BookingCreatedEvent;
-import com.rentspace.core.event.ListingAvailableResponse;
-import com.rentspace.core.event.PaymentFailureEvent;
-import com.rentspace.core.event.PaymentSuccessEvent;
+import com.rentspace.core.event.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +29,14 @@ public class BookingHandler {
     public void handlerSuccessPaymentEvent(@Payload PaymentSuccessEvent event) {
         log.info("Received payment success event for booking ID: {}", event.getBookingId());
         service.updateBookingStatus(event.getBookingId(), BookingStatus.CONFIRMED);
+
+        try {
+            BookingDto booking = service.getBookingById(event.getBookingId());
+            publishListingBlockEvent(booking);
+        }
+         catch (BookingNotFoundException e) {
+            log.error("Booking not found for payment success, booking ID: {}", event.getBookingId(), e);
+         }
     }
 
     @Transactional
@@ -70,4 +75,13 @@ public class BookingHandler {
                 .build();
         publisher.publish(paymentTopic, booking.getId(), event, "booking created");
     }
+
+    private void publishListingBlockEvent(BookingDto booking) {
+        ListingBlockEvent event = ListingBlockEvent.builder()
+                .bookingId(booking.getId())
+                .listingId(booking.getListingId())
+                .startDate(booking.getStartDate())
+                .endDate(booking.getEndDate())
+                .build();
+        publisher.publish(paymentTopic, booking.getId(), event, "listing ");}
 }

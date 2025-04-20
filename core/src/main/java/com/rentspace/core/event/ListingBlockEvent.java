@@ -11,9 +11,10 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ListingUnblockEvent {
+public class ListingBlockEvent {
     private Long bookingId;
     private Long listingId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+
 }
