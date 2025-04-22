@@ -2,6 +2,7 @@ package com.rentspace.paymentservice.service.impl;
 
 import com.rentspace.core.dto.UserDto;
 import com.rentspace.core.enums.PaymentStatus;
+import com.rentspace.core.event.NotificationEvent;
 import com.rentspace.core.event.PaymentFailureEvent;
 import com.rentspace.core.event.PaymentSuccessEvent;
 import com.rentspace.core.exception.PaymentNotFoundException;
@@ -37,6 +38,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${event.topic.payment.failure}")
     private String paymentFailureTopic;
 
+    @Value("${event.topic.notification.send-request}")
+    private String notificationSendRequestTopic;
+
     @Override
     @Transactional
     public PaymentDto createPayment(Long userId, Long bookingId, String currency, double amount) {
@@ -44,6 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
         UserDto user = fetchUser(userId);
         Payment payment = buildPayment(user.getId(), bookingId, amount, currency);
         Payment savedPayment = savePayment(payment);
+        publishNotificationEvent(savedPayment, "Payment #" + savedPayment.getId() + " initiated for booking #" + bookingId);
         return mapper.toDto(savedPayment);
     }
 
@@ -72,6 +77,9 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = findPaymentById(paymentId);
         updatePayment(payment, status);
         publishPaymentEvent(payment);
+        publishNotificationEvent(payment, status == PaymentStatus.SUCCESS
+                ? "Payment successful for booking #" + payment.getBookingId()
+                : "Payment failed for booking #" + payment.getBookingId());
         return mapper.toDto(payment);
     }
 
@@ -132,7 +140,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void publishPaymentEvent(Payment payment) {
-        if (payment.getBookingId() == null){
+        if (payment.getBookingId() == null) {
             log.warn("Payment ID {} has no associated booking, skipping event publication", payment.getId());
             return;
         }
@@ -143,5 +151,13 @@ public class PaymentServiceImpl implements PaymentService {
             PaymentFailureEvent event = createPaymentFailureEvent(payment.getBookingId(), payment.getId());
             publisher.publish(paymentFailureTopic, payment.getId(), event, "payment failure");
         }
+    }
+
+    private void publishNotificationEvent(Payment payment, String message) {
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .userId(payment.getUserId())
+                .message(message)
+                .build();
+        publisher.publish(notificationSendRequestTopic, payment.getUserId(), notificationEvent, "notification send");
     }
 }

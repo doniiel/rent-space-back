@@ -58,6 +58,8 @@ management:
 event:
   topic:
     payment:
+      create-request: "payment-create-request"
       success: "payment-success"
       failure: "payment-failure"
-      create: "payment-created"
+    notification:
+      send-request: "notification-send-request"

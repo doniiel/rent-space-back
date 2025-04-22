@@ -17,9 +17,9 @@ public class PaymentHandler {
     private final PaymentService paymentService;
 
     @Transactional
-    @KafkaListener(topics = "${event.topic.payment.create}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "${event.topic.payment.create-request}", groupId = "${spring.kafka.consumer.group-id}")
     public void handleBookingCreatedEvent(@Payload BookingCreatedEvent event) {
-        log.info("Received payment event for booking: {}", event.getBookingId());
+        log.info("Received payment create request for booking: {}", event.getBookingId());
 
         try {
             PaymentDto payment = paymentService.createPayment(

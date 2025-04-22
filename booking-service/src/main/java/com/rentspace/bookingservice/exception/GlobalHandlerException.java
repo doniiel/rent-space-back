@@ -4,6 +4,7 @@ import com.rentspace.core.dto.ErrorResponseDto;
 import com.rentspace.core.exception.ListingNotAvailableException;
 import feign.FeignException;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -14,12 +15,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalHandlerException extends ResponseEntityExceptionHandler {
     @Override
@@ -40,6 +43,7 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
                 LocalDateTime.now()
         );
 
+        log.error("Validation failed for request {}: {}", request.getDescription(false), errors);
         return new ResponseEntity<>(errorResponseDto, BAD_REQUEST);
     }
 
@@ -57,6 +61,8 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
                 "External service error: " + ex.getMessage(),
                 LocalDateTime.now()
         );
+
+        log.error("FeignException for request {}: {}", request.getDescription(false), ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponseDto, httpStatus);
     }
 
@@ -68,6 +74,8 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
                 ex.getMessage(),
                 LocalDateTime.now()
         );
+
+        log.error("BookingNotFoundException for request {}: {}", request.getDescription(false), ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, NOT_FOUND);
     }
 
@@ -79,6 +87,8 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
                 ex.getMessage(),
                 LocalDateTime.now()
         );
+
+        log.error("BookingAlreadyExistsException for request {}: {}", request.getDescription(false), ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, CONFLICT);
     }
 
@@ -90,6 +100,8 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
                 ex.getMessage(),
                 LocalDateTime.now()
         );
+
+        log.error("TokenExpiredException for request {}: {}", request.getDescription(false), ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, UNAUTHORIZED);
     }
 
@@ -101,6 +113,8 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
                 "Invalid status value. Allowed values: PENDING, SUCCESS, FAILED",
                 LocalDateTime.now()
         );
+
+        log.error("IllegalArgumentException for request {}: {}", request.getDescription(false), ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
 
@@ -108,11 +122,26 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleListingNotAvailable(ListingNotAvailableException ex, WebRequest request) {
         ErrorResponseDto errorResponse = new ErrorResponseDto(
                 request.getDescription(false).replace("uri=", ""),
-                BAD_REQUEST.value(),
+                CONFLICT.value(),
                 ex.getMessage(),
                 LocalDateTime.now()
         );
-        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+
+        log.error("ListingNotAvailableException for request {}: {}", request.getDescription(false), ex.getMessage(), ex);
+        return new ResponseEntity<>(errorResponse, CONFLICT);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
+                request.getDescription(false).replace("uri=", ""),
+                FORBIDDEN.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        log.error("AccessDeniedException for request {}: {}", request.getDescription(false), ex.getMessage(), ex);
+        return new ResponseEntity<>(errorResponseDto, FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)
@@ -123,6 +152,8 @@ public class GlobalHandlerException extends ResponseEntityExceptionHandler {
                 ex.getMessage(),
                 LocalDateTime.now()
         );
+
+        log.error("Unexpected exception for request {}: {}", request.getDescription(false), ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
 }

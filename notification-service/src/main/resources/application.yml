@@ -64,8 +64,10 @@ management:
 
 event:
   topic:
-    verification: "account-verification"
-    password-reset: "password-reset"
+    notification:
+      send-request: "notification-send-request"
+      verification: "account-verification-request"
+      password-reset: "password-reset-request"
 
 springdoc:
   swagger-ui:

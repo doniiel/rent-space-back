@@ -1,6 +1,7 @@
 package com.rentspace.notificationservice.handler;
 
 import com.rentspace.core.event.AccountVerificationEvent;
+import com.rentspace.core.event.NotificationEvent;
 import com.rentspace.core.event.PasswordResetEvent;
 import com.rentspace.notificationservice.entity.Notifications;
 import com.rentspace.notificationservice.enums.NotificationStatus;
@@ -19,7 +20,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationConsumer {
+public class NotificationHandler {
 
     private final EmailService emailService;
     private final NotificationService notificationService;
@@ -40,6 +41,16 @@ public class NotificationConsumer {
         emailVariables.put("resetCode", extractVerificationCode(event.getMessage()));
 
         processNotification(event.getEmail(), event.getSubject(), "email-password-reset", emailVariables, NotificationType.PASSWORD_RESET);
+    }
+
+    @KafkaListener(topics = "${event.topic.notification.send-request}", groupId = "${spring.kafka.consumer.group-id}")
+    public void handleNotificationEvent(@Payload NotificationEvent event) {
+        String email = "";
+        String subject = "";
+        Map<String, Object> emailVariables = new HashMap<>();
+        emailVariables.put("message", event.getMessage());
+
+        processNotification(email, subject, "general-notification", emailVariables, null);
     }
 
     private void processNotification(String email, String subject, String templateName, Map<String, Object> emailVariables, NotificationType type) {

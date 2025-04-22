@@ -19,12 +19,16 @@ public class ListingHandler {
     private final ListingAvailabilityService listingAvailabilityService;
     private final ListingsService listingsService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+
     @Value("${event.topic.listing.availability.response}")
     private String responseTopic;
 
+    @Value("${event.topic.notification.send-request}")
+    private String notificationSendRequestTopic;
+
     @KafkaListener(topics = "${event.topic.listing.availability.request}", groupId = "${spring.kafka.consumer.group-id}")
     public void handleListingAvailabilityEvent(@Payload ListingAvailabilityEvent event) {
-        log.info("Received listing availability event for booking ID: {}", event.getBookingId());
+        log.info("Received listing availability request for booking ID: {}", event.getBookingId());
 
         boolean isAvailable = listingAvailabilityService.isAvailable(event.getListingId(), event.getStartDate(), event.getEndDate());
 
@@ -32,31 +36,43 @@ public class ListingHandler {
                 .bookingId(event.getBookingId())
                 .listingId(event.getListingId())
                 .status(isAvailable ? ListingStatus.AVAILABLE.name() : ListingStatus.UNAVAILABLE.name())
-                .build();;
-            log.info("Sent listing available response for booking ID: {}", event.getBookingId());
-        }
+                .build();
+        kafkaTemplate.send(responseTopic, event.getBookingId().toString(), response);
+        log.info("Sent listing availability response for booking ID: {}", event.getBookingId());
+    }
 
     @KafkaListener(topics = "${event.topic.listing.availability.block}", groupId = "${spring.kafka.consumer.group-id}")
     public void handleListingBlockEvent(@Payload ListingBlockEvent event) {
-        log.info("Received listing block event for booking ID: {}", event.getBookingId());
+        log.info("Received listing block request for booking ID: {}", event.getBookingId());
         listingAvailabilityService.blockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
         log.info("Successfully blocked availability for listingId={} from {} to {}",
                 event.getListingId(), event.getStartDate(), event.getEndDate());
+        publishNotificationEvent(event.getListingId(), "Listing #" + event.getListingId() + " blocked for booking #" + event.getBookingId());
     }
 
     @KafkaListener(topics = "${event.topic.listing.availability.unblock}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlerListingUnblockEvent(@Payload ListingUnblockEvent event) {
-        log.info("Received listing unblock event for booking ID: {}", event.getBookingId());
-
+        log.info("Received listing unblock request for booking ID: {}", event.getBookingId());
         listingAvailabilityService.unblockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
         log.info("Successfully unblocked availability for listingId={} from {} to {}",
                 event.getListingId(), event.getStartDate(), event.getEndDate());
+        publishNotificationEvent(event.getListingId(), "Listing #" + event.getListingId() + " unblocked for booking #" + event.getBookingId());
     }
 
     @KafkaListener(topics = "${event.topic.listing.rating.updated}", groupId = "${spring.kafka.consumer.group-id}")
-    public void handleReviewUpdated(ReviewEvent event) {
+    public void handleReviewUpdated(@Payload ReviewEvent event) {
         log.info("Received review event for rating update: {}", event);
         listingsService.updateListingRating(event.getListingId(), event.getAverageRating());
         log.info("Updated listing rating for listing ID: {}", event.getListingId());
+        publishNotificationEvent(event.getListingId(), "Listing #" + event.getListingId() + " rating updated to " + event.getAverageRating());
+    }
+
+    private void publishNotificationEvent(Long listingId, String message) {
+        Long userId = listingsService.getListingById(listingId).getUserId();
+        NotificationEvent event = NotificationEvent.builder()
+                .userId(userId)
+                .message(message)
+                .build();
+        kafkaTemplate.send(notificationSendRequestTopic, userId.toString(), event);
     }
 }

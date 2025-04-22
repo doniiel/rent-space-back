@@ -11,6 +11,7 @@ import com.rentspace.bookingservice.repository.BookingRepository;
 import com.rentspace.bookingservice.service.BookingService;
 import com.rentspace.core.event.ListingAvailabilityEvent;
 import com.rentspace.core.event.ListingUnblockEvent;
+import com.rentspace.core.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +39,9 @@ public class BookingServiceImpl implements BookingService {
     @Value("${event.topic.listing.availability.unblock}")
     private String listingUnblockTopic;
 
+    @Value("${event.topic.notification.send-request}")
+    private String notificationSendRequestTopic;
+
     @Override
     @Transactional
     public BookingDto createBooking(CreateBookingRequest request) {
@@ -46,6 +50,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = buildBookingFromRequest(request);
         Booking savedBooking = repository.save(booking);
         publishAvailabilityRequest(savedBooking);
+        publishNotificationEvent(savedBooking, "Booking #" + savedBooking.getId() + " created, awaiting availability confirmation");
         log.info("Booking created with ID: {}", savedBooking.getId());
         return mapper.toDto(savedBooking);
     }
@@ -70,7 +75,7 @@ public class BookingServiceImpl implements BookingService {
     public Page<BookingDto> getAllBookingsByListingId(Long listingId, Pageable pageable) {
         Objects.requireNonNull(listingId, "Listing ID cannot be null");
         Objects.requireNonNull(pageable, "Pageable cannot be null");
-        return repository.findAll(pageable).map(mapper::toDto);
+        return repository.findByListingId(listingId, pageable).map(mapper::toDto); // Исправлено
     }
 
     @Override
@@ -135,5 +140,13 @@ public class BookingServiceImpl implements BookingService {
                 .endDate(booking.getEndDate())
                 .build();
         publisher.publish(listingUnblockTopic, booking.getId(), event, "unblock request");
+    }
+
+    private void publishNotificationEvent(Booking booking, String message) {
+        NotificationEvent event = NotificationEvent.builder()
+                .userId(booking.getUserId())
+                .message(message)
+                .build();
+        publisher.publish(notificationSendRequestTopic, booking.getUserId(), event, "notification send");
     }
 }

@@ -24,6 +24,12 @@ public class BookingHandler {
     @Value("${event.topic.payment.send}")
     private String paymentTopic;
 
+    @Value("${event.topic.listing.availability.block}")
+    private String listingBlockTopic;
+
+    @Value("${event.topic.notification.send-request}")
+    private String notificationSendRequestTopic;
+
     @Transactional
     @KafkaListener(topics = "${event.topic.payment.success}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlerSuccessPaymentEvent(@Payload PaymentSuccessEvent event) {
@@ -43,8 +49,14 @@ public class BookingHandler {
     @KafkaListener(topics = "${event.topic.payment.failure}", groupId = "${spring.kafka.consumer.group-id}")
     public void handlerFailurePaymentEvent(@Payload PaymentFailureEvent event) {
         log.info("Received payment failure event for booking ID: {}", event.getBookingId());
-        service.updateBookingStatus(event.getBookingId(), BookingStatus.CANCELLED);
-        service.cancelBooking(event.getBookingId());
+        try {
+            service.updateBookingStatus(event.getBookingId(), BookingStatus.CANCELLED);
+            BookingDto booking = service.getBookingById(event.getBookingId());
+            service.cancelBooking(event.getBookingId());
+            publishNotificationEvent(booking, "Payment failed for your booking #" + booking.getId());
+         } catch (BookingNotFoundException e) {
+            log.error("Booking not found for payment failure, booking ID: {}", event.getBookingId(), e);
+        }
     }
 
     @Transactional
@@ -62,7 +74,13 @@ public class BookingHandler {
             }
         } else {
             log.warn("Listing is not available. Canceling booking ID: {}", event.getBookingId());
-            service.cancelBooking(event.getBookingId());
+            try {
+                BookingDto booking = service.getBookingById(event.getBookingId());
+                service.cancelBooking(event.getBookingId());
+                publishNotificationEvent(booking, "Booking #" + booking.getId() + " canceled due to listing unavailability");
+            } catch (BookingNotFoundException e) {
+                log.error("Booking not found for availability response, booking ID: {}", event.getBookingId(), e);
+            }
         }
     }
 
@@ -72,6 +90,7 @@ public class BookingHandler {
                 .userId(booking.getUserId())
                 .listingId(booking.getListingId())
                 .totalPrice(booking.getTotalPrice())
+                .currency("USD")
                 .build();
         publisher.publish(paymentTopic, booking.getId(), event, "booking created");
     }
@@ -83,5 +102,14 @@ public class BookingHandler {
                 .startDate(booking.getStartDate())
                 .endDate(booking.getEndDate())
                 .build();
-        publisher.publish(paymentTopic, booking.getId(), event, "listing ");}
+        publisher.publish(listingBlockTopic, booking.getId(), event, "listing ");
+    }
+
+    private void publishNotificationEvent(BookingDto booking, String message) {
+        NotificationEvent event = NotificationEvent.builder()
+                .userId(booking.getUserId())
+                .message(message)
+                .build();
+        publisher.publish(notificationSendRequestTopic, booking.getUserId(), event, "notification send");
+    }
 }

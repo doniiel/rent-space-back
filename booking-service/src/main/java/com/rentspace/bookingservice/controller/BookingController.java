@@ -32,13 +32,13 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    @Operation(summary = "Create a new booking", description = "Creates a new booking based on the provided request")
+    @Operation(summary = "Create a new booking", description = "Creates a new booking based on the provided request. The booking will be in PENDING status until availability is confirmed.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Booking created successfully", content = @Content(schema = @Schema(implementation = BookingDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid booking data"),
             @ApiResponse(responseCode = "409", description = "Booking conflict (e.g., listing unavailable)")
     })
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') and #request.userId == authentication.principal.id")
     @PostMapping
     public ResponseEntity<BookingDto> createBooking(
             @Valid @RequestBody CreateBookingRequest request) {
@@ -53,12 +53,13 @@ public class BookingController {
     @Operation(summary = "Get booking by ID", description = "Retrieves a booking by its unique identifier")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Booking retrieved successfully", content = @Content(schema = @Schema(implementation = BookingDto.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
             @ApiResponse(responseCode = "404", description = "Booking not found")
     })
-    @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER')")
     @GetMapping("/{bookingId}")
     public ResponseEntity<BookingDto> getBookingById(
-            @PathVariable @NotNull Long bookingId) {
+            @PathVariable @NotNull @Min(1) Long bookingId) {
         return ResponseEntity.ok(bookingService.getBookingById(bookingId));
     }
 
@@ -67,7 +68,7 @@ public class BookingController {
             @ApiResponse(responseCode = "200", description = "Bookings retrieved successfully", content = @Content(schema = @Schema(implementation = Page.class))),
             @ApiResponse(responseCode = "400", description = "Invalid user ID")
     })
-    @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN') or #userId == authentication.principal.id")
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<BookingDto>> getBookingsByUserId(
             @PathVariable @NotNull @Parameter(description = "User ID", example = "1") Long userId,
@@ -77,19 +78,20 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getAllBookingsByUserId(userId, pageable));
     }
 
-    @Operation(summary = "Get booking by listing ID", description = "Retrieves a paginated list of bookings for specific user")
+    @Operation(summary = "Get bookings by listing ID", description = "Retrieves a paginated list of bookings for a specific listing")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Bookings retrieved successfully", content = @Content(schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid listing ID")
+            @ApiResponse(responseCode = "400", description = "Invalid listing ID"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
     })
-    @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER')")
     @GetMapping("/listing/{listingId}")
     public ResponseEntity<Page<BookingDto>> getBookingsByListingId(
-            @PathVariable @NotNull Long listingId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @PathVariable @NotNull @Min(1) Long listingId,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(bookingService.getAllBookingsByListingId(listingId,pageable));
+        return ResponseEntity.ok(bookingService.getAllBookingsByListingId(listingId, pageable));
     }
 
     @Operation(summary = "Get all bookings", description = "Retrieves a paginated list of all bookings (admin only)")
@@ -100,8 +102,8 @@ public class BookingController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<Page<BookingDto>> getAllBookings(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(bookingService.getAllBookings(pageable));
     }
@@ -109,12 +111,13 @@ public class BookingController {
     @Operation(summary = "Cancel a booking", description = "Cancels an existing booking by its ID")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Booking cancelled successfully"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
             @ApiResponse(responseCode = "404", description = "Booking not found")
     })
-    @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER')")
     @DeleteMapping("/{bookingId}")
     public ResponseEntity<Void> cancelBooking(
-            @PathVariable @NotNull Long bookingId) {
+            @PathVariable @NotNull @Min(1) Long bookingId) {
         bookingService.cancelBooking(bookingId);
         return ResponseEntity.noContent().build();
     }

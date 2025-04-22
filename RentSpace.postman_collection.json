@@ -481,14 +481,14 @@
 			"name": "Booking",
 			"item": [
 				{
-					"name": "http://localhost:9085/api/v1/booking",
+					"name": "create booking",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ4IiwiaWF0IjoxNzM4NDkzMTQ3LCJleHAiOjE3Mzg0OTY3NDd9.1LqzDnQJBQkAw37rt9atXVy-xx-gDQFFAUW_qhSm4d8",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ1MTY2MzAwLCJleHAiOjE3NDUxNjk5MDAsInJvbGUiOiJVU0VSIn0.CI-SukVxJ9Nv7VeXNe-L0hAdGX28EUD8HvHIBDxtmic",
 									"type": "string"
 								}
 							]
@@ -497,7 +497,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"bookingDetails\" : \"Daniyal stenid sen\"\n}",
+							"raw": "{\n    \"listingId\": 1,\n    \"userId\": 1,\n    \"startDate\": \"2025-10-01T00:00:00\",\n    \"endDate\": \"2025-10-31T23:59:59\",\n    \"totalPrice\": 150.50\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -505,16 +505,175 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9085/api/v1/booking",
+							"raw": "http://localhost:8084/api/v1/bookings",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "9085",
+							"port": "8084",
 							"path": [
 								"api",
 								"v1",
-								"booking"
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all listings booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ1MTY2MzAwLCJleHAiOjE3NDUxNjk5MDAsInJvbGUiOiJVU0VSIn0.CI-SukVxJ9Nv7VeXNe-L0hAdGX28EUD8HvHIBDxtmic",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8084/api/v1/bookings/listing/1?page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"api",
+								"v1",
+								"bookings",
+								"listing",
+								"1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all users booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ1MTY2MzAwLCJleHAiOjE3NDUxNjk5MDAsInJvbGUiOiJVU0VSIn0.CI-SukVxJ9Nv7VeXNe-L0hAdGX28EUD8HvHIBDxtmic",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8084/api/v1/bookings/user/1?page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"api",
+								"v1",
+								"bookings",
+								"user",
+								"1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all bookings",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ1MTY2MzAwLCJleHAiOjE3NDUxNjk5MDAsInJvbGUiOiJVU0VSIn0.CI-SukVxJ9Nv7VeXNe-L0hAdGX28EUD8HvHIBDxtmic",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8084/api/v1/bookings?page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"api",
+								"v1",
+								"bookings"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all bookings Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ1MTY2MzAwLCJleHAiOjE3NDUxNjk5MDAsInJvbGUiOiJVU0VSIn0.CI-SukVxJ9Nv7VeXNe-L0hAdGX28EUD8HvHIBDxtmic",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8084/api/v1/bookings/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"api",
+								"v1",
+								"bookings",
+								"1"
 							]
 						}
 					},
@@ -707,7 +866,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMwMTYwLCJleHAiOjE3NDQ2MzM3NjAsInJvbGUiOiJVU0VSIn0.uXreShAJgP6utdbNq3GFMlquAf804i5GmuQcu7mpY8U",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0OTA0MDI4LCJleHAiOjE3NDQ5MDc2MjgsInJvbGUiOiJVU0VSIn0.d9f2YSvrp1QeiT887PLHzCZfZvkwa1VrX6fCj2wqnmU",
 											"type": "string"
 										}
 									]
@@ -740,7 +899,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMyNjgxLCJleHAiOjE3NDQ2MzYyODEsInJvbGUiOiJVU0VSIn0.UAIdgFOM1F3vRu3HGoGqsdmH3svhjYno13NLV0CJQts",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ1MTY2MzAwLCJleHAiOjE3NDUxNjk5MDAsInJvbGUiOiJVU0VSIn0.CI-SukVxJ9Nv7VeXNe-L0hAdGX28EUD8HvHIBDxtmic",
 											"type": "string"
 										}
 									]
@@ -782,7 +941,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMyNjgxLCJleHAiOjE3NDQ2MzYyODEsInJvbGUiOiJVU0VSIn0.UAIdgFOM1F3vRu3HGoGqsdmH3svhjYno13NLV0CJQts",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NzE5NTAzLCJleHAiOjE3NDQ3MjMxMDMsInJvbGUiOiJVU0VSIn0.qxlg6qusXOf4LqwCXlxTyuX-jHkaMzg9d-HEcrGdTSc",
 											"type": "string"
 										}
 									]
@@ -791,7 +950,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"listingId\": 1,\n  \"startDate\": \"2025-09-15T00:00:00\",\n  \"endDate\": \"2025-10-30T23:59:59\",\n  \"available\": false\n}",
+									"raw": "{\n  \"listingId\": 2,\n  \"startDate\": \"2025-10-15T00:00:00\",\n  \"endDate\": \"2025-11-15T23:59:59\",\n  \"available\": false\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -799,7 +958,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8082/api/v1/listings/1/availability",
+									"raw": "http://localhost:8082/api/v1/listings/1/availability/1",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -810,7 +969,42 @@
 										"v1",
 										"listings",
 										"1",
-										"availability"
+										"availability",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete listing availability",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0ODI3NzQ5LCJleHAiOjE3NDQ4MzEzNDksInJvbGUiOiJVU0VSIn0.Mxzqmt29YwfudmIFPvGdIHa2P5mU-A-W5xLoAHxP9ok",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/api/v1/listings/1/availability/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"listings",
+										"1",
+										"availability",
+										"1"
 									]
 								}
 							},
@@ -827,7 +1021,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMwMTYwLCJleHAiOjE3NDQ2MzM3NjAsInJvbGUiOiJVU0VSIn0.uXreShAJgP6utdbNq3GFMlquAf804i5GmuQcu7mpY8U",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NzE3NTg0LCJleHAiOjE3NDQ3MjExODQsInJvbGUiOiJVU0VSIn0._aroYcyUZpug3778biRfqjTU7Vi6fM0kFmH_oZK8izM",
 											"type": "string"
 										}
 									]
@@ -870,7 +1064,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMwMTYwLCJleHAiOjE3NDQ2MzM3NjAsInJvbGUiOiJVU0VSIn0.uXreShAJgP6utdbNq3GFMlquAf804i5GmuQcu7mpY8U",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NzE3NTg0LCJleHAiOjE3NDQ3MjExODQsInJvbGUiOiJVU0VSIn0._aroYcyUZpug3778biRfqjTU7Vi6fM0kFmH_oZK8izM",
 											"type": "string"
 										}
 									]
@@ -913,7 +1107,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NjMwMTYwLCJleHAiOjE3NDQ2MzM3NjAsInJvbGUiOiJVU0VSIn0.uXreShAJgP6utdbNq3GFMlquAf804i5GmuQcu7mpY8U",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkYW5peWFsIiwiaWF0IjoxNzQ0NzE3NTg0LCJleHAiOjE3NDQ3MjExODQsInJvbGUiOiJVU0VSIn0._aroYcyUZpug3778biRfqjTU7Vi6fM0kFmH_oZK8izM",
 											"type": "string"
 										}
 									]

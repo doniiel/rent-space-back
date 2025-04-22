@@ -60,12 +60,11 @@ event:
         block: "listing-availability-block"
         unblock: "listing-availability-unblock"
     payment:
+      create-request: "payment-create-request"
       success: "payment-success"
       failure: "payment-failure"
-      send: "payment-send"
-
-listing-service:
-  url: http://localhost:8082/api/v1/listings
+    notification:
+      send-request: "notification-send-request"
 
 springdoc:
   swagger-ui:
