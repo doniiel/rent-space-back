@@ -47,7 +47,16 @@ public class ListingHandler {
         listingAvailabilityService.blockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
         log.info("Successfully blocked availability for listingId={} from {} to {}",
                 event.getListingId(), event.getStartDate(), event.getEndDate());
-        publishNotificationEvent(event.getListingId(), "Listing #" + event.getListingId() + " blocked for booking #" + event.getBookingId());
+
+        Long userId = listingsService.getListingById(event.getListingId()).getUserId();
+        ListingNotificationEvent notificationEvent = ListingNotificationEvent.builder()
+                .userId(userId)
+                .listingId(event.getListingId())
+                .message("Listing #" + event.getListingId() + " blocked for booking #" + event.getBookingId())
+                .eventType("listing-blocked")
+                .build();
+
+        kafkaTemplate.send(notificationSendRequestTopic, userId.toString(), notificationEvent);
     }
 
     @KafkaListener(topics = "${event.topic.listing.availability.unblock}", groupId = "${spring.kafka.consumer.group-id}")
@@ -56,7 +65,15 @@ public class ListingHandler {
         listingAvailabilityService.unblockAvailability(event.getListingId(), event.getStartDate(), event.getEndDate());
         log.info("Successfully unblocked availability for listingId={} from {} to {}",
                 event.getListingId(), event.getStartDate(), event.getEndDate());
-        publishNotificationEvent(event.getListingId(), "Listing #" + event.getListingId() + " unblocked for booking #" + event.getBookingId());
+
+        Long userId = listingsService.getListingById(event.getListingId()).getUserId();
+        ListingNotificationEvent notificationEvent = ListingNotificationEvent.builder()
+                .userId(userId)
+                .listingId(event.getListingId())
+                .message("Listing #" + event.getListingId() + " unblocked for booking #" + event.getBookingId())
+                .eventType("listing-unblocked")
+                .build();
+        kafkaTemplate.send(notificationSendRequestTopic, userId.toString(), notificationEvent);
     }
 
     @KafkaListener(topics = "${event.topic.listing.rating.updated}", groupId = "${spring.kafka.consumer.group-id}")
@@ -64,15 +81,14 @@ public class ListingHandler {
         log.info("Received review event for rating update: {}", event);
         listingsService.updateListingRating(event.getListingId(), event.getAverageRating());
         log.info("Updated listing rating for listing ID: {}", event.getListingId());
-        publishNotificationEvent(event.getListingId(), "Listing #" + event.getListingId() + " rating updated to " + event.getAverageRating());
-    }
 
-    private void publishNotificationEvent(Long listingId, String message) {
-        Long userId = listingsService.getListingById(listingId).getUserId();
-        NotificationEvent event = NotificationEvent.builder()
+        Long userId = listingsService.getListingById(event.getListingId()).getUserId();
+        ListingNotificationEvent notificationEvent = ListingNotificationEvent.builder()
                 .userId(userId)
-                .message(message)
+                .listingId(event.getListingId())
+                .message("Listing #" + event.getListingId() + " rating updated to " + event.getAverageRating())
+                .eventType("listing-rating-updated")
                 .build();
-        kafkaTemplate.send(notificationSendRequestTopic, userId.toString(), event);
+        kafkaTemplate.send(notificationSendRequestTopic, userId.toString(), notificationEvent);
     }
 }

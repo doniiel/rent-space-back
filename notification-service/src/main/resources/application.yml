@@ -66,8 +66,9 @@ event:
   topic:
     notification:
       send-request: "notification-send-request"
-      verification: "account-verification-request"
-      password-reset: "password-reset-request"
+      verification: "account-verification"
+      password-reset: "password-reset"
+      listing-request: "listing-notification"
 
 springdoc:
   swagger-ui:

@@ -21,7 +21,7 @@ public class BookingHandler {
     private final BookingService service;
     private final BookingPublisher publisher;
 
-    @Value("${event.topic.payment.send}")
+    @Value("${event.topic.payment.create-request}")
     private String paymentTopic;
 
     @Value("${event.topic.listing.availability.block}")

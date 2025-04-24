@@ -88,3 +88,5 @@ event:
         response: "listing-availability-response"
         block: "listing-availability-block"
         unblock: "listing-availability-unblock"
+    notification:
+      send-request: "listing-notification"

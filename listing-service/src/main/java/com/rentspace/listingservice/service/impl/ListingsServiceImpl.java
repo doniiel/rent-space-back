@@ -1,6 +1,8 @@
 package com.rentspace.listingservice.service.impl;
 
 import com.rentspace.core.event.ListingEvent;
+import com.rentspace.core.event.ListingNotificationEvent;
+import com.rentspace.core.event.NotificationEvent;
 import com.rentspace.listingservice.dto.ListingCreateRequest;
 import com.rentspace.listingservice.dto.ListingDto;
 import com.rentspace.listingservice.dto.ListingUpdateRequest;
@@ -45,6 +47,10 @@ public class ListingsServiceImpl implements ListingsService {
     @Value("${event.topic.listing.deleted}")
     private String listingDeletedTopic;
 
+    @Value("${event.topic.notification.send-request}")
+    private String notificationSendRequestTopic;
+
+
     @Override
     @Transactional
     @Caching(put = {@CachePut(value = "listing", key = "#result.id")},
@@ -60,6 +66,14 @@ public class ListingsServiceImpl implements ListingsService {
         ListingEvent event = createListingEvent(listing, "CREATED");
         kafkaTemplate.send(listingCreatedTopic, listing.getId().toString(), event);
         log.info("Listing created with ID: {} and event sent to topic Kafka: {}", listing.getId(), listingCreatedTopic);
+
+        ListingNotificationEvent notificationEvent = ListingNotificationEvent.builder()
+                .userId(listing.getUserId())
+                .listingId(listing.getId())
+                .message("Listing #" + listing.getTitle() + " created")
+                .eventType("listing-created")
+                .build();
+        kafkaTemplate.send(notificationSendRequestTopic, listing.getUserId().toString(), notificationEvent);
         return listingMapper.toDto(listing);
     }
 
@@ -107,6 +121,14 @@ public class ListingsServiceImpl implements ListingsService {
         ListingEvent event = createListingEvent(listing, "UPDATED");
         kafkaTemplate.send(listingUpdatedTopic, listing.getId().toString(), event);
         log.info("Listing ID: {} updated and event sent to topic Kafka: {}", listingId, listing);
+
+        ListingNotificationEvent notificationEvent = ListingNotificationEvent.builder()
+                .userId(listing.getUserId())
+                .listingId(listing.getId())
+                .message("Listing #" + listing.getTitle() + " updated")
+                .eventType("listing-updated")
+                .build();
+        kafkaTemplate.send(notificationSendRequestTopic, listing.getUserId().toString(), notificationEvent);
         return listingMapper.toDto(listing);
     }
 
@@ -128,6 +150,13 @@ public class ListingsServiceImpl implements ListingsService {
         kafkaTemplate.send(listingDeletedTopic, listingId.toString(), event);
         cacheManager.getCache("userListings").evict(listing.getUserId());
         log.info("Listing ID: {} deleted and event sent to topic Kafka: {}", listingId, listingDeletedTopic);
+
+        ListingNotificationEvent notificationEvent = ListingNotificationEvent.builder()
+                .userId(listing.getUserId())
+                .listingId(listing.getId())
+                .message("Listing #" + listing.getTitle() + " deleted")
+                .eventType("listing-deleted")
+                .build();
     }
 
     @Override
