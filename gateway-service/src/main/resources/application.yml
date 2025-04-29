@@ -13,6 +13,9 @@ spring:
         connect-timeout: 1000
         response-timeout: 10s
 
+jwt:
+  secret-key: ZGlnNF4lXiYqKCo0MjRnZXdnZXdma2Vmfmg4gr25fbg15
+
 management:
   endpoints:
     web:
