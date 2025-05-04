@@ -1,0 +1,121 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build configservice
+        run: |
+          cd config-service
+          mvn clean package -DskipTests
+      - name: Build discoveryservice
+        run: |
+          cd discovery-service
+          mvn clean package -DskipTests
+      - name: Build gatewayservice
+        run: |
+          cd gateway-service
+          mvn clean package -DskipTests
+      - name: Build userservice
+        run: |
+          cd user-service
+          mvn clean package -DskipTests
+      - name: Build listingservice
+        run: |
+          cd listing-service
+          mvn clean package -DskipTests
+      - name: Build notificationservice
+        run: |
+          cd notification-service
+          mvn clean package -DskipTests
+      - name: Build bookingservice
+        run: |
+          cd booking-service
+          mvn clean package -DskipTests
+      - name: Build searchservice
+        run: |
+          cd search-service
+          mvn clean package -DskipTests
+      - name: Build reviewservice
+        run: |
+          cd review-service
+          mvn clean package -DskipTests
+      - name: Build paymentservice
+        run: |
+          cd payment-service
+          mvn clean package -DskipTests
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push configservice
+        run: |
+          docker build -t d0niiel/configservice:latest -t d0niiel/configservice:${{ github.sha }} ./config-service
+          docker push d0niiel/configservice:latest
+          docker push d0niiel/configservice:${{ github.sha }}
+      - name: Build and push discoveryservice
+        run: |
+          docker build -t d0niiel/discoveryservice:latest -t d0niiel/discoveryservice:${{ github.sha }} ./discovery-service
+          docker push d0niiel/discoveryservice:latest
+          docker push d0niiel/discoveryservice:${{ github.sha }}
+      - name: Build and push gatewayservice
+        run: |
+          docker build -t d0niiel/gatewayservice:latest -t d0niiel/gatewayservice:${{ github.sha }} ./gateway-service
+          docker push d0niiel/gatewayservice:latest
+          docker push d0niiel/gatewayservice:${{ github.sha }}
+      - name: Build and push userservice
+        run: |
+          docker build -t d0niiel/userservice:latest -t d0niiel/userservice:${{ github.sha }} ./user-service
+          docker push d0niiel/userservice:latest
+          docker push d0niiel/userservice:${{ github.sha }}
+      - name: Build and push listingservice
+        run: |
+          docker build -t d0niiel/listingservice:latest -t d0niiel/listingservice:${{ github.sha }} ./listing-service
+          docker push d0niiel/listingservice:latest
+          docker push d0niiel/listingservice:${{ github.sha }}
+      - name: Build and push notificationservice
+        run: |
+          docker build -t d0niiel/notificationservice:latest -t d0niiel/notificationservice:${{ github.sha }} ./notification-service
+          docker push d0niiel/notificationservice:latest
+          docker push d0niiel/notificationservice:${{ github.sha }}
+      - name: Build and push bookingservice
+        run: |
+          docker build -t d0niiel/bookingservice:latest -t d0niiel/bookingservice:${{ github.sha }} ./booking-service
+          docker push d0niiel/bookingservice:latest
+          docker push d0niiel/bookingservice:${{ github.sha }}
+      - name: Build and push searchservice
+        run: |
+          docker build -t d0niiel/searchservice:latest -t d0niiel/searchservice:${{ github.sha }} ./search-service
+          docker push d0niiel/searchservice:latest
+          docker push d0niiel/searchservice:${{ github.sha }}
+      - name: Build and push reviewservice
+        run: |
+          docker build -t d0niiel/reviewservice:latest -t d0niiel/reviewservice:${{ github.sha }} ./review-service
+          docker push d0niiel/reviewservice:latest
+          docker push d0niiel/reviewservice:${{ github.sha }}
+      - name: Build and push paymentservice
+        run: |
+          docker build -t d0niiel/paymentservice:latest -t d0niiel/paymentservice:${{ github.sha }} ./payment-service
+          docker push d0niiel/paymentservice:latest
+          docker push d0niiel/paymentservice:${{ github.sha }}

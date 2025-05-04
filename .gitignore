@@ -32,6 +32,28 @@ build/
 ### VS Code ###
 .vscode/
 
+# Build artifacts
 target/
+*.jar
+*.log
 .idea/
+
+# Docker and data
+postgres_db_data/
+observability/*/data/
 .env
+
+# Maven/Gradle
+.mvn/
+.nb-gradle/
+build/
+dist/
+nbbuild/
+nbdist/
+nbproject/private/
+
+# Keep source and test directories
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
